@@ -1,5 +1,5 @@
 <div>
     <p *ngFor="let prediction of predictions">
-        {{ prediction.minutes }}
+        {{ this.formatTimeToWait(prediction.minutes, prediction.seconds) }}
     </p>
 </div>
