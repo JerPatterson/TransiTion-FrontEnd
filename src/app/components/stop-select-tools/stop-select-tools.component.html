@@ -1,4 +1,4 @@
 <div>
-    <app-route-list></app-route-list>
-    <app-stop-list></app-stop-list>
+    <app-route-list (newRouteTag)="this.onNewRouteTag($event)"></app-route-list>
+    <app-stop-list [routeTag]="this.routeTag"></app-stop-list>
 </div>

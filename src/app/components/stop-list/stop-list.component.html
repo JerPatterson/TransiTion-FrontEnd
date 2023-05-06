@@ -1,4 +1,4 @@
-<select id="stop-list">
+<select id="stop-list" *ngIf="stops.length > 0">
     <option *ngFor="let stop of stops">
         {{ stop.tag }} - {{ stop.title }}
     </option>

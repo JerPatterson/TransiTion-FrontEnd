@@ -6,5 +6,13 @@ import { Component } from '@angular/core';
     styleUrls: ['./stop-select-tools.component.css']
 })
 export class StopSelectToolsComponent {
-    constructor() {}
+    routeTag: string;
+
+    constructor() {
+        this.routeTag = '';
+    }
+
+    onNewRouteTag(tag: string) {
+        this.routeTag = tag;
+    }
 }
