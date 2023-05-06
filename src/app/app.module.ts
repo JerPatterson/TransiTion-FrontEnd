@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { RouteListComponent } from './components/route-list/route-list.component';
+import { RouteListComponent } from './components/route-list.component';
 
 @NgModule({
     declarations: [
