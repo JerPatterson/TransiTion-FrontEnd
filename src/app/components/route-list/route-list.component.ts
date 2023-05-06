@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Route } from '../interfaces/real-time-communications';
-import { RealTimeDataService } from '../services/real-time-data.service';
+import { Route } from '../../interfaces/real-time-communications';
+import { RealTimeDataService } from '../../services/real-time-data.service';
 
 @Component({
-    selector: 'route-list',
+    selector: 'app-route-list',
     templateUrl: './route-list.component.html',
     styleUrls: ['./route-list.component.css']
 })

@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { RouteListComponent } from './components/route-list.component';
+import { RouteListComponent } from './components/route-list/route-list.component';
+import { StopListComponent } from './components/stop-list/stop-list.component';
 
 @NgModule({
     declarations: [
-        RouteListComponent
+        RouteListComponent,
+        StopListComponent
     ],
     imports: [
         BrowserModule

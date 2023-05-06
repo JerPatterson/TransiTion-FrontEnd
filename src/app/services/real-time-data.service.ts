@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
-import { Agency, Route } from '../interfaces/real-time-communications';
+import { Agency, Route, Stop } from '../interfaces/real-time-communications';
 
 @Injectable({
     providedIn: 'root'
@@ -51,11 +51,43 @@ export class RealTimeDataService {
         return routeList;
     }
 
+    getStopList(routeTag: string): Stop[] {
+        const stopList: Stop[] = [];
+
+        fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'routeConfig'), ['a', 'r'], [this.agency, routeTag])).then((res) => {
+            return res.text();
+        }).then((xmlString) => {
+            const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
+            const stops = xmlDocument.querySelectorAll('stop');
+
+            stops.forEach((stop) => {
+                const tag =  stop.getAttribute('tag');
+                const title = stop.getAttribute('title');
+                const location = {
+                    latitude: Number(stop.getAttribute('lat')),
+                    longitude: Number(stop.getAttribute('lon')),
+                }
+                if (tag && title) {
+                    stopList.push({ tag, title, location })
+                }
+            });
+        });
+
+        return stopList;
+    }
+
     private addCommandToURL(url: string, commandName: string): string {
         return url + 'command=' + commandName;
     }
 
-    private addParameterToURL(url: string, paramName: string, param: string) {
+    private addParameterToURL(url: string, paramName: string, param: string): string {
         return url + '&' + paramName + '=' + param;
+    }
+
+    private addParametersToURL(url: string, paramNames: string[], param: string[]): string {
+        if (paramNames.length === param.length)
+            paramNames.forEach((paramName, index) => url += '&' + paramName + '=' + param[index]);
+
+        return url;
     }
 }
