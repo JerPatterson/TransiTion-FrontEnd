@@ -1,4 +1,6 @@
-<div>
+<div style="display: flex; flex-direction: row; gap: 10px;">
     <app-route-list (newRouteTag)="this.onNewRouteTag($event)"></app-route-list>
-    <app-stop-list [routeTag]="this.routeTag"></app-stop-list>
+    <app-stop-list (newStopTag)="this.onNewStopTag($event)" [routeTag]="this.routeTag"></app-stop-list>
 </div>
+
+<app-schedule [routeTag]="this.routeTag" [stopId]="this.stopTag"></app-schedule>

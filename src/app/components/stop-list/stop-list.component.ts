@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { Stop } from '../../interfaces/real-time-communications';
 import { RealTimeDataService } from '../../services/real-time-data.service';
 
@@ -9,11 +9,13 @@ import { RealTimeDataService } from '../../services/real-time-data.service';
 })
 export class StopListComponent implements OnChanges {
     @Input() routeTag: string;
+    @Output() newStopTag: EventEmitter<string>;
 
     stops: Stop[];
     
     constructor(private rtDataService: RealTimeDataService) {
         this.routeTag = '';
+        this.newStopTag = new EventEmitter<string>();
         this.stops = [];
     }
 
@@ -23,5 +25,10 @@ export class StopListComponent implements OnChanges {
 
     getStopList(): void {
         this.stops = this.rtDataService.getStopList(this.routeTag);
+    }
+
+    stopChange(event: Event): void {
+        const tag = (event.target as any).value;
+        if (tag) this.newStopTag.emit(tag);
     }
 }

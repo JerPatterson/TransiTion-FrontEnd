@@ -7,12 +7,18 @@ import { Component } from '@angular/core';
 })
 export class StopSelectToolsComponent {
     routeTag: string;
+    stopTag: string;
 
     constructor() {
         this.routeTag = '';
+        this.stopTag = ''
     }
 
-    onNewRouteTag(tag: string) {
+    onNewRouteTag(tag: string): void {
         this.routeTag = tag;
+    }
+
+    onNewStopTag(tag: string): void {
+        this.stopTag = tag;
     }
 }

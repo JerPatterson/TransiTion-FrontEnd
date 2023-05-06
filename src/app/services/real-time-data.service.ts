@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
-import { Agency, Route, Stop } from '../interfaces/real-time-communications';
+import { Agency, Prediction, Route, Stop } from '../interfaces/real-time-communications';
 
 @Injectable({
     providedIn: 'root'
@@ -74,6 +74,27 @@ export class RealTimeDataService {
         });
 
         return stopList;
+    }
+
+    getPredictionList(routeTag: string, stopId: string): Prediction[] {
+        const predictionList: Prediction[] = [];
+
+        fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopId, routeTag])).then((res) => {
+            return res.text();
+        }).then((xmlString) => {
+            const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
+            const predictions = xmlDocument.querySelectorAll('prediction');
+
+            predictions.forEach((prediction) => {
+                const seconds = Number(prediction.getAttribute('seconds'));
+                const minutes = Number(prediction.getAttribute('minutes'));
+                const epochTime = Number(prediction.getAttribute('epochTime'));
+                const isDeparture = Boolean(prediction.getAttribute('isDeparture'));
+                predictionList.push({ seconds, minutes, epochTime, isDeparture });
+            });
+        });
+
+        return predictionList;
     }
 
     private addCommandToURL(url: string, commandName: string): string {

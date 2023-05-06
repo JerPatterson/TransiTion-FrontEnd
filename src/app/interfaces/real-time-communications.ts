@@ -19,3 +19,10 @@ export interface Stop {
     title: string;
     location: Location;
 }
+
+export interface Prediction {
+    seconds: number;
+    minutes: number;
+    epochTime: number;
+    isDeparture: boolean;
+}
