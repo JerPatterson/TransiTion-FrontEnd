@@ -1,5 +1,5 @@
-<div id="stop-list">
-    <p *ngFor="let stop of stops">
-        {{ stop.title }}
-    </p>
-</div>
+<select id="stop-list">
+    <option *ngFor="let stop of stops">
+        {{ stop.tag }} - {{ stop.title }}
+    </option>
+</select>

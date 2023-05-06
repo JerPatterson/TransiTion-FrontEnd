@@ -1,8 +1,5 @@
-<div id="route-list">
-    <div>
-        <p *ngFor="let route of routes">
-            {{route.tag}} - {{route.title}}
-        </p>
-    </div>
-    <app-stop-list></app-stop-list>
-</div>
+<select id="route-list">
+    <option *ngFor="let route of routes">
+        {{route.title}}
+    </option>
+</select>
