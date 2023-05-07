@@ -13,22 +13,23 @@ export class StopListComponent implements OnChanges {
 
     stops: Stop[];
     
-    constructor(private rtDataService: RealTimeDataService) {
+    constructor(private readonly rtDataService: RealTimeDataService) {
         this.routeTag = '';
         this.newStopTag = new EventEmitter<string>();
         this.stops = [];
     }
 
-    ngOnChanges() {
-        this.getStopList();
+    async ngOnChanges() {
+        await this.getStopList();
+        this.newStopTag.emit(this.stops.length > 0 ? this.stops[0].tag : '');
     }
 
-    getStopList(): void {
-        this.stops = this.rtDataService.getStopList(this.routeTag);
+    async getStopList(): Promise<void> {
+        this.stops = await this.rtDataService.getStopList(this.routeTag);
     }
 
     stopChange(event: Event): void {
-        const tag = (event.target as any).value;
-        if (tag) this.newStopTag.emit(tag);
+        const stopTag = (event.target as any).value;
+        if (stopTag) this.newStopTag.emit(stopTag);
     }
 }

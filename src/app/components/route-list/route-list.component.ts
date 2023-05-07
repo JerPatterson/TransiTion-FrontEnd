@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { Route } from '../../interfaces/real-time-communications';
 import { RealTimeDataService } from '../../services/real-time-data.service';
 
@@ -7,18 +7,22 @@ import { RealTimeDataService } from '../../services/real-time-data.service';
     templateUrl: './route-list.component.html',
     styleUrls: ['./route-list.component.css']
 })
-export class RouteListComponent {
+export class RouteListComponent implements AfterViewInit {
     @Output() newRouteTag: EventEmitter<string>;
 
     routes: Route[];
 
-    constructor(rtDataService: RealTimeDataService) {
+    constructor(private readonly rtDataService: RealTimeDataService) {
         this.newRouteTag = new EventEmitter<string>();
-        this.routes = rtDataService.getRouteList();
+        this.routes = [];
+    }
+
+    async ngAfterViewInit(): Promise<void> {
+        this.routes = await this.rtDataService.getRouteList();
     }
 
     routeChange(event: Event): void {
-        const tag = (event.target as any).value;
-        if (tag) this.newRouteTag.emit(tag);
+        const routeTag = (event.target as any).value;
+        if (routeTag) this.newRouteTag.emit(routeTag);
     }
 }

@@ -8,10 +8,10 @@ import { Agency, Prediction, Route, Stop } from '../interfaces/real-time-communi
 export class RealTimeDataService {
     private agency = 'stl'
 
-    getAgencyList(): Agency[] {
+    async getAgencyList(): Promise<Agency[]> {
         const agencyList: Agency[] = [];
 
-        fetch(this.addCommandToURL(realTimeDataAPI, 'agencyList')).then((res) => {
+        await fetch(this.addCommandToURL(realTimeDataAPI, 'agencyList')).then((res) => {
             return res.text();
         }).then((xmlString) => {
             const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
@@ -30,10 +30,10 @@ export class RealTimeDataService {
         return agencyList;
     }
 
-    getRouteList(): Route[] {
+    async getRouteList(): Promise<Route[]> {
         const routeList: Route[] = [];
 
-        fetch(this.addParameterToURL(this.addCommandToURL(realTimeDataAPI, 'routeList'), 'a', this.agency)).then((res) => {
+        await fetch(this.addParameterToURL(this.addCommandToURL(realTimeDataAPI, 'routeList'), 'a', this.agency)).then((res) => {
             return res.text();
         }).then((xmlString) => {
             const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
@@ -51,10 +51,10 @@ export class RealTimeDataService {
         return routeList;
     }
 
-    getStopList(routeTag: string): Stop[] {
+    async getStopList(routeTag: string): Promise<Stop[]> {
         const stopList: Stop[] = [];
 
-        fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'routeConfig'), ['a', 'r'], [this.agency, routeTag])).then((res) => {
+        await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'routeConfig'), ['a', 'r'], [this.agency, routeTag])).then((res) => {
             return res.text();
         }).then((xmlString) => {
             const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
@@ -76,10 +76,10 @@ export class RealTimeDataService {
         return stopList;
     }
 
-    getPredictionList(routeTag: string, stopId: string): Prediction[] {
+    async getPredictionList(routeTag: string, stopId: string): Promise<Prediction[]> {
         const predictionList: Prediction[] = [];
 
-        fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopId, routeTag])).then((res) => {
+        await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopId, routeTag])).then((res) => {
             return res.text();
         }).then((xmlString) => {
             const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');

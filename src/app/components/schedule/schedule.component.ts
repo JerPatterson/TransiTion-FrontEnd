@@ -9,13 +9,13 @@ import { RealTimeDataService } from 'src/app/services/real-time-data.service';
 })
 export class ScheduleComponent {
     @Input() routeTag: string;
-    @Input() stopId: string;
+    @Input() stopTag: string;
 
     predictions: Prediction[];
     
-    constructor(private rtDataService: RealTimeDataService) {
+    constructor(private readonly rtDataService: RealTimeDataService) {
         this.routeTag = '';
-        this.stopId = '';
+        this.stopTag = '';
         this.predictions = [];
     }
 
@@ -23,15 +23,22 @@ export class ScheduleComponent {
         this.getPredictionList();
     }
 
-    getPredictionList(): void {
-        this.predictions = this.rtDataService.getPredictionList(this.routeTag, this.stopId);
+    async getPredictionList(): Promise<void> {
+        if (this.routeTag && this.stopTag) {
+            this.predictions = await this.rtDataService.getPredictionList(
+                this.routeTag, 
+                this.stopTag.includes('CP') ? this.stopTag.slice(2) : this.stopTag
+            );
+        } else {
+            this.predictions = [];
+        }
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
         const TIME_FACTOR = 60;
     
         let stringContent = '';
-        if (minutes > TIME_FACTOR)
+        if (minutes >= TIME_FACTOR)
             stringContent += `${Math.floor(minutes / TIME_FACTOR)}hr `;
         stringContent += `${this.convertToTwoDigit(minutes % TIME_FACTOR)}min `;
         stringContent += `${this.convertToTwoDigit(seconds - minutes * TIME_FACTOR)}sec`
