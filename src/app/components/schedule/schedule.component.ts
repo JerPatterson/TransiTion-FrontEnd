@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Prediction } from 'src/app/interfaces/real-time-communications';
+import { Time } from 'src/app/interfaces/real-time-communications';
 import { RealTimeDataService } from 'src/app/services/real-time-data.service';
+import { StaticDataService } from 'src/app/services/static-data.service';
 
 @Component({
     selector: 'app-schedule',
@@ -11,27 +12,31 @@ export class ScheduleComponent {
     @Input() routeTag: string;
     @Input() stopTag: string;
 
-    predictions: Prediction[];
+    times: Time[];
+    expectedTimes: Time[];
     
-    constructor(private readonly rtDataService: RealTimeDataService) {
+    constructor(private readonly rtDataService: RealTimeDataService, private readonly stDataService: StaticDataService) {
         this.routeTag = '';
         this.stopTag = '';
-        this.predictions = [];
+        this.times = [];
+        this.expectedTimes = [];
     }
 
-    ngOnChanges() {
-        this.getPredictionList();
+    async ngOnChanges() {
+        if (!this.routeTag || !this.stopTag) return;
+        this.getTimeList();
+        this.getTimeExpectedList();
     }
 
-    async getPredictionList(): Promise<void> {
-        if (this.routeTag && this.stopTag) {
-            this.predictions = await this.rtDataService.getPredictionList(
-                this.routeTag, 
-                this.stopTag.includes('CP') ? this.stopTag.slice(2) : this.stopTag
-            );
-        } else {
-            this.predictions = [];
-        }
+    async getTimeList(): Promise<void> {
+        this.times = await this.rtDataService.getTimeList(
+            this.routeTag, 
+            this.stopTag.includes('CP') ? this.stopTag.slice(2) : this.stopTag
+        );
+    }
+
+    async getTimeExpectedList() {
+        this.expectedTimes = await this.stDataService.getTimeExpectedList(this.routeTag, this.stopTag);
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

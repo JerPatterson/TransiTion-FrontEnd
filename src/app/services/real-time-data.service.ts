@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
-import { Agency, Prediction, Route, Stop } from '../interfaces/real-time-communications';
+import { Agency, Time, Route, Stop } from '../interfaces/real-time-communications';
 
 @Injectable({
     providedIn: 'root'
@@ -76,25 +76,25 @@ export class RealTimeDataService {
         return stopList;
     }
 
-    async getPredictionList(routeTag: string, stopId: string): Promise<Prediction[]> {
-        const predictionList: Prediction[] = [];
+    async getTimeList(routeTag: string, stopTag: string): Promise<Time[]> {
+        const timeList: Time[] = [];
 
-        await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopId, routeTag])).then((res) => {
+        await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopTag, routeTag])).then((res) => {
             return res.text();
         }).then((xmlString) => {
             const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
-            const predictions = xmlDocument.querySelectorAll('prediction');
+            const times = xmlDocument.querySelectorAll('prediction');
 
-            predictions.forEach((prediction) => {
-                const seconds = Number(prediction.getAttribute('seconds'));
-                const minutes = Number(prediction.getAttribute('minutes'));
-                const epochTime = Number(prediction.getAttribute('epochTime'));
-                const isDeparture = Boolean(prediction.getAttribute('isDeparture'));
-                predictionList.push({ seconds, minutes, epochTime, isDeparture });
+            times.forEach((time) => {
+                const seconds = Number(time.getAttribute('seconds'));
+                const minutes = Number(time.getAttribute('minutes'));
+                const epochTime = Number(time.getAttribute('epochTime'));
+                const isDeparture = Boolean(time.getAttribute('isDeparture'));
+                timeList.push({ seconds, minutes, epochTime, isDeparture });
             });
         });
 
-        return predictionList;
+        return timeList;
     }
 
     private addCommandToURL(url: string, commandName: string): string {

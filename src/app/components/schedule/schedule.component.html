@@ -1,5 +1,14 @@
-<div>
-    <p *ngFor="let prediction of predictions">
-        {{ this.formatTimeToWait(prediction.minutes, prediction.seconds) }}
-    </p>
+<div style="display: flex; flex-direction: row; gap: 10px;">
+    <div>
+        <p>Passages en temps réel</p>
+        <p *ngFor="let time of times">
+            {{ this.formatTimeToWait(time.minutes, time.seconds) }}
+        </p>
+    </div>
+    <div>
+        <p>Passages planifiés</p>
+        <p *ngFor="let expectedTime of expectedTimes">
+            {{ this.formatTimeToWait(expectedTime.minutes, expectedTime.seconds) }}
+        </p>
+    </div>
 </div>
