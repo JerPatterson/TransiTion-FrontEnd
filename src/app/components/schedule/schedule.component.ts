@@ -48,8 +48,10 @@ export class ScheduleComponent {
         let stringContent = '';
         if (minutes >= ONE_HOUR_IN_MIN)
             stringContent += `${Math.floor(minutes / ONE_HOUR_IN_MIN)}hr `;
-        stringContent += `${this.convertToTwoDigit(minutes % ONE_HOUR_IN_MIN)}min `;
-        stringContent += `${this.convertToTwoDigit(seconds - minutes * ONE_MINUTE_IN_SEC)}sec`
+        const waitMin = minutes % ONE_HOUR_IN_MIN;
+        const waitSec = seconds - minutes * ONE_MINUTE_IN_SEC;
+        stringContent += `${this.convertToTwoDigit(waitSec < 0 ? waitMin - 1 : waitMin)}min `;
+        stringContent += `${this.convertToTwoDigit(waitSec < 0 ? ONE_MINUTE_IN_SEC + waitSec : waitSec)}sec`
 
         return stringContent;
     }

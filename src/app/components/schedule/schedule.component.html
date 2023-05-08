@@ -13,4 +13,30 @@
             {{ this.formatTimeToWait(expectedTime.minutesAhead, expectedTime.secondsAhead) }}
         </p>
     </div>
+    <div>
+        <p *ngIf="times.length === 1">État du passage</p>
+        <p *ngIf="times.length > 1">État des passage</p>
+        <p *ngFor="let time of times, let i = index">
+            <span *ngIf="expectedTimes.length > i">
+                <span *ngIf="time.secondsAhead - expectedTimes[i].secondsAhead > -15
+                    && time.secondsAhead - expectedTimes[i].secondsAhead < 15">
+                    À l'heure
+                </span>
+                <span *ngIf="time.secondsAhead - expectedTimes[i].secondsAhead < -15">
+                    En avance de {{ this.formatTimeToWait(
+                        expectedTimes[i].minutesAhead - time.minutesAhead,
+                        expectedTimes[i].secondsAhead - time.secondsAhead
+                    ) 
+                    }}
+                </span>
+                <span *ngIf="time.secondsAhead - expectedTimes[i].secondsAhead > 15">
+                    En retard de {{ this.formatTimeToWait(
+                        time.minutesAhead - expectedTimes[i].minutesAhead,
+                        time.secondsAhead - expectedTimes[i].secondsAhead
+                    ) 
+                    }}
+                </span>
+            </span>
+        </p>
+    </div>
 </div>
