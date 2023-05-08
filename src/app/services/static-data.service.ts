@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Time } from '../interfaces/transit-concept'
 import { Calendar, stStop, stTime, stTrip } from '../interfaces/static-time-communication';
-import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '../constants/time';
 import { Day } from '../enums/day';
-
+import { VALUE_DELIMITER, LINE_DELIMITER } from '../constants/csv';
+import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '../constants/time';
 
 @Injectable({
     providedIn: 'root'
@@ -40,15 +40,18 @@ export class StaticDataService {
     }
 
     async getTimeListFromRoute(routeTag: string): Promise<Time[]> {
+        const now = Date.now();
         return (await this.getStaticTimeListFromRoute(routeTag))
             .map(trip => {
                 const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
                 return { 
-                    epochTime: Date.now() + timeAhead,
+                    epochTime: now + timeAhead,
                     secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
                     minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
                 } 
-            });
+            })
+            .filter(time => time.epochTime > now)
+            .sort((a, b) => a.epochTime - b.epochTime);
     }
 
     private async getStaticTimeListFromRouteStop(routeTag: string, stopTag: string): Promise<stTime[]> {
@@ -65,7 +68,6 @@ export class StaticDataService {
 
     private async getTripListFromRoute(routeTag: string, day: number): Promise<stTrip[]> {
         const serviceIds = this.getServiceIdsFromDay(day);
-        console.log(serviceIds);
         return this.trips.filter(trip => trip.route_id?.includes(routeTag) && serviceIds.includes(trip.service_id));
     }
 
@@ -81,21 +83,22 @@ export class StaticDataService {
     }
 
     private getServiceIdsFromDay(dayOfTheWeek: number): string[] {
+        const ACTIVE = '1';
         switch (dayOfTheWeek) {
             case Day.Sunday:
-                return this.calendar.filter(column => column.sunday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.sunday === ACTIVE).map(row => row.service_id);
             case Day.Monday:
-                return this.calendar.filter(column => column.monday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.monday === ACTIVE).map(row => row.service_id);
             case Day.Tuesday:
-                return this.calendar.filter(column => column.tuesday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.tuesday === ACTIVE).map(row => row.service_id);
             case Day.Wednesday:
-                return this.calendar.filter(column => column.wednesday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.wednesday === ACTIVE).map(row => row.service_id);
             case Day.Thursday:
-                return this.calendar.filter(column => column.thursday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.thursday === ACTIVE).map(row => row.service_id);
             case Day.Friday:
-                return this.calendar.filter(column => column.friday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.friday === ACTIVE).map(row => row.service_id);
             case Day.Saturday:
-                return this.calendar.filter(column => column.saturday === '1').map(row => row.service_id);
+                return this.calendar.filter(column => column.saturday === ACTIVE).map(row => row.service_id);
             default:
                 return [];
         }
@@ -125,9 +128,6 @@ export class StaticDataService {
     }
 
     private async readFile(path: string): Promise<Object[]> {
-        const VALUE_DELIMITER = ',';
-        const LINE_DELIMITER = '\r\n';
-
         const content = await fetch(path).then((res) => res.text());
         const parameters = content.split(LINE_DELIMITER, 1)[0].split(VALUE_DELIMITER);
 
