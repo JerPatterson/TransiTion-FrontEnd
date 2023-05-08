@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Time } from 'src/app/interfaces/real-time-communications';
+import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from 'src/app/constants/time';
 import { RealTimeDataService } from 'src/app/services/real-time-data.service';
 import { StaticDataService } from 'src/app/services/static-data.service';
 
@@ -40,13 +41,11 @@ export class ScheduleComponent {
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
-        const TIME_FACTOR = 60;
-    
         let stringContent = '';
-        if (minutes >= TIME_FACTOR)
-            stringContent += `${Math.floor(minutes / TIME_FACTOR)}hr `;
-        stringContent += `${this.convertToTwoDigit(minutes % TIME_FACTOR)}min `;
-        stringContent += `${this.convertToTwoDigit(seconds - minutes * TIME_FACTOR)}sec`
+        if (minutes >= ONE_HOUR_IN_MIN)
+            stringContent += `${Math.floor(minutes / ONE_HOUR_IN_MIN)}hr `;
+        stringContent += `${this.convertToTwoDigit(minutes % ONE_HOUR_IN_MIN)}min `;
+        stringContent += `${this.convertToTwoDigit(seconds - minutes * ONE_MINUTE_IN_SEC)}sec`
 
         return stringContent;
     }

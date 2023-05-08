@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Time, StaticTime } from '../interfaces/real-time-communications';
+import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '../constants/time';
 
 @Injectable({
     providedIn: 'root'
@@ -19,19 +20,16 @@ export class StaticDataService {
                 const value = this.getTimeToWaitInMS(time.arrival_time);
                 return {
                     epochTime: value,
-                    minutes: Math.floor(value / (60 * 1000)),
-                    seconds:  Math.floor(value / (1000)),
+                    minutes: Math.floor(value / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                    seconds:  Math.floor(value / (ONE_SEC_IN_MS)),
                     isDeparture: false,
                 }
             });
     }
 
     private getTimeToWaitInMS(time: string): number {
-        const TIME_FACTOR = 60;
-        const ONE_SEC_IN_MS = 1000;
         const [hours, minutes, _] = time.split(':');
-        console.log(hours, minutes, _);
-        return (Number(hours) * TIME_FACTOR + Number(minutes)) * TIME_FACTOR * ONE_SEC_IN_MS;
+        return (Number(hours) * ONE_HOUR_IN_MIN + Number(minutes)) * ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS;
     } 
 
     private async readStopTimesFile(): Promise<void> {

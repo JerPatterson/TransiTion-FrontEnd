@@ -1,12 +1,14 @@
 <div style="display: flex; flex-direction: row; gap: 10px;">
     <div>
-        <p>Passages en temps réel</p>
+        <p *ngIf="times.length === 1">Passage en temps réel</p>
+        <p *ngIf="times.length > 1">Passages en temps réel</p>
         <p *ngFor="let time of times">
             {{ this.formatTimeToWait(time.minutes, time.seconds) }}
         </p>
     </div>
     <div>
-        <p>Passages planifiés</p>
+        <p *ngIf="expectedTimes.length === 1">Passage planifié</p>
+        <p *ngIf="expectedTimes.length > 1">Passages planifiés</p>
         <p *ngFor="let expectedTime of expectedTimes">
             {{ this.formatTimeToWait(expectedTime.minutes, expectedTime.seconds) }}
         </p>
