@@ -3,14 +3,14 @@
         <p *ngIf="times.length === 1">Passage en temps réel</p>
         <p *ngIf="times.length > 1">Passages en temps réel</p>
         <p *ngFor="let time of times">
-            {{ this.formatTimeToWait(time.minutes, time.seconds) }}
+            {{ this.formatTimeToWait(time.minutesAhead, time.secondsAhead) }}
         </p>
     </div>
     <div>
         <p *ngIf="expectedTimes.length === 1">Passage planifié</p>
         <p *ngIf="expectedTimes.length > 1">Passages planifiés</p>
         <p *ngFor="let expectedTime of expectedTimes">
-            {{ this.formatTimeToWait(expectedTime.minutes, expectedTime.seconds) }}
+            {{ this.formatTimeToWait(expectedTime.minutesAhead, expectedTime.secondsAhead) }}
         </p>
     </div>
 </div>

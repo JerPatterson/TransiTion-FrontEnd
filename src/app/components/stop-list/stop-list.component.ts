@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { Stop } from '../../interfaces/real-time-communications';
+import { rtStop } from '../../interfaces/real-time-communications';
 import { RealTimeDataService } from '../../services/real-time-data.service';
 
 @Component({
@@ -11,7 +11,7 @@ export class StopListComponent implements OnChanges {
     @Input() routeTag: string;
     @Output() newStopTag: EventEmitter<string>;
 
-    stops: Stop[];
+    stops: rtStop[];
     
     constructor(private readonly rtDataService: RealTimeDataService) {
         this.routeTag = '';

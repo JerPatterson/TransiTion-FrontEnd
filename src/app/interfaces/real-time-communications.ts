@@ -6,18 +6,18 @@ export interface Agency {
     regionTitle: string | null;
 }
 
-export interface Route {
+export interface rtRoute {
     tag: string;
     title: string;
 }
 
-export interface Stop {
+export interface rtStop {
     tag: string;
     title: string;
     location: Location;
 }
 
-export interface Time {
+export interface rtTime {
     seconds: number;
     minutes: number;
     epochTime: number;

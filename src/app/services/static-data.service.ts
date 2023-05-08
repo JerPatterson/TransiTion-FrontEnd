@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Time } from '../interfaces/real-time-communications';
-import { StaticStop, StaticTime, StaticTrip } from '../interfaces/static-time-communication';
-import { ScheduleType } from '../enums/static-data';
+import { Time } from '../interfaces/transit-concept'
+import { Calendar, stStop, stTime, stTrip } from '../interfaces/static-time-communication';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '../constants/time';
+import { Day } from '../enums/day';
+
 
 @Injectable({
     providedIn: 'root'
@@ -10,55 +11,117 @@ import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '../constants/
 export class StaticDataService {
     private agency = 'stl'
 
-    private trips: StaticTrip[];
-    private stops: StaticStop[];
-    private times: StaticTime[];
+    private calendar: Calendar[];
+    private trips: stTrip[];
+    private stops: stStop[];
+    private times: stTime[];
 
     constructor() {
+        this.calendar = [];
         this.trips = [];
         this.stops = [];
         this.times = [];
         this.initLists();
     }
 
-    async getTimeExpectedList(routeTag: string, stopTag: string): Promise<Time[]> {
-        return this.getTimeScheduleList(routeTag, stopTag, ScheduleType.Week);
+    async getTimeListFromRouteStop(routeTag: string, stopTag: string): Promise<Time[]> {
+        const now = Date.now();
+        return (await this.getStaticTimeListFromRouteStop(routeTag, stopTag))
+            .map(trip => {
+                const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
+                return { 
+                    epochTime: now + timeAhead,
+                    secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
+                    minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                } 
+            })
+            .filter(time => time.epochTime > now)
+            .sort((a, b) => a.epochTime - b.epochTime);
     }
-    
-    async getTimeScheduleList(routeTag: string, stopTag: string, _: ScheduleType): Promise<Time[]> {
-        return this.times.filter((time) => time.trip_id.includes(routeTag) && time.stop_id.includes(stopTag))
-            .map((time) => {
-                const value = this.getTimeToWaitInMS(time.arrival_time);
-                return {
-                    epochTime: value,
-                    minutes: Math.floor(value / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
-                    seconds:  Math.floor(value / (ONE_SEC_IN_MS)),
-                    isDeparture: false,
-                }
+
+    async getTimeListFromRoute(routeTag: string): Promise<Time[]> {
+        return (await this.getStaticTimeListFromRoute(routeTag))
+            .map(trip => {
+                const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
+                return { 
+                    epochTime: Date.now() + timeAhead,
+                    secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
+                    minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                } 
             });
     }
 
-    private getTimeToWaitInMS(time: string): number {
-        const [hours, minutes, _] = time.split(':');
-        return (Number(hours) * ONE_HOUR_IN_MIN + Number(minutes)) * ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS;
+    private async getStaticTimeListFromRouteStop(routeTag: string, stopTag: string): Promise<stTime[]> {
+        const today = new Date(Date.now()).getDay();
+        const tripIds = (await this.getTripListFromRoute(routeTag, today)).map(trip => trip.trip_id);
+        return this.times.filter(time => time.stop_id?.includes(stopTag) && tripIds.includes(time.trip_id));
+    }
+
+    private async getStaticTimeListFromRoute(routeTag: string): Promise<stTime[]> {
+        const today = new Date(Date.now()).getDay();
+        const tripIds = (await this.getTripListFromRoute(routeTag, today)).map(trip => trip.trip_id);
+        return this.times.filter(time => tripIds.includes(time.trip_id));
+    }
+
+    private async getTripListFromRoute(routeTag: string, day: number): Promise<stTrip[]> {
+        const serviceIds = this.getServiceIdsFromDay(day);
+        console.log(serviceIds);
+        return this.trips.filter(trip => trip.route_id?.includes(routeTag) && serviceIds.includes(trip.service_id));
+    }
+
+    private getTimeAheadInMilliseconds(time: string): number {
+        const now = new Date(Date.now());
+        const [hr, min, sec] = time.split(':').map(value => Number(value));
+        const [nHr, nMin, nSec] = [now.getHours(), now.getMinutes(), now.getSeconds()];
+        return this.convertTimeToMilliseconds(hr, min, sec) - this.convertTimeToMilliseconds(nHr, nMin, nSec);
+    }
+
+    private convertTimeToMilliseconds(hours: number, minutes: number, seconds: number): number {
+        return ((hours * ONE_HOUR_IN_MIN + minutes) * ONE_MINUTE_IN_SEC + seconds) * ONE_SEC_IN_MS;
+    }
+
+    private getServiceIdsFromDay(dayOfTheWeek: number): string[] {
+        switch (dayOfTheWeek) {
+            case Day.Sunday:
+                return this.calendar.filter(column => column.sunday === '1').map(row => row.service_id);
+            case Day.Monday:
+                return this.calendar.filter(column => column.monday === '1').map(row => row.service_id);
+            case Day.Tuesday:
+                return this.calendar.filter(column => column.tuesday === '1').map(row => row.service_id);
+            case Day.Wednesday:
+                return this.calendar.filter(column => column.wednesday === '1').map(row => row.service_id);
+            case Day.Thursday:
+                return this.calendar.filter(column => column.thursday === '1').map(row => row.service_id);
+            case Day.Friday:
+                return this.calendar.filter(column => column.friday === '1').map(row => row.service_id);
+            case Day.Saturday:
+                return this.calendar.filter(column => column.saturday === '1').map(row => row.service_id);
+            default:
+                return [];
+        }
     }
 
     private async initLists() {
+        await this.readCalendarFile();
         await this.readTripsFile();
         await this.readStopsFile();
         await this.readStopTimesFile();
     }
 
+    private async readCalendarFile(): Promise<void> {
+        if (!this.calendar.length) this.calendar = await this.readFile(`./assets/calendar.${this.agency}.txt`) as Calendar[];
+    }
+
     private async readTripsFile(): Promise<void> {
-        if (!this.trips.length) this.trips = await this.readFile(`./assets/trips.${this.agency}.txt`) as StaticTrip[];
+        if (!this.trips.length) this.trips = await this.readFile(`./assets/trips.${this.agency}.txt`) as stTrip[];
     }
 
     private async readStopsFile(): Promise<void> {
-        if (!this.stops.length) this.stops = await this.readFile(`./assets/stops.${this.agency}.txt`) as StaticStop[];
+        if (!this.stops.length) this.stops = await this.readFile(`./assets/stops.${this.agency}.txt`) as stStop[];
     }
 
     private async readStopTimesFile(): Promise<void> {
-        if (!this.times.length) this.times = await this.readFile(`./assets/stop_times.${this.agency}.txt`) as StaticTime[];
+        if (!this.times.length) this.times = await this.readFile(`./assets/stop_times.${this.agency}.txt`) as stTime[];
     }
 
     private async readFile(path: string): Promise<Object[]> {

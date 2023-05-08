@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
-import { Agency, Time, Route, Stop } from '../interfaces/real-time-communications';
+import { Agency, rtTime, rtRoute, rtStop } from '../interfaces/real-time-communications';
 
 @Injectable({
     providedIn: 'root'
@@ -30,8 +30,8 @@ export class RealTimeDataService {
         return agencyList;
     }
 
-    async getRouteList(): Promise<Route[]> {
-        const routeList: Route[] = [];
+    async getRouteList(): Promise<rtRoute[]> {
+        const routeList: rtRoute[] = [];
 
         await fetch(this.addParameterToURL(this.addCommandToURL(realTimeDataAPI, 'routeList'), 'a', this.agency)).then((res) => {
             return res.text();
@@ -51,8 +51,8 @@ export class RealTimeDataService {
         return routeList;
     }
 
-    async getStopList(routeTag: string): Promise<Stop[]> {
-        const stopList: Stop[] = [];
+    async getStopList(routeTag: string): Promise<rtStop[]> {
+        const stopList: rtStop[] = [];
 
         await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'routeConfig'), ['a', 'r'], [this.agency, routeTag])).then((res) => {
             return res.text();
@@ -76,8 +76,8 @@ export class RealTimeDataService {
         return stopList;
     }
 
-    async getTimeList(routeTag: string, stopTag: string): Promise<Time[]> {
-        const timeList: Time[] = [];
+    async getTimeList(routeTag: string, stopTag: string): Promise<rtTime[]> {
+        const timeList: rtTime[] = [];
 
         await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopTag, routeTag])).then((res) => {
             return res.text();

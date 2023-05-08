@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
-import { Route } from '../../interfaces/real-time-communications';
+import { rtRoute } from '../../interfaces/real-time-communications';
 import { RealTimeDataService } from '../../services/real-time-data.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { RealTimeDataService } from '../../services/real-time-data.service';
 export class RouteListComponent implements AfterViewInit {
     @Output() newRouteTag: EventEmitter<string>;
 
-    routes: Route[];
+    routes: rtRoute[];
 
     constructor(private readonly rtDataService: RealTimeDataService) {
         this.newRouteTag = new EventEmitter<string>();
