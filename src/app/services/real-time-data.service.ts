@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
-import { Agency, rtTime, rtRoute, rtStop } from '../interfaces/real-time-communications';
+import { Agency, rtTime, rtRoute, rtStop, rtRouteConfig } from '../interfaces/real-time-communications';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RealTimeDataService {
-    private agency = 'stl'
+    private agency = 'stl';
 
     async getAgencyList(): Promise<Agency[]> {
         const agencyList: Agency[] = [];
@@ -51,6 +51,29 @@ export class RealTimeDataService {
         return routeList;
     }
 
+    async getRouteConfig(routeTag: string): Promise<rtRouteConfig> {
+        let routeConfig: rtRouteConfig = {} as rtRouteConfig;
+
+        await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'routeConfig'), ['a', 'r'], [this.agency, routeTag])).then((res) => {
+            return res.text();
+        }).then((xmlString) => {
+            const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
+            const route = xmlDocument.querySelector('route');
+
+            if (!route) return;
+            const tag =  route.getAttribute('tag');
+            const title = route.getAttribute('title');
+            const latitudeMin = Number(route.getAttribute('latMin'));
+            const latitudeMax = Number(route.getAttribute('latMax'));
+            const longitudeMin = Number(route.getAttribute('lonMin'));
+            const longitudeMax = Number(route.getAttribute('lonMax'));
+            
+            if (tag && title) routeConfig = { tag, title, latitudeMin, latitudeMax, longitudeMin, longitudeMax }
+        });
+
+        return routeConfig;
+    }
+
     async getStopList(routeTag: string): Promise<rtStop[]> {
         const stopList: rtStop[] = [];
 
@@ -63,13 +86,9 @@ export class RealTimeDataService {
             stops.forEach((stop) => {
                 const tag =  stop.getAttribute('tag');
                 const title = stop.getAttribute('title');
-                const location = {
-                    latitude: Number(stop.getAttribute('lat')),
-                    longitude: Number(stop.getAttribute('lon')),
-                }
-                if (tag && title) {
-                    stopList.push({ tag, title, location })
-                }
+                const latitude = Number(stop.getAttribute('lat'));
+                const longitude = Number(stop.getAttribute('lon')); 
+                if (tag && title) stopList.push({ tag, title, latitude, longitude });
             });
         });
 

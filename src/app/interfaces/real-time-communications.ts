@@ -1,5 +1,3 @@
-import { Location } from "./transit-concept";
-
 export interface Agency {
     tag: string;
     title: string;
@@ -11,10 +9,20 @@ export interface rtRoute {
     title: string;
 }
 
+export interface rtRouteConfig {
+    tag: string;
+    title: string;
+    latitudeMin: number;
+    latitudeMax: number;
+    longitudeMin: number;
+    longitudeMax: number;
+}
+
 export interface rtStop {
     tag: string;
     title: string;
-    location: Location;
+    latitude: number;
+    longitude: number;
 }
 
 export interface rtTime {
