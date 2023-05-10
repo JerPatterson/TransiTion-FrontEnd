@@ -41,7 +41,7 @@ export class ScheduleComponent {
     }
 
     async getTimeExpectedList() {
-        this.expectedTimes = await this.stDataService.getTimeListFromRouteStop(this.routeTag, this.stopTag);
+        this.expectedTimes = await this.stDataService.getTimeListFromStop(this.routeTag, this.stopTag);
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

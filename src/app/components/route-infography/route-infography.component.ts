@@ -38,13 +38,10 @@ export class RouteInfographyComponent implements OnChanges {
         const context = this.routeCanvas.nativeElement.getContext('2d');
         this.stops.forEach((stop) => {
             if (!context) return;
+            const longitude = this.getLongitudeCanvasPosition(stop);
+            const latitude =  this.getLatitudeCanvasPosition(stop);
             context.fillStyle = '#000000'
-            context.fillRect(
-                this.getLongitudeCanvasPosition(stop),
-                this.getLatitudeCanvasPosition(stop),
-                STOP_SIZE,
-                STOP_SIZE,
-            )
+            context.fillRect(longitude, latitude, STOP_SIZE, STOP_SIZE);
         });
     }
 
