@@ -19,14 +19,14 @@ export class StaticDataService {
     constructor() {
         this.calendar = [];
         this.trips = [];
-        this.stops = new Map<string, stStop>();
-        this.times = new Map<string, stTime[]>();
+        this.stops = new Map<string, stStop>();   // Key: Only stopId 
+        this.times = new Map<string, stTime[]>(); // Key: Either tripId or stopId
         this.initLists();
     }
 
-    async getTimeListFromStop(routeTag: string, stopTag: string): Promise<Time[]> {
+    async getTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<Time[]> {
         const now = Date.now();
-        return (await this.getStaticTimeListFromStop(routeTag, stopTag))
+        return (await this.getStaticTimesFromStopOfRoute(routeTag, stopTag))
             .map(trip => {
                 const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
                 return { 
@@ -39,9 +39,9 @@ export class StaticDataService {
             .sort((a, b) => a.epochTime - b.epochTime);
     }
 
-    async getTimeListFromRoute(routeTag: string): Promise<Time[]> {
+    async getTimesFromRoute(routeTag: string): Promise<Time[]> {
         const now = Date.now();
-        return (await this.getStaticTimeListFromRoute(routeTag))
+        return (await this.getStaticTimesFromRoute(routeTag))
             .map(trip => {
                 const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
                 return {
@@ -54,15 +54,15 @@ export class StaticDataService {
             .sort((a, b) => a.epochTime - b.epochTime);
     }
 
-    private async getStaticTimeListFromStop(routeTag: string, stopTag: string): Promise<stTime[]> {
-        return (await this.getStaticTimeListFromRoute(routeTag)).filter((time) => time.stop_id.includes(stopTag));
+    private async getStaticTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<stTime[]> {
+        return (await this.getStaticTimesFromRoute(routeTag)).filter((time) => time.stop_id.includes(stopTag));
     }
 
-    private async getStaticTimeListFromRoute(routeTag: string): Promise<stTime[]> {
+    private async getStaticTimesFromRoute(routeTag: string): Promise<stTime[]> {
         const today = new Date(Date.now()).getDay();
         const timeList: stTime[] = [];
         let tripTimes : stTime[] | undefined;
-        (await this.getStaticTripListFromRoute(routeTag, today)).map(trip => trip.trip_id)
+        (await this.getStaticTripsFromRoute(routeTag, today)).map(trip => trip.trip_id)
             .forEach((tripId) => {
             if ((tripTimes = this.times.get(tripId)))
                 timeList.push(...tripTimes) 
@@ -70,7 +70,7 @@ export class StaticDataService {
         return timeList;
     }
 
-    private async getStaticTripListFromRoute(routeTag: string, day: number): Promise<stTrip[]> {
+    private async getStaticTripsFromRoute(routeTag: string, day: number): Promise<stTrip[]> {
         const serviceIds = this.getServiceIdsFromDay(day);
         return this.trips.filter(trip => trip.route_id?.includes(routeTag) && serviceIds.includes(trip.service_id));
     }
@@ -134,9 +134,14 @@ export class StaticDataService {
         let tripTimes: stTime[] | undefined;
         (await this.readFile(`./assets/stop_times.${this.agency}.txt`) as stTime[])
             .forEach((time) => {
-                (tripTimes = this.times.get(time.trip_id)) ? 
-                    this.times.set(time.trip_id, tripTimes.concat([time]))
-                    : this.times.set(time.trip_id, [time]);
+                if (tripTimes = this.times.get(time.trip_id)) {
+                    tripTimes.push(time);
+                    this.times.set(time.trip_id, tripTimes);
+                    this.times.set(time.stop_id, tripTimes);
+                } else {
+                    this.times.set(time.trip_id, [time]);
+                    this.times.set(time.stop_id, [time]);
+                }
             });
     }
 

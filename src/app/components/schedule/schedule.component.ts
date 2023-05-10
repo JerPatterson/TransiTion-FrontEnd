@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { Time } from '../../interfaces/transit-concept'
-import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from 'src/app/constants/time';
+import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from 'src/app/constants/time';
 import { RealTimeDataService } from 'src/app/services/real-time-data.service';
 import { StaticDataService } from 'src/app/services/static-data.service';
 
@@ -41,7 +41,7 @@ export class ScheduleComponent {
     }
 
     async getTimeExpectedList() {
-        this.expectedTimes = await this.stDataService.getTimeListFromStop(this.routeTag, this.stopTag);
+        this.expectedTimes = await this.stDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag);
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
