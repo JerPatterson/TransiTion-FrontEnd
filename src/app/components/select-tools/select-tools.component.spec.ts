@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StopSelectToolsComponent } from './stop-select-tools.component';
+import { StopSelectToolsComponent } from './select-tools.component';
 
 describe('StopSelectToolsComponent', () => {
     let component: StopSelectToolsComponent;
