@@ -3,22 +3,24 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { RouteListComponent } from './components/route-list/route-list.component';
 import { StopListComponent } from './components/stop-list/stop-list.component';
-import { StopSelectToolsComponent } from './components/select-tools/select-tools.component';
+import { SelectToolsComponent } from './components/select-tools/select-tools.component';
 import { ScheduleComponent } from './components/schedule/schedule.component';
 import { RouteInfographyComponent } from './components/route-infography/route-infography.component';
+import { AppRoutingModule } from './modules/app-routing.module';
 
 @NgModule({
     declarations: [
         RouteListComponent,
         StopListComponent,
-        StopSelectToolsComponent,
+        SelectToolsComponent,
         ScheduleComponent,
         RouteInfographyComponent,
     ],
     imports: [
-        BrowserModule
+        BrowserModule,
+        AppRoutingModule,
     ],
     providers: [],
-    bootstrap: [StopSelectToolsComponent]
+    bootstrap: [SelectToolsComponent]
 })
 export class AppModule {}

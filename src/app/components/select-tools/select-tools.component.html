@@ -7,19 +7,19 @@
             <label for="default-filter">Choix parmi les lignes et arrêts</label>
         </div>
         <div>
-            <input type="radio" id="stop-filter" name="filter" value="stop-filter"
-                (input)="this.changeFilter('stop-filter')">
+            <input type="radio" id="stop-filter" name="filter" value="stop"
+                (input)="this.changeFilter('stop')">
             <label for="stop-filter">Choix parmi les arrêts seulement</label>
         </div>
         <div>
-            <input type="radio" id="route-filter" name="filter" value="route-filter" 
-                (input)="this.changeFilter('route-filter')">
+            <input type="radio" id="route-filter" name="filter" value="route" 
+                (input)="this.changeFilter('route')">
             <label for="route-filter">Choix parmi les lignes seulement</label>
         </div>
     </fieldset>
 
-    <app-route-list (newRouteTag)="this.onNewRouteTag($event)"></app-route-list>
-    <app-stop-list (newStopTag)="this.onNewStopTag($event)" [routeTag]="this.data.routeTag"></app-stop-list>
+    <app-route-list (newRouteTag)="this.changeRouteTag($event)"></app-route-list>
+    <app-stop-list (newStopTag)="this.changeStopTag($event)" [routeTag]="this.data.routeTag"></app-stop-list>
 </div>
 
 <app-schedule [routeTag]="this.data.routeTag" [stopTag]="this.data.stopTag"></app-schedule>

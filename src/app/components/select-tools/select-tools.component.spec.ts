@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StopSelectToolsComponent } from './select-tools.component';
+import { SelectToolsComponent } from './select-tools.component';
 
-describe('StopSelectToolsComponent', () => {
-    let component: StopSelectToolsComponent;
-    let fixture: ComponentFixture<StopSelectToolsComponent>;
+describe('SelectToolsComponent', () => {
+    let component: SelectToolsComponent;
+    let fixture: ComponentFixture<SelectToolsComponent>;
     
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ StopSelectToolsComponent ]
+            declarations: [ SelectToolsComponent ]
         })
         .compileComponents();
         
-        fixture = TestBed.createComponent(StopSelectToolsComponent);
+        fixture = TestBed.createComponent(SelectToolsComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
