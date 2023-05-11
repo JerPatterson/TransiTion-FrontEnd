@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core
 import { rtStop } from '../../interfaces/real-time-communications';
 import { RealTimeDataService } from '../../services/real-time-data.service';
 import { StaticDataService } from 'src/app/services/static-data.service';
+import { Filter } from 'src/app/enums/filter';
 
 @Component({
     selector: 'app-stop-list',
@@ -9,6 +10,7 @@ import { StaticDataService } from 'src/app/services/static-data.service';
     styleUrls: ['./stop-list.component.css']
 })
 export class StopListComponent implements OnChanges {
+    @Input() filter: Filter;
     @Input() routeTag: string;
     @Output() newStopTag: EventEmitter<string>;
 
@@ -18,6 +20,7 @@ export class StopListComponent implements OnChanges {
         private readonly rtDataService: RealTimeDataService, 
         private readonly stDataService: StaticDataService,
     ) {
+        this.filter = Filter.Default;
         this.routeTag = '';
         this.newStopTag = new EventEmitter<string>();
         this.stops = [];
@@ -29,8 +32,10 @@ export class StopListComponent implements OnChanges {
     }
 
     async getStopList(): Promise<void> {
-        this.stops = !this.routeTag ? 
-            await this.getAllStops() : await this.rtDataService.getStopList(this.routeTag);
+        if (this.filter === Filter.Default)
+            this.stops = await this.rtDataService.getStopList(this.routeTag);
+        else if (this.filter === Filter.Stops)
+            this.stops = await this.getAllStops();
     }
 
     stopChange(event: Event): void {

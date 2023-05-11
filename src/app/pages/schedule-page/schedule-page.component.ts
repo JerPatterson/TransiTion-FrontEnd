@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationExtras, Router } from '@angular/router';
+import { Filter } from 'src/app/enums/filter';
 import { DataService } from 'src/app/services/data.service';
 
 @Component({
@@ -31,14 +32,23 @@ export class SchedulePageComponent {
     }
 
     private updateURLQueryParams() {
-        this.router.navigate([], {
+        const extras = {
             relativeTo: this.route,
-            queryParams: { 
-                filter: this.data.filter,
-                route: this.data.routeTag,
-                stop: this.data.stopTag,
-            },
-            queryParamsHandling: 'merge',
-        });
+            queryParams: {},
+            queryParamsHandling: '',
+        } as NavigationExtras;
+
+        switch (this.data.filter) {
+            case Filter.Routes:
+                extras.queryParams = { filter: this.data.filter, route: this.data.routeTag };
+                break;
+            case Filter.Stops:
+                extras.queryParams = { filter: this.data.filter, stop: this.data.stopTag };
+                break;
+            default:
+                extras.queryParams = { filter: this.data.filter, route: this.data.routeTag, stop: this.data.stopTag };
+        }
+
+        this.router.navigate([], extras);
     }
 }

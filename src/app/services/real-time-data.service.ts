@@ -95,7 +95,28 @@ export class RealTimeDataService {
         return stopList;
     }
 
-    async getTimeList(routeTag: string, stopTag: string): Promise<rtTime[]> {
+    async getTimesFromStop(stopTag: string): Promise<rtTime[]> {
+        const timeList: rtTime[] = [];
+
+        await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId'], [this.agency, stopTag])).then((res) => {
+            return res.text();
+        }).then((xmlString) => {
+            const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
+            const times = xmlDocument.querySelectorAll('prediction');
+
+            times.forEach((time) => {
+                const seconds = Number(time.getAttribute('seconds'));
+                const minutes = Number(time.getAttribute('minutes'));
+                const epochTime = Number(time.getAttribute('epochTime'));
+                const isDeparture = Boolean(time.getAttribute('isDeparture'));
+                timeList.push({ seconds, minutes, epochTime, isDeparture });
+            });
+        });
+
+        return timeList;
+    }
+
+    async getTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<rtTime[]> {
         const timeList: rtTime[] = [];
 
         await fetch(this.addParametersToURL(this.addCommandToURL(realTimeDataAPI, 'predictions'), ['a', 'stopId', 'routeTag'], [this.agency, stopTag, routeTag])).then((res) => {
