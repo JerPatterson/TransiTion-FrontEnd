@@ -54,6 +54,10 @@ export class StaticDataService {
             .sort((a, b) => a.epochTime - b.epochTime);
     }
 
+    async getAllStops(): Promise<stStop[]> {
+        return (await this.readFile(`./assets/stops.${this.agency}.txt`) as stStop[])
+    }
+
     private async getStaticTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<stTime[]> {
         return (await this.getStaticTimesFromRoute(routeTag)).filter((time) => time.stop_id.includes(stopTag));
     }

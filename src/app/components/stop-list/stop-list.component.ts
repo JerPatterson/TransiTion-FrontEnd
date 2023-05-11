@@ -29,12 +29,23 @@ export class StopListComponent implements OnChanges {
     }
 
     async getStopList(): Promise<void> {
-        // TODO if (this.routeTag === 'all') this.stDataService.getAllStops();
-        this.stops = await this.rtDataService.getStopList(this.routeTag);
+        this.stops = !this.routeTag ? 
+            await this.getAllStops() : await this.rtDataService.getStopList(this.routeTag);
     }
 
     stopChange(event: Event): void {
         const stopTag = (event.target as any).value;
         if (stopTag) this.newStopTag.emit(stopTag);
+    }
+
+    private async getAllStops(): Promise<rtStop[]> {
+        return (await this.stDataService.getAllStops()).map((stop) => { 
+            return {
+                tag: stop.stop_code,
+                title: stop.stop_name,
+                longitude: Number(stop.stop_lat),
+                latitude: Number(stop.stop_lon),
+            }
+        });
     }
 }

@@ -18,8 +18,8 @@
         </div>
     </fieldset>
 
-    <app-route-list (newRouteTag)="this.changeRouteTag($event)"></app-route-list>
-    <app-stop-list (newStopTag)="this.changeStopTag($event)" [routeTag]="this.data.routeTag"></app-stop-list>
+    <app-route-list *ngIf="this.data.filter !== 'stop'" (newRouteTag)="this.changeRouteTag($event)"></app-route-list>
+    <app-stop-list *ngIf="this.data.filter !== 'route'" (newStopTag)="this.changeStopTag($event)" [routeTag]="this.data.routeTag"></app-stop-list>
 </div>
 
 <app-schedule [routeTag]="this.data.routeTag" [stopTag]="this.data.stopTag"></app-schedule>
