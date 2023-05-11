@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SelectToolsComponent } from './select-tools.component';
+import { SchedulePageComponent } from './schedule-page.component';
 
-describe('SelectToolsComponent', () => {
-    let component: SelectToolsComponent;
-    let fixture: ComponentFixture<SelectToolsComponent>;
+describe('SchedulePageComponent', () => {
+    let component: SchedulePageComponent;
+    let fixture: ComponentFixture<SchedulePageComponent>;
     
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ SelectToolsComponent ]
+            declarations: [ SchedulePageComponent ]
         })
         .compileComponents();
         
-        fixture = TestBed.createComponent(SelectToolsComponent);
+        fixture = TestBed.createComponent(SchedulePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

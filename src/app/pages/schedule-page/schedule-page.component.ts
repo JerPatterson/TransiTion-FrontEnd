@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DataService } from 'src/app/data.service';
+import { DataService } from 'src/app/services/data.service';
 
 @Component({
     selector: 'app-select-tools',
-    templateUrl: './select-tools.component.html',
-    styleUrls: ['./select-tools.component.css']
+    templateUrl: './schedule-page.component.html',
+    styleUrls: ['./schedule-page.component.css']
 })
-export class SelectToolsComponent {
+export class SchedulePageComponent {
+
     constructor(
         readonly data: DataService,
         private readonly router: Router,

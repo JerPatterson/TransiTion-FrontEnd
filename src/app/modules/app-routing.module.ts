@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SelectToolsComponent } from '../components/select-tools/select-tools.component';
+import { SchedulePageComponent } from '../pages/schedule-page/schedule-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/schedule', pathMatch: 'full' },
-    { path: 'schedule', component: SelectToolsComponent },
+    { path: 'schedule', component: SchedulePageComponent },
     { path: '**', redirectTo: '/schedule' },
 ];
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Filter } from './enums/filter';
+import { Filter } from '../enums/filter';
 
 @Injectable({
     providedIn: 'root'
