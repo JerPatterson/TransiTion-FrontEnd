@@ -47,7 +47,6 @@ export class ScheduleComponent {
     }
 
     async getTimesFromStop(): Promise<void> {
-        console.log('here1');
         this.times = (await this.rtDataService.getTimesFromStop(
             this.stopTag.replace('CP', ''),
         )).map(time => { 
