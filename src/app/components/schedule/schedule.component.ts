@@ -15,9 +15,6 @@ export class ScheduleComponent {
     @Input() routeTag: string;
     @Input() stopTag: string;
 
-    times: Time[];
-    expectedTimes: Time[];
-
     mergeTimes: { rt?: Time; st: Time }[];
     
     constructor(
@@ -27,8 +24,6 @@ export class ScheduleComponent {
         this.filter = Filter.Default;
         this.routeTag = '';
         this.stopTag = '';
-        this.times = [];
-        this.expectedTimes = [];
         this.mergeTimes = [];
     }
 
@@ -37,22 +32,17 @@ export class ScheduleComponent {
             case Filter.Stops:
                 if (!this.stopTag) return;
                 this.routeTag = '';
-                await this.getTimesFromStop();
-                await this.getTimesExpectedFromStop();
+                this.getTimesFromStop();
                 break;
             case Filter.Routes:
                 if (!this.routeTag) return;
                 this.stopTag = '';
-                await this.getTimesFromRoute();
-                await this.getTimesExpectedFromRoute();
+                this.getTimesFromRoute();
                 break;
             default:
                 if (!this.routeTag || !this.stopTag) return;
-                await this.getTimesFromStopOfRoute();
-                await this.getTimesExpectedFromStopOfRoute();
+                this.getTimesFromStopOfRoute();
         }
-
-        this.computeMergeTimes();
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
@@ -68,36 +58,28 @@ export class ScheduleComponent {
         return stringContent;
     }
 
-    private async computeMergeTimes(): Promise<void> {
-        console.log(this.times, this.expectedTimes);
-        this.mergeTimes = this.expectedTimes.map((st) => {
-           const rt = this.times.find((time) => st.tripTag.includes(time.tripTag));
+    private async computeMergeTimes(times: Time[], expectedTimes: Time[]): Promise<void> {
+        this.mergeTimes = expectedTimes.map((st) => {
+           const rt = times.find((time) => st.tripTag.includes(time.tripTag));
            return { rt, st };
         });
     }
  
     private async getTimesFromStopOfRoute(): Promise<void> {
-        this.times = await this.rtDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag.replace('CP', ''));
+        const times = await this.rtDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag.replace('CP', ''));
+        const expectedTimes = await this.stDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag);
+        await this.computeMergeTimes(times, expectedTimes);
     }
 
     private async getTimesFromStop(): Promise<void> {
-        this.times = await this.rtDataService.getTimesFromStop(this.stopTag.replace('CP', ''));
+        const times = await this.rtDataService.getTimesFromStop(this.stopTag.replace('CP', ''));
+        const expectedTimes = await this.stDataService.getTimesFromStop(this.stopTag);
+        await this.computeMergeTimes(times, expectedTimes);
     }
 
     private async getTimesFromRoute(): Promise<void> {
-        this.times = [];
-    }
-
-    private async getTimesExpectedFromStopOfRoute(): Promise<void> {
-        this.expectedTimes = await this.stDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag);
-    }
-
-    private async getTimesExpectedFromStop(): Promise<void> {
-        this.expectedTimes = await this.stDataService.getTimesFromStop(this.stopTag);
-    }
-
-    private async getTimesExpectedFromRoute(): Promise<void> {
-        this.expectedTimes = await this.stDataService.getTimesFromRoute(this.routeTag);
+        const expectedTimes = await this.stDataService.getTimesFromRoute(this.routeTag);
+        await this.computeMergeTimes([], expectedTimes);
     }
 
     private convertToTwoDigit(number: number) {

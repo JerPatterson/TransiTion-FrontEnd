@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
-import { Agency, rtTime, rtRoute, rtStop, rtRouteConfig } from '../interfaces/real-time-communications';
+import { Agency, rtRoute, rtStop, rtRouteConfig } from '../interfaces/real-time-communications';
 import { Time } from '../interfaces/transit-concept';
 
 @Injectable({
@@ -25,6 +25,7 @@ export class RealTimeDataService {
 
         return agencyList;
     }
+
 
     async getRouteList(): Promise<rtRoute[]> {
         const routeList: rtRoute[] = [];
@@ -82,6 +83,7 @@ export class RealTimeDataService {
         return stopList;
     }
 
+
     async getTimesFromStop(stopTag: string): Promise<Time[]> {
         const timeList: Time[] = [];
 
@@ -96,7 +98,7 @@ export class RealTimeDataService {
                 const secondsAhead = Number(time.getAttribute('seconds'));
                 const minutesAhead = Number(time.getAttribute('minutes'));
                 const tripTag = time.getAttribute('tripTag');
-                const routeTag = route.getAttribute('routeTag');
+                const routeTag = route.getAttribute('routeTitle');
                 if (tripTag && routeTag) 
                     timeList.push({ secondsAhead, minutesAhead, epochTime, tripTag, routeTag, stopTag });
             })
@@ -126,6 +128,7 @@ export class RealTimeDataService {
 
         return timeList;
     }
+
 
     private addCommandToURL(commandName: string, paramNames: string[] = [], params: string[] = []): string {
         let url = realTimeDataAPI + 'command=' + commandName;

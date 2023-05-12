@@ -17,8 +17,7 @@
     </div>
 
     <div>
-        <p *ngIf="times.length === 1">Passage en temps réel</p>
-        <p *ngIf="times.length > 1">Passages en temps réel</p>
+        <p *ngIf="filter !== 'route'">Passages en temps réel</p>
         <p *ngFor="let mergeTime of mergeTimes">
             <br *ngIf="!mergeTime.rt">
             <span *ngIf="mergeTime.rt">
@@ -28,16 +27,14 @@
     </div>
     
     <div>
-        <p *ngIf="expectedTimes.length === 1">Passage planifié</p>
-        <p *ngIf="expectedTimes.length > 1">Passages planifiés</p>
+        <p>Passages planifiés</p>
         <p *ngFor="let mergeTime of mergeTimes">
             {{ this.formatTimeToWait(mergeTime.st.minutesAhead, mergeTime.st.secondsAhead) }}
         </p>
     </div>
 
     <div>
-        <p *ngIf="times.length === 1">État du passage</p>
-        <p *ngIf="times.length > 1">État des passage</p>
+        <p *ngIf="filter !== 'route'">État des passage</p>
         <p *ngFor="let mergeTime of mergeTimes">
             <br *ngIf="!mergeTime.rt">
             <span *ngIf="mergeTime.rt">
