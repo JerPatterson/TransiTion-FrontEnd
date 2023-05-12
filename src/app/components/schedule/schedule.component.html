@@ -1,56 +1,63 @@
 <div style="display: flex; flex-direction: row; gap: 10px;">
-    <div *ngIf="times.length > 0 && times[0].routeTag">
+    <div *ngIf="filter === 'stop' && mergeTimes.length > 0">
         <p>Nom de la ligne</p>
-        <p *ngFor="let time of times">
-            {{ time.routeTag }}
+        <p *ngFor="let mergeTime of mergeTimes">
+            <br *ngIf="!mergeTime.rt">
+            <span *ngIf="mergeTime.rt">
+                {{ mergeTime.rt.routeTag }}
+            </span>
         </p>
     </div>
 
-    <div *ngIf="expectedTimes.length > 0 && expectedTimes[0].stopTag">
+    <div *ngIf="filter === 'route' && mergeTimes.length > 0">
         <p>Nom de l'arrêt</p>
-        <p *ngFor="let expectedTime of expectedTimes">
-            {{ expectedTime.stopTag }}
+        <p *ngFor="let mergeTime of mergeTimes">
+            {{ mergeTime.st.stopTag }}
         </p>
     </div>
 
     <div>
         <p *ngIf="times.length === 1">Passage en temps réel</p>
         <p *ngIf="times.length > 1">Passages en temps réel</p>
-        <p *ngFor="let time of times">
-            {{ this.formatTimeToWait(time.minutesAhead, time.secondsAhead) }}
+        <p *ngFor="let mergeTime of mergeTimes">
+            <br *ngIf="!mergeTime.rt">
+            <span *ngIf="mergeTime.rt">
+                {{ this.formatTimeToWait(mergeTime.rt.minutesAhead, mergeTime.rt.secondsAhead) }}
+            </span>
         </p>
     </div>
     
     <div>
         <p *ngIf="expectedTimes.length === 1">Passage planifié</p>
         <p *ngIf="expectedTimes.length > 1">Passages planifiés</p>
-        <p *ngFor="let expectedTime of expectedTimes">
-            {{ this.formatTimeToWait(expectedTime.minutesAhead, expectedTime.secondsAhead) }}
+        <p *ngFor="let mergeTime of mergeTimes">
+            {{ this.formatTimeToWait(mergeTime.st.minutesAhead, mergeTime.st.secondsAhead) }}
         </p>
     </div>
 
     <div>
         <p *ngIf="times.length === 1">État du passage</p>
         <p *ngIf="times.length > 1">État des passage</p>
-        <p *ngFor="let time of times, let i = index">
-            <span *ngIf="expectedTimes.length > i">
-                <span *ngIf="time.secondsAhead - expectedTimes[i].secondsAhead > -15
-                    && time.secondsAhead - expectedTimes[i].secondsAhead < 15">
+        <p *ngFor="let mergeTime of mergeTimes">
+            <br *ngIf="!mergeTime.rt">
+            <span *ngIf="mergeTime.rt">
+                <span *ngIf="mergeTime.rt.secondsAhead - mergeTime.st.secondsAhead > -15
+                    && mergeTime.rt.secondsAhead - mergeTime.st.secondsAhead < 15">
                     À l'heure
                 </span>
-                <span *ngIf="time.secondsAhead - expectedTimes[i].secondsAhead < -15">
+                <span *ngIf="mergeTime.rt.secondsAhead - mergeTime.st.secondsAhead < -15">
                     En avance de {{ 
                         this.formatTimeToWait(
-                            expectedTimes[i].minutesAhead - time.minutesAhead,
-                            expectedTimes[i].secondsAhead - time.secondsAhead
+                            mergeTime.st.minutesAhead - mergeTime.rt.minutesAhead,
+                            mergeTime.st.secondsAhead - mergeTime.rt.secondsAhead
                         ) 
                     }}
                 </span>
-                <span *ngIf="time.secondsAhead - expectedTimes[i].secondsAhead > 15">
+                <span *ngIf="mergeTime.rt.secondsAhead - mergeTime.st.secondsAhead > 15">
                     En retard de {{ 
                         this.formatTimeToWait(
-                            time.minutesAhead - expectedTimes[i].minutesAhead,
-                            time.secondsAhead - expectedTimes[i].secondsAhead
+                            mergeTime.rt.minutesAhead - mergeTime.st.minutesAhead,
+                            mergeTime.rt.secondsAhead - mergeTime.st.secondsAhead
                         ) 
                     }}
                 </span>

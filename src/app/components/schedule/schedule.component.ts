@@ -17,6 +17,8 @@ export class ScheduleComponent {
 
     times: Time[];
     expectedTimes: Time[];
+
+    mergeTimes: { rt?: Time; st: Time }[];
     
     constructor(
         private readonly stDataService: StaticDataService,
@@ -27,6 +29,7 @@ export class ScheduleComponent {
         this.stopTag = '';
         this.times = [];
         this.expectedTimes = [];
+        this.mergeTimes = [];
     }
 
     async ngOnChanges() {
@@ -34,20 +37,22 @@ export class ScheduleComponent {
             case Filter.Stops:
                 if (!this.stopTag) return;
                 this.routeTag = '';
-                this.getTimesFromStop();
-                this.getTimesExpectedFromStop();
+                await this.getTimesFromStop();
+                await this.getTimesExpectedFromStop();
                 break;
             case Filter.Routes:
                 if (!this.routeTag) return;
                 this.stopTag = '';
-                this.getTimesFromRoute();
-                this.getTimesExpectedFromRoute();
+                await this.getTimesFromRoute();
+                await this.getTimesExpectedFromRoute();
                 break;
             default:
                 if (!this.routeTag || !this.stopTag) return;
-                this.getTimesFromStopOfRoute();
-                this.getTimesExpectedFromStopOfRoute();
+                await this.getTimesFromStopOfRoute();
+                await this.getTimesExpectedFromStopOfRoute();
         }
+
+        this.computeMergeTimes();
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
@@ -63,6 +68,14 @@ export class ScheduleComponent {
         return stringContent;
     }
 
+    private async computeMergeTimes(): Promise<void> {
+        console.log(this.times, this.expectedTimes);
+        this.mergeTimes = this.expectedTimes.map((st) => {
+           const rt = this.times.find((time) => st.tripTag.includes(time.tripTag));
+           return { rt, st };
+        });
+    }
+ 
     private async getTimesFromStopOfRoute(): Promise<void> {
         this.times = await this.rtDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag.replace('CP', ''));
     }
