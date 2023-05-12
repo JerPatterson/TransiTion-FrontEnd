@@ -24,21 +24,6 @@ export class StaticDataService {
         this.initLists();
     }
 
-    async getTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<Time[]> {
-        const now = Date.now();
-        return (await this.getStaticTimesFromStopOfRoute(routeTag, stopTag))
-            .map(trip => {
-                const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
-                return { 
-                    epochTime: now + timeAhead,
-                    secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
-                    minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
-                } 
-            })
-            .filter(time => time.epochTime > now)
-            .sort((a, b) => a.epochTime - b.epochTime);
-    }
-
     async getTimesFromRoute(routeTag: string): Promise<Time[]> {
         const now = Date.now();
         return (await this.getStaticTimesFromRoute(routeTag))
@@ -54,12 +39,38 @@ export class StaticDataService {
             .sort((a, b) => a.epochTime - b.epochTime);
     }
 
-    async getAllStops(): Promise<stStop[]> {
-        return (await this.readFile(`./assets/stops.${this.agency}.txt`) as stStop[])
+    async getTimesFromStop(stopTag: string): Promise<Time[]> {
+        const now = Date.now();
+        return (await this.getStaticTimesFromStop(stopTag))
+            .map(trip => {
+                const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
+                return { 
+                    epochTime: now + timeAhead,
+                    secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
+                    minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                } 
+            })
+            .filter(time => time.epochTime > now)
+            .sort((a, b) => a.epochTime - b.epochTime);
     }
 
-    private async getStaticTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<stTime[]> {
-        return (await this.getStaticTimesFromRoute(routeTag)).filter((time) => time.stop_id.includes(stopTag));
+    async getTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<Time[]> {
+        const now = Date.now();
+        return (await this.getStaticTimesFromStopOfRoute(routeTag, stopTag))
+            .map(trip => {
+                const timeAhead = this.getTimeAheadInMilliseconds(trip.arrival_time);
+                return { 
+                    epochTime: now + timeAhead,
+                    secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
+                    minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                } 
+            })
+            .filter(time => time.epochTime > now)
+            .sort((a, b) => a.epochTime - b.epochTime);
+    }
+
+    async getAllStops(): Promise<stStop[]> {
+        return (await this.readFile(`./assets/stops.${this.agency}.txt`) as stStop[])
     }
 
     private async getStaticTimesFromRoute(routeTag: string): Promise<stTime[]> {
@@ -74,20 +85,19 @@ export class StaticDataService {
         return timeList;
     }
 
+    private async getStaticTimesFromStop(stopTag: string): Promise<stTime[]> {
+        const times = this.times.get('MARS23' + stopTag);
+        return times ? times : [];
+    }
+
+    private async getStaticTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<stTime[]> {
+        return (await this.getStaticTimesFromRoute(routeTag)).filter((time) => time.stop_id.includes(stopTag));
+    }
+
+
     private async getStaticTripsFromRoute(routeTag: string, day: number): Promise<stTrip[]> {
         const serviceIds = this.getServiceIdsFromDay(day);
         return this.trips.filter(trip => trip.route_id?.includes(routeTag) && serviceIds.includes(trip.service_id));
-    }
-
-    private getTimeAheadInMilliseconds(time: string): number {
-        const now = new Date(Date.now());
-        const [hr, min, sec] = time.split(':').map(value => Number(value));
-        const [nHr, nMin, nSec] = [now.getHours(), now.getMinutes(), now.getSeconds()];
-        return this.convertTimeToMilliseconds(hr, min, sec) - this.convertTimeToMilliseconds(nHr, nMin, nSec);
-    }
-
-    private convertTimeToMilliseconds(hours: number, minutes: number, seconds: number): number {
-        return ((hours * ONE_HOUR_IN_MIN + minutes) * ONE_MINUTE_IN_SEC + seconds) * ONE_SEC_IN_MS;
     }
 
     private getServiceIdsFromDay(dayOfTheWeek: number): string[] {
@@ -111,6 +121,19 @@ export class StaticDataService {
                 return [];
         }
     }
+
+
+    private getTimeAheadInMilliseconds(time: string): number {
+        const now = new Date(Date.now());
+        const [hr, min, sec] = time.split(':').map(value => Number(value));
+        const [nHr, nMin, nSec] = [now.getHours(), now.getMinutes(), now.getSeconds()];
+        return this.convertTimeToMilliseconds(hr, min, sec) - this.convertTimeToMilliseconds(nHr, nMin, nSec);
+    }
+
+    private convertTimeToMilliseconds(hours: number, minutes: number, seconds: number): number {
+        return ((hours * ONE_HOUR_IN_MIN + minutes) * ONE_MINUTE_IN_SEC + seconds) * ONE_SEC_IN_MS;
+    }
+
 
     private async initLists() {
         await this.readCalendarFile();

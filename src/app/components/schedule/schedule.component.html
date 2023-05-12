@@ -1,4 +1,11 @@
 <div style="display: flex; flex-direction: row; gap: 10px;">
+    <div *ngIf="times.length > 0 && times[0].routeTitle">
+        <p>Nom de la ligne</p>
+        <p *ngFor="let time of times">
+            {{ time.routeTitle }}
+        </p>
+    </div>
+
     <div>
         <p *ngIf="times.length === 1">Passage en temps réel</p>
         <p *ngIf="times.length > 1">Passages en temps réel</p>

@@ -32,58 +32,23 @@ export class ScheduleComponent {
     async ngOnChanges() {
         switch (this.filter) {
             case Filter.Stops:
+                if (!this.stopTag) return;
+                this.routeTag = '';
                 this.getTimesFromStop();
                 this.getTimesExpectedFromStop();
                 break;
             case Filter.Routes:
+                if (!this.routeTag) return;
+                this.stopTag = '';
                 this.getTimesFromRoute();
                 this.getTimesExpectedFromRoute();
                 break;
             default:
+                if (!this.routeTag || !this.stopTag) return;
                 this.getTimesFromStopOfRoute();
                 this.getTimesExpectedFromStopOfRoute();
-                break;
         }
-    }
-
-    async getTimesFromStop(): Promise<void> {
-        this.times = (await this.rtDataService.getTimesFromStop(
-            this.stopTag.replace('CP', ''),
-        )).map(time => { 
-            return {
-                epochTime: time.epochTime,
-                secondsAhead: time.seconds,
-                minutesAhead: time.minutes,
-            }
-        });
-    }
-
-    async getTimesExpectedFromStop(): Promise<void> {
-        this.expectedTimes = []; // TODO
-    }
-
-    async getTimesFromRoute(): Promise<void> {
-        this.times = []; // TODO
-    }
-
-    async getTimesExpectedFromRoute(): Promise<void> {
-        this.expectedTimes = await this.stDataService.getTimesFromRoute(this.routeTag);
-    }
-
-    async getTimesFromStopOfRoute(): Promise<void> {
-        this.times = (await this.rtDataService.getTimesFromStopOfRoute(
-            this.routeTag, this.stopTag.replace('CP', ''),
-        )).map(time => { 
-            return {
-                epochTime: time.epochTime,
-                secondsAhead: time.seconds,
-                minutesAhead: time.minutes,
-            }
-        });
-    }
-
-    async getTimesExpectedFromStopOfRoute() {
-        this.expectedTimes = await this.stDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag);
+        console.log('Action done!');
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
@@ -97,6 +62,30 @@ export class ScheduleComponent {
         stringContent += `${this.convertToTwoDigit(waitSec < 0 ? ONE_MINUTE_IN_SEC + waitSec : waitSec)}sec`
 
         return stringContent;
+    }
+
+    private async getTimesFromStopOfRoute(): Promise<void> {
+        this.times = await this.rtDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag.replace('CP', ''));
+    }
+
+    private async getTimesFromStop(): Promise<void> {
+        this.times = await this.rtDataService.getTimesFromStop(this.stopTag.replace('CP', ''));
+    }
+
+    private async getTimesFromRoute(): Promise<void> {
+        this.times = [];
+    }
+
+    private async getTimesExpectedFromStopOfRoute(): Promise<void> {
+        this.expectedTimes = await this.stDataService.getTimesFromStopOfRoute(this.routeTag, this.stopTag);
+    }
+
+    private async getTimesExpectedFromStop(): Promise<void> {
+        this.expectedTimes = await this.stDataService.getTimesFromStop(this.stopTag);
+    }
+
+    private async getTimesExpectedFromRoute(): Promise<void> {
+        this.expectedTimes = await this.stDataService.getTimesFromRoute(this.routeTag);
     }
 
     private convertToTwoDigit(number: number) {

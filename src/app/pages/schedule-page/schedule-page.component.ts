@@ -38,15 +38,16 @@ export class SchedulePageComponent {
             queryParamsHandling: '',
         } as NavigationExtras;
 
-        switch (this.data.filter) {
+        const filter = this.data.filter;
+        switch (filter) {
             case Filter.Routes:
-                extras.queryParams = { filter: this.data.filter, route: this.data.routeTag };
+                extras.queryParams = { filter, route: this.data.routeTag };
                 break;
             case Filter.Stops:
-                extras.queryParams = { filter: this.data.filter, stop: this.data.stopTag };
+                extras.queryParams = { filter, stop: this.data.stopTag };
                 break;
             default:
-                extras.queryParams = { filter: this.data.filter, route: this.data.routeTag, stop: this.data.stopTag };
+                extras.queryParams = { filter, route: this.data.routeTag, stop: this.data.stopTag };
         }
 
         this.router.navigate([], extras);

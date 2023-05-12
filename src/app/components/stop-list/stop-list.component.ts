@@ -33,7 +33,7 @@ export class StopListComponent implements OnChanges {
 
     async getStopList(): Promise<void> {
         if (this.filter === Filter.Default)
-            this.stops = await this.rtDataService.getStopList(this.routeTag);
+            this.stops = await this.rtDataService.getStopsOfRoute(this.routeTag);
         else if (this.filter === Filter.Stops)
             this.stops = await this.getAllStops();
     }

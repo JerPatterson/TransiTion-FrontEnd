@@ -13,4 +13,5 @@ export interface Time {
     epochTime: number;
     minutesAhead: number;
     secondsAhead: number;
+    routeTitle?: string | null;
 }

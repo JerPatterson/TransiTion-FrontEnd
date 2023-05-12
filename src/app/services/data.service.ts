@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Filter } from '../enums/filter';
+import { StaticDataService } from './static-data.service';
+import { RealTimeDataService } from './real-time-data.service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,6 +18,9 @@ export class DataService {
     }
 
     setFilter(type: string) {
+        this.routeTag = '';
+        this.stopTag = '';
+
         switch (type) {
             case Filter.Routes:
                 this.filter = Filter.Routes;

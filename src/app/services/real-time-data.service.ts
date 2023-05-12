@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { realTimeDataAPI } from '../environments/environment';
 import { Agency, rtTime, rtRoute, rtStop, rtRouteConfig } from '../interfaces/real-time-communications';
+import { Time } from '../interfaces/transit-concept';
 
 @Injectable({
     providedIn: 'root'
@@ -62,7 +63,7 @@ export class RealTimeDataService {
         return routeConfig;
     }
 
-    async getStopList(routeTag: string): Promise<rtStop[]> {
+    async getStopsOfRoute(routeTag: string): Promise<rtStop[]> {
         const stopList: rtStop[] = [];
 
         const res = await fetch(this.addCommandToURL('routeConfig', ['a', 'r'], [this.agency, routeTag]));
@@ -81,27 +82,29 @@ export class RealTimeDataService {
         return stopList;
     }
 
-    async getTimesFromStop(stopTag: string): Promise<rtTime[]> {
-        const timeList: rtTime[] = [];
+    async getTimesFromStop(stopTag: string): Promise<Time[]> {
+        const timeList: Time[] = [];
 
         const res = await fetch(this.addCommandToURL('predictions', ['a', 'stopId'], [this.agency, stopTag]));
         const xmlString = await res.text();
         const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
-        const times = xmlDocument.querySelectorAll('prediction');
-
-        times.forEach((time) => {
-            const seconds = Number(time.getAttribute('seconds'));
-            const minutes = Number(time.getAttribute('minutes'));
-            const epochTime = Number(time.getAttribute('epochTime'));
-            const isDeparture = Boolean(time.getAttribute('isDeparture'));
-            timeList.push({ seconds, minutes, epochTime, isDeparture });
-        });
+        const predictions = xmlDocument.querySelectorAll('predictions');
+        
+        predictions.forEach((route) => 
+            route.querySelectorAll('prediction').forEach((time) => {
+                const secondsAhead = Number(time.getAttribute('seconds'));
+                const minutesAhead = Number(time.getAttribute('minutes'));
+                const epochTime = Number(time.getAttribute('epochTime'));
+                const routeTitle = route.getAttribute('routeTitle');
+                timeList.push({ secondsAhead, minutesAhead, epochTime, routeTitle });
+            })
+        );
 
         return timeList.sort((a, b) => a.epochTime - b.epochTime);
     }
 
-    async getTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<rtTime[]> {
-        const timeList: rtTime[] = [];
+    async getTimesFromStopOfRoute(routeTag: string, stopTag: string): Promise<Time[]> {
+        const timeList: Time[] = [];
 
         const res = await fetch(
             this.addCommandToURL('predictions', ['a', 'stopId', 'routeTag'], [this.agency, stopTag, routeTag])
@@ -111,11 +114,10 @@ export class RealTimeDataService {
         const times = xmlDocument.querySelectorAll('prediction');
 
         times.forEach((time) => {
-            const seconds = Number(time.getAttribute('seconds'));
-            const minutes = Number(time.getAttribute('minutes'));
+            const secondsAhead = Number(time.getAttribute('seconds'));
+            const minutesAhead = Number(time.getAttribute('minutes'));
             const epochTime = Number(time.getAttribute('epochTime'));
-            const isDeparture = Boolean(time.getAttribute('isDeparture'));
-            timeList.push({ seconds, minutes, epochTime, isDeparture });
+            timeList.push({ secondsAhead, minutesAhead, epochTime });
         });
 
         return timeList;

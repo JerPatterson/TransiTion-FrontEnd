@@ -24,7 +24,7 @@ export class RouteInfographyComponent implements OnChanges {
     async ngOnChanges() {
         this.routeConfig = await this.rtDataService.getRouteConfig(this.routeTag);
         this.setCanvasDimensions();
-        this.stops = await this.rtDataService.getStopList(this.routeTag);
+        this.stops = await this.rtDataService.getStopsOfRoute(this.routeTag);
         this.addStops();
     }
 
