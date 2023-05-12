@@ -6,6 +6,13 @@
         </p>
     </div>
 
+    <div *ngIf="expectedTimes.length > 0 && expectedTimes[0].stopTitle">
+        <p>Nom de l'arrêt</p>
+        <p *ngFor="let expectedTime of expectedTimes">
+            {{ expectedTime.stopTitle }}
+        </p>
+    </div>
+
     <div>
         <p *ngIf="times.length === 1">Passage en temps réel</p>
         <p *ngIf="times.length > 1">Passages en temps réel</p>
