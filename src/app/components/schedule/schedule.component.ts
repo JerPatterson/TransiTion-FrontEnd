@@ -48,7 +48,6 @@ export class ScheduleComponent {
                 this.getTimesFromStopOfRoute();
                 this.getTimesExpectedFromStopOfRoute();
         }
-        console.log('Action done!');
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
