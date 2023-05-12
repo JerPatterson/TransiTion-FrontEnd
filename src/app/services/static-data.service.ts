@@ -35,7 +35,9 @@ export class StaticDataService {
                     epochTime: now + timeAhead,
                     secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
                     minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
-                    stopTitle: this.stops.get(trip.stop_id)?.stop_name,
+                    tripTag: trip.trip_id, 
+                    routeTag, 
+                    stopTag: this.stops.get(trip.stop_id)?.stop_code,
                 } 
             })
             .filter(time => time.epochTime > now)
@@ -51,6 +53,8 @@ export class StaticDataService {
                     epochTime: now + timeAhead,
                     secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
                     minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                    tripTag: trip.trip_id,
+                    stopTag,
                 } 
             })
             .filter(time => time.epochTime > now)
@@ -66,6 +70,9 @@ export class StaticDataService {
                     epochTime: now + timeAhead,
                     secondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
                     minutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
+                    tripTag: trip.trip_id,
+                    routeTag,
+                    stopTag,
                 } 
             })
             .filter(time => time.epochTime > now)

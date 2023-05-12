@@ -13,6 +13,7 @@ export interface Time {
     epochTime: number;
     minutesAhead: number;
     secondsAhead: number;
-    stopTitle?: string | null;
-    routeTitle?: string | null;
+    tripTag: string;
+    routeTag?: string;
+    stopTag?: string;
 }

@@ -1,15 +1,15 @@
 <div style="display: flex; flex-direction: row; gap: 10px;">
-    <div *ngIf="times.length > 0 && times[0].routeTitle">
+    <div *ngIf="times.length > 0 && times[0].routeTag">
         <p>Nom de la ligne</p>
         <p *ngFor="let time of times">
-            {{ time.routeTitle }}
+            {{ time.routeTag }}
         </p>
     </div>
 
-    <div *ngIf="expectedTimes.length > 0 && expectedTimes[0].stopTitle">
+    <div *ngIf="expectedTimes.length > 0 && expectedTimes[0].stopTag">
         <p>Nom de l'arrêt</p>
         <p *ngFor="let expectedTime of expectedTimes">
-            {{ expectedTime.stopTitle }}
+            {{ expectedTime.stopTag }}
         </p>
     </div>
 

@@ -92,11 +92,13 @@ export class RealTimeDataService {
         
         predictions.forEach((route) => 
             route.querySelectorAll('prediction').forEach((time) => {
+                const epochTime = Number(time.getAttribute('epochTime'));
                 const secondsAhead = Number(time.getAttribute('seconds'));
                 const minutesAhead = Number(time.getAttribute('minutes'));
-                const epochTime = Number(time.getAttribute('epochTime'));
-                const routeTitle = route.getAttribute('routeTitle');
-                timeList.push({ secondsAhead, minutesAhead, epochTime, routeTitle });
+                const tripTag = time.getAttribute('tripTag');
+                const routeTag = route.getAttribute('routeTag');
+                if (tripTag && routeTag) 
+                    timeList.push({ secondsAhead, minutesAhead, epochTime, tripTag, routeTag, stopTag });
             })
         );
 
@@ -114,10 +116,12 @@ export class RealTimeDataService {
         const times = xmlDocument.querySelectorAll('prediction');
 
         times.forEach((time) => {
+            const epochTime = Number(time.getAttribute('epochTime'));
             const secondsAhead = Number(time.getAttribute('seconds'));
             const minutesAhead = Number(time.getAttribute('minutes'));
-            const epochTime = Number(time.getAttribute('epochTime'));
-            timeList.push({ secondsAhead, minutesAhead, epochTime });
+            const tripTag = time.getAttribute('tripTag');
+            if (tripTag) 
+                timeList.push({ secondsAhead, minutesAhead, epochTime, tripTag, routeTag, stopTag });
         });
 
         return timeList;
