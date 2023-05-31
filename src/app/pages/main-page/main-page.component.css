@@ -1,0 +1,51 @@
+.delimitation {
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+.region-title {
+    margin-top: 1%;
+    margin-left: 1%;
+}
+
+.page-title, .region-title {
+    color: #0a2196;
+    margin-bottom: 0px;
+    padding-bottom: 5px;
+}
+
+.agency-group {
+    background-color: #f0f8ff;
+    border: #ffffff;
+    border-radius: 10px;
+    padding-bottom: 6px;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5%;
+    padding-left: 1%;
+}
+
+button.agency-logo {
+    padding: 8px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+}
+
+button.agency-logo:enabled:hover {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
+img.agency-logo {
+    max-width: 140px;
+    max-height: 140px;
+}
+
+button.agency-logo:disabled > img.agency-logo {
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
