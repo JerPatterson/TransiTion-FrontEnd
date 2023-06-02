@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Route } from '@app/interfaces/concepts';
 import { CommunicationService } from '@app/services/communication.service';
 
 @Component({
@@ -7,7 +8,7 @@ import { CommunicationService } from '@app/services/communication.service';
     styleUrls: ['./routes-page.component.css']
 })
 export class RoutesPageComponent {
-    routes: any[] = [];
+    routes: Route[] = [];
 
     constructor(private communication: CommunicationService) {
         this.setRoutes();
@@ -15,8 +16,6 @@ export class RoutesPageComponent {
 
     private async setRoutes() {
         (await this.communication.getRoutesFromAgency('STL'))
-            .forEach(doc => {
-                this.routes.push({ id: doc.id, data: doc.data()});
-            });
+            .forEach(doc => this.routes.push({ ...doc.data(), id: doc.id } as Route));
     }
 }
