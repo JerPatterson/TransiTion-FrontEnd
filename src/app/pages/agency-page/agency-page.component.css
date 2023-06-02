@@ -3,11 +3,6 @@
     padding-top: 0px;
 }
 
-.region-title {
-    margin-top: 1%;
-    margin-left: 1%;
-}
-
 .page-title {
     color: #0a2196;
     margin-bottom: 0px;
@@ -23,7 +18,7 @@
 button.option-icon {
     padding: 8px;
     border: 2px solid transparent;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 button.option-icon:enabled:hover {

@@ -1,0 +1,52 @@
+.delimitation {
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+.page-title {
+    color: #0a2196;
+    margin-bottom: 0px;
+    padding-bottom: 5px;
+}
+
+.route-container {
+    margin: 5px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-color: #cfcfcf;
+}
+
+.route-container:hover {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
+.route-name {
+    width: 60%;
+    font-size: 150%;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.route-icon {
+    margin-right: 0.5%;
+    padding: 1%;
+    border-radius: 5%;
+    background-color: #0a2196;
+}
+
+.route-icon > span {
+    color: aliceblue;
+    font-size: 100%;
+    font-weight: bold;
+}
+
+.route-info-icon {
+    max-width: 50px;
+    max-height: 50px;
+}
+

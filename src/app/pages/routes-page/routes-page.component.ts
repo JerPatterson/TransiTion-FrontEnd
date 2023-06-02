@@ -8,13 +8,32 @@ import { CommunicationService } from '@app/services/communication.service';
     styleUrls: ['./routes-page.component.css']
 })
 export class RoutesPageComponent {
-    routes: Route[] = [];
+    routes: Route[] = [
+        {
+            id: '12E',
+            name: '12E PONT-VIAU',
+            type: 3,
+        },
+        {
+            id: '17N',
+            name: '17N AUTEUIL',
+            type: 3,
+        },
+        {
+            id: '31N',
+            name: '31N AUTEUIL',
+            type: 3,
+        },
+        {
+            id: '45N',
+            name: '45N AUTEUIL',
+            type: 3,
+        }
+    ];
 
-    constructor(private communication: CommunicationService) {
-        this.setRoutes();
-    }
+    constructor(private communication: CommunicationService) {}
 
-    private async setRoutes() {
+    async setRoutes() {
         (await this.communication.getRoutesFromAgency('STL'))
             .forEach(doc => this.routes.push({ ...doc.data(), id: doc.id } as Route));
     }

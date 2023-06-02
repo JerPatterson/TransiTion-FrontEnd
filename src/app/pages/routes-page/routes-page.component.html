@@ -1,1 +1,14 @@
-<p *ngFor="let route of this.routes">{{ route.name }}</p>
+<h1 class="page-title">Les lignes de ...</h1>
+<hr class="delimitation">
+
+<div class="route-container" *ngFor="let route of this.routes">
+    <span class="route-name">
+        <span class="route-icon">
+            <span>{{ route.id }}</span>
+        </span>
+        <span>{{ route.name }}</span>
+    </span>
+    <span class="route-info">
+        <img *ngIf="route.type === 3" class="route-info-icon" src="./assets/options/bus.png"/>
+    </span>
+</div>
