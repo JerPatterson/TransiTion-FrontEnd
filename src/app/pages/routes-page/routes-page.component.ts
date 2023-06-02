@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Route } from '@app/interfaces/concepts';
 import { CommunicationService } from '@app/services/communication.service';
 
@@ -8,33 +9,18 @@ import { CommunicationService } from '@app/services/communication.service';
     styleUrls: ['./routes-page.component.css']
 })
 export class RoutesPageComponent {
-    routes: Route[] = [
-        {
-            id: '12E',
-            name: '12E PONT-VIAU',
-            type: 3,
-        },
-        {
-            id: '17N',
-            name: '17N AUTEUIL',
-            type: 3,
-        },
-        {
-            id: '31N',
-            name: '31N AUTEUIL',
-            type: 3,
-        },
-        {
-            id: '45N',
-            name: '45N AUTEUIL',
-            type: 3,
-        }
-    ];
+    agency: string | null;
+    routes: Route[] = [];
 
-    constructor(private communication: CommunicationService) {}
+    constructor(private route: ActivatedRoute, private communication: CommunicationService) {
+        this.agency = this.route.snapshot.paramMap.get('agency-name');
+        this.setRoutes();
+    }
 
-    async setRoutes() {
-        (await this.communication.getRoutesFromAgency('STL'))
+    private async setRoutes() {
+        if (!this.agency) return;
+        (await this.communication.getRoutesFromAgency(this.agency))
             .forEach(doc => this.routes.push({ ...doc.data(), id: doc.id } as Route));
+        this.routes = this.routes.sort((a, b) => a.id.length - b.id.length);
     }
 }

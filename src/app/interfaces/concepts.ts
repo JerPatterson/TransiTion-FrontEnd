@@ -2,6 +2,9 @@ import { RouteType } from '@app/enums/attributes';
 
 export interface Route {
     id: string,
-    name: string,
+    destination: string,
     type: RouteType,
+    color: string,
+    nightOnly: boolean,
+    accessible: boolean,
 }
