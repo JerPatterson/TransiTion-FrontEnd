@@ -5,12 +5,14 @@ import { AppComponent } from '@app/app/app.component';
 import { AppRoutingModule } from '@app/app-routing.module';
 import { AgencyPageComponent } from './pages/agency-page/agency-page.component';
 import { MainPageComponent } from './pages/main-page/main-page.component';
+import { RoutesPageComponent } from './pages/routes-page/routes-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainPageComponent,
-    AgencyPageComponent
+    AgencyPageComponent,
+    RoutesPageComponent
   ],
   imports: [
     AppRoutingModule,
