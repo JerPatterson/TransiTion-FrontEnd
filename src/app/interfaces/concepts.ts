@@ -1,27 +1,35 @@
 import { RouteType } from '@app/enums/attributes';
 
 export interface Route {
-    id: string,
-    destination: string,
-    type: RouteType,
-    color: string,
-    nightOnly: boolean,
-    accessible: boolean,
+    id: string;
+    destination: string;
+    type: RouteType;
+    color: string;
+    nightOnly: boolean;
+    accessible: boolean;
 }
 
 export interface Location {
-    lon: number,
-    lat: number,
+    lon: number;
+    lat: number;
 }
 
 export interface Stop {
-    id: string,
-    code: string,
-    name: string,
-    location: Location,
-    hasShelter: boolean,
-    hasDisplay: boolean,
-    accessible: boolean,
-    routeIds: string[],
-    tripIds: string[],
+    id: string;
+    code: string;
+    name: string;
+    location: Location;
+    hasShelter: boolean;
+    hasDisplay: boolean;
+    accessible: boolean;
+    routeIds: string[];
+    tripIds: string[];
+}
+
+export interface Time {
+    routeId: string;
+    tripId: string;
+    epochTime: number;
+    minutesAhead: number;
+    secondsAhead: number;
 }
