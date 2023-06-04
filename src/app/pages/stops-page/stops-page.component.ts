@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Stop } from '@app/interfaces/concepts';
-import { CommunicationService } from '@app/services/communication.service';
+import { StaticDataService } from '@app/services/static-data.service';
 
 @Component({
     selector: 'app-stops-page',
@@ -11,7 +11,7 @@ import { CommunicationService } from '@app/services/communication.service';
 export class StopsPageComponent {
     stops: Stop[] = [];
     
-    constructor(private route: ActivatedRoute, private communication: CommunicationService) {
+    constructor(private route: ActivatedRoute, private stDataService: StaticDataService) {
         this.setStops();
     }
     
@@ -20,7 +20,7 @@ export class StopsPageComponent {
         const routeId = this.route.snapshot.paramMap.get('route-id');
 
         if (!agency) return;
-        const stops = await this.communication.getStopsFromAgency(agency);
+        const stops = await this.stDataService.getStopsFromAgency(agency);
 
         if (!stops) return;
         this.stops = routeId ? stops.filter(r => r.routeIds.includes(routeId)) : stops;

@@ -6,7 +6,7 @@ import { getFirestore, Firestore, doc, collection, getDoc, getDocs } from 'fireb
 @Injectable({
     providedIn: 'root'
 })
-export class CommunicationService {
+export class StaticDataService {
     private app: FirebaseApp;
     private db: Firestore;
 
