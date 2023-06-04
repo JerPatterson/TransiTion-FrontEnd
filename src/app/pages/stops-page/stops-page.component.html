@@ -1,0 +1,17 @@
+<h1 class="page-title">Les arrêts de transport en commun</h1>
+<hr class="delimitation">
+
+<div class="stop-container" *ngFor="let stop of this.stops">
+    <span class="stop-name">
+        <span class="stop-icon">
+            <span>{{ stop.code }}</span>
+        </span>
+        <span>{{ stop.name }}</span>
+    </span>
+    <span class="stop-info">
+        <img *ngIf="stop.hasDisplay" class="stop-info-icon" src="./assets/options/display.png"/>
+        <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/options/accessible.png"/>
+        <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/options/stop.png"/>
+        <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/options/stop-sign.png"/>
+    </span>
+</div>

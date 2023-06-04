@@ -28,11 +28,15 @@ export class CommunicationService {
         return this.getDocumentFromAgency(agencyId, 'all', 'routes');
     }
 
+    async getStopsFromAgency(agencyId: string) {
+        return this.getDocumentFromAgency(agencyId, 'all', 'stops');
+    }
+
     async getCollectionFromAgency(agencyId: string, collectionId: string) {
         return getDocs(collection(this.db, 'agencies', agencyId, collectionId));
     }
 
-    async getDocumentFromAgency(agencyId: string, collectionId: string, documentId: string) {
+    private async getDocumentFromAgency(agencyId: string, collectionId: string, documentId: string) {
         return getDoc(doc(collection(this.db, 'agencies', agencyId, collectionId), documentId));
     }
 }

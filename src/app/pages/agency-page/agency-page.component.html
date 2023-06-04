@@ -2,13 +2,13 @@
 <hr class="delimitation">
 
 <div class="button-group">
-    <button class="option-icon"  [routerLink]="['/routes/stl']">
+    <button class="option-icon" [routerLink]="['/routes/stl']">
         <div>
             <img class="option-icon" src="assets/options/bus.png" />
             <p>Visualiser toutes les lignes du réseau</p>
         </div>
     </button>
-    <button class="option-icon" disabled>
+    <button class="option-icon" [routerLink]="['/stops/stl']">
         <div>
             <img class="option-icon" src="assets/options/stop.png" />
             <p>Visualiser tous les arrêts du réseau</p>
