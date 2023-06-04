@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { getFirestore, Firestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, Firestore, doc, collection, getDoc, getDocs } from 'firebase/firestore';
 
 @Injectable({
     providedIn: 'root'
@@ -25,10 +25,14 @@ export class CommunicationService {
     }
 
     async getRoutesFromAgency(agencyId: string) {
-        return this.getCollectionFromAgency(agencyId, 'routes');
+        return this.getDocumentFromAgency(agencyId, 'all', 'routes');
     }
 
-    private async getCollectionFromAgency(agencyId: string, collectionId: string) {
+    async getCollectionFromAgency(agencyId: string, collectionId: string) {
         return getDocs(collection(this.db, 'agencies', agencyId, collectionId));
+    }
+
+    async getDocumentFromAgency(agencyId: string, collectionId: string, documentId: string) {
+        return getDoc(doc(collection(this.db, 'agencies', agencyId, collectionId), documentId));
     }
 }
