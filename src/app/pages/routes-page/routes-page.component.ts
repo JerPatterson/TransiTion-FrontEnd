@@ -19,8 +19,7 @@ export class RoutesPageComponent {
 
     private async setRoutes() {
         if (!this.agency) return;
-        this.routes = ((await this.communication.getRoutesFromAgency(this.agency))
-            .data()?.arr as Route[])
+        this.routes = (await this.communication.getRoutesFromAgency(this.agency))
             .sort((a, b) => a.id.length - b.id.length);
     }
 }

@@ -20,9 +20,9 @@ export class StopsPageComponent {
         const routeId = this.route.snapshot.paramMap.get('route-id');
 
         if (!agency) return;
-        const stops = (await this.communication.getStopsFromAgency(agency)).data()?.arr;
+        const stops = await this.communication.getStopsFromAgency(agency);
 
         if (!stops) return;
-        this.stops = routeId ? (stops as Stop[]).filter(r => r.routeIds.includes(routeId)) : stops;
+        this.stops = routeId ? stops.filter(r => r.routeIds.includes(routeId)) : stops;
     }
 }
