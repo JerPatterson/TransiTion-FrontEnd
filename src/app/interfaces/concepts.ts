@@ -8,3 +8,20 @@ export interface Route {
     nightOnly: boolean,
     accessible: boolean,
 }
+
+export interface Location {
+    lon: number,
+    lat: number,
+}
+
+export interface Stop {
+    id: string,
+    code: string,
+    name: string,
+    location: Location,
+    hasShelter: boolean,
+    hasDisplay: boolean,
+    accessible: boolean,
+    routeIds: string[],
+    tripIds: string[],
+}
