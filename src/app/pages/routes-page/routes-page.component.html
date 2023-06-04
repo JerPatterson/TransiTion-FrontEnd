@@ -1,7 +1,7 @@
 <h1 class="page-title">Les lignes de transport en commun</h1>
 <hr class="delimitation">
 
-<div class="route-container" *ngFor="let route of this.routes">
+<div *ngFor="let route of this.routes" class="route-container" [routerLink]="['/stops', agency, route.id]">
     <span class="route-name">
         <span class="route-icon">
             <span>{{ route.id }}</span>

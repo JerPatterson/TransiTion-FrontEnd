@@ -11,6 +11,7 @@ const routes: Routes = [
     { path: 'agency/:agency-name', component: AgencyPageComponent },
     { path: 'routes/:agency-name', component: RoutesPageComponent },
     { path: 'stops/:agency-name', component: StopsPageComponent },
+    { path: 'stops/:agency-name/:route-id', component: StopsPageComponent },
     { path: '**', redirectTo: '/agency-list' },
 ];
 

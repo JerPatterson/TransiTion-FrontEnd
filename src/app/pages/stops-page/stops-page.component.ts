@@ -9,18 +9,20 @@ import { CommunicationService } from '@app/services/communication.service';
     styleUrls: ['./stops-page.component.css']
 })
 export class StopsPageComponent {
-    agency: string | null;
     stops: Stop[] = [];
     
     constructor(private route: ActivatedRoute, private communication: CommunicationService) {
-        this.agency = this.route.snapshot.paramMap.get('agency-name');
         this.setStops();
     }
     
     private async setStops() {
-        if (!this.agency) return;
-        this.stops = ((await this.communication.getStopsFromAgency(this.agency))
-            .data()?.arr as Stop[])
-            .sort((a, b) => a.id.length - b.id.length);
+        const agency = this.route.snapshot.paramMap.get('agency-name');
+        const routeId = this.route.snapshot.paramMap.get('route-id');
+
+        if (!agency) return;
+        const stops = (await this.communication.getStopsFromAgency(agency)).data()?.arr;
+
+        if (!stops) return;
+        this.stops = routeId ? (stops as Stop[]).filter(r => r.routeIds.includes(routeId)) : stops;
     }
 }
