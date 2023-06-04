@@ -9,9 +9,9 @@
         <span>{{ stop.name }}</span>
     </span>
     <span class="stop-info">
-        <img *ngIf="stop.hasDisplay" class="stop-info-icon" src="./assets/options/display.png"/>
-        <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/options/accessible.png"/>
-        <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/options/stop.png"/>
-        <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/options/stop-sign.png"/>
+        
+        <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/icons/accessible.png"/>
+        <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
+        <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
     </span>
 </div>
