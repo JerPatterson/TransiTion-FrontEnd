@@ -1,0 +1,4 @@
+<span>Test</span>
+<div *ngFor="let time of mergeTimes">
+    Passage en temps réel -> {{ formatTimeToWait(this.time.rt.minutesAhead, this.time.rt.secondsAhead) }} | Passage planifié -> {{ time.st.scheduledTime }} 
+</div>

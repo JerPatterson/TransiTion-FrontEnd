@@ -13,12 +13,13 @@ export class RealtimeDataService {
     
     async getTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
         const timeList: Time[] = [];
-        const url = this.addCommandToURL('predictions', `a=${agencyId}`, `stopID${stopId}`);
+        const url = this.addCommandToURL('predictions', `a=${agencyId}`, `stopId=${stopId}`);
 
         const res = await fetch(url);
         const xmlString = await res.text();
         const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
         const predictions = xmlDocument.querySelectorAll('predictions');
+        console.log(xmlDocument);
         
         predictions.forEach((route) => 
             route.querySelectorAll('prediction').forEach((time) => {
@@ -36,6 +37,6 @@ export class RealtimeDataService {
     }
     
     private addCommandToURL(commandName: string, ...params: string[]): string {
-        return `${this.rtDataAPI}command=${commandName}${params.reduce((previous, current) => `${previous}&${current}`)}`;
+        return `${this.rtDataAPI}command=${commandName}&${params.reduce((previous, current) => `${previous}&${current}`)}`;
     }
 }

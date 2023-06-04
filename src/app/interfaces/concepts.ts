@@ -33,3 +33,16 @@ export interface Time {
     minutesAhead: number;
     secondsAhead: number;
 }
+
+export interface ScheduledTime {
+    scheduledTime: string;
+    stopId: string
+}
+
+export interface Trip {
+    routeId: string;
+    destinationHeadSign: string;
+    serviceId: string;
+    wheelchairAccessibility: number;
+    times: ScheduledTime[];
+}

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Route, Stop } from '@app/interfaces/concepts';
+import { Route, Stop, Trip } from '@app/interfaces/concepts';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc, getDocs } from 'firebase/firestore';
 
@@ -43,6 +43,10 @@ export class StaticDataService {
         sessionStorage.setItem(`${agencyId}/stops`, JSON.stringify(content));
     
         return content;
+    }
+
+    async getTimesFromTripId(agencyId: string, tripId: string) {
+        return (await this.getDocumentFromAgency(agencyId, 'trips', tripId)).data() as Trip;
     }
 
     async getCollectionFromAgency(agencyId: string, collectionId: string) {

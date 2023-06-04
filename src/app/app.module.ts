@@ -7,6 +7,7 @@ import { AgencyPageComponent } from './pages/agency-page/agency-page.component';
 import { MainPageComponent } from './pages/main-page/main-page.component';
 import { RoutesPageComponent } from './pages/routes-page/routes-page.component';
 import { StopsPageComponent } from './pages/stops-page/stops-page.component';
+import { SchedulePageComponent } from './pages/schedule-page/schedule-page.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { StopsPageComponent } from './pages/stops-page/stops-page.component';
     MainPageComponent,
     AgencyPageComponent,
     RoutesPageComponent,
-    StopsPageComponent
+    StopsPageComponent,
+    SchedulePageComponent
   ],
   imports: [
     AppRoutingModule,
