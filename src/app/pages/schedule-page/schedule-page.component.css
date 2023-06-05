@@ -3,8 +3,43 @@
     padding-top: 0px;
 }
 
-.page-title {
+.page-title, .column-title {
     color: #0a2196;
     margin-bottom: 0px;
     padding-bottom: 5px;
+}
+
+.column-title {
+    margin-top: 1%;
+    margin-left: 1%;
+}
+
+
+.schedule-container {
+    max-width: 36%;
+    display: grid;
+    grid-template-columns: 29% 29% 42%;
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-color: #cfcfcf;
+}
+
+.schedule-column {
+    padding: 8px;
+}
+
+.schedule-based {
+    grid-column: 1;
+}
+
+.realtime-based {
+    grid-column: 2;
+}
+
+.service-state {
+    grid-column: 3;
+}
+
+p, span {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
