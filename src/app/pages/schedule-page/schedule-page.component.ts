@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/constants/time';
+import { ACCEPTABLE_DELAY_IN_SEC, ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/constants/time';
+import { TripArrivalState } from '@app/enums/states';
 import { Stop, Time } from '@app/interfaces/concepts';
 import { ScheduleService } from '@app/services/schedule.service';
-import { StaticDataService } from '@app/services/static-data.service';
 
 @Component({
     selector: 'app-schedule-page',
@@ -16,11 +16,9 @@ export class SchedulePageComponent {
 
     constructor(
         private route: ActivatedRoute,
-        private stDataService: StaticDataService,
         private scheduleService: ScheduleService,
     ) {
         this.setTimes();
-        this.setStops();
     }
 
     async setTimes() {
@@ -30,15 +28,6 @@ export class SchedulePageComponent {
 
         if (!agencyId || !routeId || !stopId) return;
         this.times = await this.scheduleService.getTimesFromStopOfRoute(agencyId, routeId, stopId)
-    }
-
-    async setStops() {
-        const agencyId = this.route.snapshot.paramMap.get('agency-name');
-
-        if (!agencyId) return;
-        (await this.stDataService.getStopsFromAgency(agencyId)).forEach(stop =>
-            this.stops.set(stop.id, stop)
-        );
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {
@@ -52,6 +41,24 @@ export class SchedulePageComponent {
         stringContent += `${this.convertToTwoDigit(waitSec < 0 ? ONE_MINUTE_IN_SEC + waitSec : waitSec)}sec`
 
         return stringContent;
+    }
+
+    formatTimeDifference(time: Time): string {
+        if (!time.rtMinutesAhead || !time.rtSecondsAhead) return ' ';
+        const minutes = Math.abs(time.stMinutesAhead - time.rtMinutesAhead);
+        const seconds = Math.abs(time.stSecondsAhead - time.rtSecondsAhead);
+        return this.formatTimeToWait(minutes, seconds);
+    }
+
+    getTripArrivalState(time: Time): TripArrivalState {
+        if (time.rtSecondsAhead === undefined) return TripArrivalState.Unknown;
+        const difference = time.rtSecondsAhead - time.stSecondsAhead;
+        if (difference < -ACCEPTABLE_DELAY_IN_SEC) 
+            return TripArrivalState.Early;
+        else if (difference > ACCEPTABLE_DELAY_IN_SEC)
+            return TripArrivalState.Late;
+        else
+            return TripArrivalState.OnTime;
     }
 
     private convertToTwoDigit(number: number) {

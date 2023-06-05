@@ -23,27 +23,16 @@
     <div class="schedule-column service-state">
         <h3 class="column-title">État du service</h3>
         <p *ngFor="let time of times">
-            <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
+            <br *ngIf="getTripArrivalState(time) === 4">
             <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
-                <span *ngIf="time.rtSecondsAhead - time.stSecondsAhead > -15
-                    && time.rtSecondsAhead - time.stSecondsAhead < 15">
+                <span *ngIf="getTripArrivalState(time) === 0">
+                    En avance de {{ this.formatTimeDifference(time) }}
+                </span>
+                <span *ngIf="getTripArrivalState(time) === 1">
                     À l'heure
                 </span>
-                <span *ngIf="time.rtSecondsAhead - time.stSecondsAhead < -15">
-                    En avance de {{ 
-                        this.formatTimeToWait(
-                            time.stMinutesAhead - time.rtMinutesAhead,
-                            time.stSecondsAhead - time.rtSecondsAhead
-                        ) 
-                    }}
-                </span>
-                <span *ngIf="time.rtSecondsAhead - time.stSecondsAhead > 15">
-                    En retard de {{ 
-                        this.formatTimeToWait(
-                            time.rtMinutesAhead - time.stMinutesAhead,
-                            time.rtSecondsAhead - time.stSecondsAhead
-                        ) 
-                    }}
+                <span *ngIf="getTripArrivalState(time) === 2">
+                    En retard de {{ this.formatTimeDifference(time) }}
                 </span>
             </span>
         </p>
