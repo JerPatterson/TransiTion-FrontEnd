@@ -1,10 +1,51 @@
-<span>Test</span>
-<div *ngFor="let tripTimes of mergeTimes">
-    Voyage :
-    <div *ngFor="let time of tripTimes">
-        {{ formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
-        <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
-            // {{ formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
-        </span>
+<h1 class="page-title">Horaire des passages</h1>
+<hr class="delimitation">
+
+<div style="display: flex; flex-direction: row; gap: 10px;">
+
+    <div>
+        <p>Passages planifiés</p>
+        <p *ngFor="let time of times">
+            {{ this.formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
+        </p>
+    </div>
+
+    <div>
+        <p>Passages en temps réel</p>
+        <p *ngFor="let time of times">
+            <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
+            <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
+                {{ this.formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
+            </span>
+        </p>
+    </div>
+
+    <div>
+        <p>État des passage</p>
+        <p *ngFor="let time of times">
+            <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
+            <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
+                <span *ngIf="time.rtSecondsAhead - time.stSecondsAhead > -15
+                    && time.rtSecondsAhead - time.stSecondsAhead < 15">
+                    À l'heure
+                </span>
+                <span *ngIf="time.rtSecondsAhead - time.stSecondsAhead < -15">
+                    En avance de {{ 
+                        this.formatTimeToWait(
+                            time.stMinutesAhead - time.rtMinutesAhead,
+                            time.stSecondsAhead - time.rtSecondsAhead
+                        ) 
+                    }}
+                </span>
+                <span *ngIf="time.rtSecondsAhead - time.stSecondsAhead > 15">
+                    En retard de {{ 
+                        this.formatTimeToWait(
+                            time.rtMinutesAhead - time.stMinutesAhead,
+                            time.rtSecondsAhead - time.stSecondsAhead
+                        ) 
+                    }}
+                </span>
+            </span>
+        </p>
     </div>
 </div>

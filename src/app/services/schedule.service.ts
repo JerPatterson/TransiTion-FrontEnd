@@ -13,26 +13,27 @@ export class ScheduleService {
         private rtDataService: RealtimeDataService,
     ) {}
 
-    async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[][]> {
+    async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
         const trips = await this.stDataService.getTodayTripsFromRoute(agencyId, routeId);
         const predictions = await this.rtDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
         
-        const times = trips.map(trip => {
-            return trip.times.map(time => {
-                const prediction = predictions.find(pred => 
-                    pred.tripId === trip.id && time.stopId.includes(stopId));
-                return this.computeTimeObject(time, prediction);
-            });
+        const stopTimes: Time[] = [];
+        trips.forEach(trip => {
+            const time = trip.times.find(time => time.stopId === stopId);
+            const prediction = predictions.find(prediction => 
+                prediction.tripId === trip.id && time?.stopId.includes(stopId));
+            if (time) stopTimes.push(this.computeTimeObject(time, prediction));
         });
-
-        return times
-            .filter(trip => trip[0].stEpochTime > Date.now())
-            .sort((a, b) => a[0].stEpochTime - b[0].stEpochTime);
+        
+        return stopTimes
+            .filter(time => time.stEpochTime > Date.now())
+            .sort((a, b) => a.stEpochTime - b.stEpochTime);
     }
 
     private computeTimeObject(stData: ScheduledTime, rtData?: PredictedTime): Time {
         const timeAhead = this.getTimeAheadInMilliseconds(stData.scheduledTime);
         return {
+            stopId: stData.stopId,
             stEpochTime: Date.now() + timeAhead,
             stSecondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
             stMinutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),

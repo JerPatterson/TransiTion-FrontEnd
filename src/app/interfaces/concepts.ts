@@ -27,6 +27,7 @@ export interface Stop {
 }
 
 export interface Time {
+    stopId: string;
     stEpochTime: number;
     stMinutesAhead: number;
     stSecondsAhead: number;
