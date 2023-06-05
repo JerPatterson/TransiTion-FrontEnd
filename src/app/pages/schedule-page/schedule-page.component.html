@@ -1,4 +1,10 @@
 <span>Test</span>
-<div *ngFor="let time of mergeTimes">
-    Passage en temps réel -> {{ formatTimeToWait(this.time.rt.minutesAhead, this.time.rt.secondsAhead) }} | Passage planifié -> {{ time.st.scheduledTime }} 
+<div *ngFor="let tripTimes of mergeTimes">
+    Voyage :
+    <div *ngFor="let time of tripTimes">
+        {{ formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
+        <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
+            // {{ formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
+        </span>
+    </div>
 </div>

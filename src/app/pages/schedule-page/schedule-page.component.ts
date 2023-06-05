@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { RealtimeDataService } from '@app/services/realtime-data.service';
-import { StaticDataService } from '@app/services/static-data.service';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/constants/time';
-import { ScheduledTime, Time } from '@app/interfaces/concepts';
+import { Time } from '@app/interfaces/concepts';
+import { ScheduleService } from '@app/services/schedule.service';
 
 @Component({
     selector: 'app-schedule-page',
@@ -11,12 +10,11 @@ import { ScheduledTime, Time } from '@app/interfaces/concepts';
     styleUrls: ['./schedule-page.component.css']
 })
 export class SchedulePageComponent {
-    mergeTimes: { rt: Time, st: ScheduledTime }[] = [];
+    mergeTimes: Time[][] = [];
 
     constructor(
         private route: ActivatedRoute,
-        private stDataService: StaticDataService,
-        private rtDataService: RealtimeDataService,
+        private scheduleService: ScheduleService,
     ) {
         this.setTimes();
     }
@@ -25,17 +23,12 @@ export class SchedulePageComponent {
         const agencyId = this.route.snapshot.paramMap.get('agency-name');
         const routeId = this.route.snapshot.paramMap.get('route-id');
         const stopId = this.route.snapshot.paramMap.get('stop-id');
-        
-        if (!agencyId || !stopId) return;
+        console.log('here');
 
-        let predictedTimes: Time[] = [];
-        if (routeId) () => {};
-        else  predictedTimes = await this.rtDataService.getTimesFromStop(agencyId, stopId);
-        predictedTimes.forEach(async (predictedTime) => {
-            const st = (await this.stDataService.getTimesFromTripId(agencyId, 'MARS23' + predictedTime.tripId))
-                .times.find(time => time.stopId.includes(stopId));
-            if (st) this.mergeTimes.push({ rt: predictedTime, st });
-        })
+        if (!agencyId || !routeId || !stopId) return;
+
+        console.log('here');
+        this.mergeTimes = await this.scheduleService.getTimesFromStopOfRoute(agencyId, routeId, stopId)
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

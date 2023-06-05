@@ -1,4 +1,4 @@
-import { RouteType } from '@app/enums/attributes';
+import { DropOffType, PickupType, RouteType } from '@app/enums/attributes';
 
 export interface Route {
     id: string;
@@ -27,6 +27,15 @@ export interface Stop {
 }
 
 export interface Time {
+    stEpochTime: number;
+    stMinutesAhead: number;
+    stSecondsAhead: number;
+    rtEpochTime?: number;
+    rtMinutesAhead?: number;
+    rtSecondsAhead?: number;
+}
+
+export interface PredictedTime {
     routeId: string;
     tripId: string;
     epochTime: number;
@@ -35,14 +44,17 @@ export interface Time {
 }
 
 export interface ScheduledTime {
+    stopId: string;
     scheduledTime: string;
-    stopId: string
+    pickupType: PickupType;
+    dropOffType: DropOffType;
+    sequenceNb: number;
 }
 
 export interface Trip {
-    routeId: string;
-    destinationHeadSign: string;
-    serviceId: string;
+    id: string;
+    shapeId: string;
+    destination: string;
     wheelchairAccessibility: number;
     times: ScheduledTime[];
 }

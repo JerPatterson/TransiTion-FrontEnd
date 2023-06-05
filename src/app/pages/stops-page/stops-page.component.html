@@ -1,7 +1,7 @@
 <h1 class="page-title">Les arrêts de transport en commun</h1>
 <hr class="delimitation">
 
-<div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.code]">
+<div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.code]">
     <span class="stop-name">
         <span class="stop-icon">
             <span>{{ stop.code }}</span>

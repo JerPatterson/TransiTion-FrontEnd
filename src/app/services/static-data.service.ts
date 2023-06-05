@@ -45,8 +45,12 @@ export class StaticDataService {
         return content;
     }
 
-    async getTimesFromTripId(agencyId: string, tripId: string) { // TODO
-        return (await this.getDocumentFromAgency(agencyId, 'trips')).data() as Trip;
+    async getTodayTripsFromRoute(agencyId: string, routeId: string): Promise<Trip[]> {
+        return this.getTripsFromRoute(agencyId, routeId, 'MARS23SEM'); // TODO
+    }
+
+    private async getTripsFromRoute(agencyId: string, routeId: string, serviceId: string): Promise<Trip[]> {
+        return (await this.getDocumentFromAgency(agencyId, `trips/${routeId}/${serviceId}`)).data()?.arr as Trip[];
     }
 
     private async getDocumentFromAgency(agencyId: string, documentId: string) {

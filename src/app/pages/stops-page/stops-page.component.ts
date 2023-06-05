@@ -10,19 +10,24 @@ import { StaticDataService } from '@app/services/static-data.service';
 })
 export class StopsPageComponent {
     stops: Stop[] = [];
+
+    agencyId: string | undefined;
+    routeId: string | undefined;
     
     constructor(private route: ActivatedRoute, private stDataService: StaticDataService) {
         this.setStops();
     }
     
     private async setStops() {
-        const agency = this.route.snapshot.paramMap.get('agency-name');
+        const agencyId = this.route.snapshot.paramMap.get('agency-name');
         const routeId = this.route.snapshot.paramMap.get('route-id');
 
-        if (!agency) return;
-        const stops = await this.stDataService.getStopsFromAgency(agency);
+        if (!agencyId) return;
+        this.agencyId = agencyId;
+        const stops = await this.stDataService.getStopsFromAgency(agencyId);
 
-        if (!stops) return;
+        if (!stops || !routeId) return;
+        this.routeId = routeId;
         this.stops = routeId ? stops.filter(r => r.routeIds.includes(routeId)) : stops;
     }
 }
