@@ -24,3 +24,18 @@ export enum DropOffType {
     MustPhoneAgencToArrangeDropOff,
     MustCoordinateWithDriverToArrangeDropOff,
 }
+
+export enum DateException {
+    Replacing = 1,
+    BeingReplace = 2,
+}
+
+export enum Day {
+    Sunday,
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+}
