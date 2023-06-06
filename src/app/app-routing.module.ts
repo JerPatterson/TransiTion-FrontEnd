@@ -13,6 +13,7 @@ const routes: Routes = [
     { path: 'routes/:agency-name', component: RoutesPageComponent },
     { path: 'stops/:agency-name', component: StopsPageComponent },
     { path: 'stops/:agency-name/:route-id', component: StopsPageComponent },
+    { path: 'schedule/:agency-name/:stop-id', component: SchedulePageComponent },
     { path: 'schedule/:agency-name/:route-id/:stop-id', component: SchedulePageComponent },
     { path: '**', redirectTo: '/agency-list' },
 ];

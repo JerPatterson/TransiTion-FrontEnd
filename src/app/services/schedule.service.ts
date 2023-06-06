@@ -28,6 +28,22 @@ export class ScheduleService {
             .sort((a, b) => a.stEpochTime - b.stEpochTime);
     }
 
+    async getTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
+        const expectations = await this.stDataService.getTimesFromStop(agencyId, stopId);
+        const predictions = await this.rtDataService.getTimesFromStop(agencyId, stopId);
+        
+        const stopTimes: Time[] = expectations.map(expectation => {
+            const prediction = predictions.find(prediction => {
+                return prediction.tripId === expectation.tripId;
+            });
+            return this.computeTimeObject(expectation, prediction);
+        });
+
+        return stopTimes
+            .filter(time => time.stEpochTime > Date.now())
+            .sort((a, b) => a.stEpochTime - b.stEpochTime);
+    }
+
     private computeTimeObject(stData: ScheduledTime, rtData?: PredictedTime): Time {
         const timeAhead = this.getTimeAheadInMilliseconds(stData.scheduledTime);
         return {

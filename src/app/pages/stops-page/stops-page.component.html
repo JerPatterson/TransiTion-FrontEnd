@@ -1,17 +1,36 @@
 <h1 class="page-title">Les arrêts de transport en commun</h1>
 <hr class="delimitation">
 
-<div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.code]">
-    <span class="stop-name">
-        <span class="stop-icon">
-            <span>{{ stop.code }}</span>
+<div *ngIf="routeId">
+    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.code]">
+        <span class="stop-name">
+            <span class="stop-icon">
+                <span>{{ stop.code }}</span>
+            </span>
+            <span>{{ stop.name }}</span>
         </span>
-        <span>{{ stop.name }}</span>
-    </span>
-    <span class="stop-info">
-        
-        <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/icons/accessible.png"/>
-        <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-        <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
-    </span>
+        <span class="stop-info">
+            
+            <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/icons/accessible.png"/>
+            <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
+            <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
+        </span>
+    </div>
+</div>
+
+<div *ngIf="!routeId">
+    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.code]">
+        <span class="stop-name">
+            <span class="stop-icon">
+                <span>{{ stop.code }}</span>
+            </span>
+            <span>{{ stop.name }}</span>
+        </span>
+        <span class="stop-info">
+            
+            <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/icons/accessible.png"/>
+            <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
+            <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
+        </span>
+    </div>
 </div>

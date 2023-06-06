@@ -30,11 +30,16 @@ export class SchedulePageComponent {
         const routeId = this.route.snapshot.paramMap.get('route-id');
         const stopId = this.route.snapshot.paramMap.get('stop-id');
 
-        if (!agencyId || !routeId || !stopId) return;
+        if (!agencyId || !stopId) return;
         this.agencyId = agencyId;
-        this.routeId = routeId;
         this.stopId = stopId;
-        this.times = await this.scheduleService.getTimesFromStopOfRoute(agencyId, routeId, stopId)
+
+        if (routeId) {
+            this.routeId = routeId;
+            this.times = await this.scheduleService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
+        } else {
+            this.times = await this.scheduleService.getTimesFromStop(agencyId, stopId);
+        }
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

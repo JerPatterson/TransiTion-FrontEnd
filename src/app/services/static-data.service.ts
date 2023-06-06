@@ -51,6 +51,10 @@ export class StaticDataService {
         return (await this.getStopsFromAgency(agencyId)).filter(stop => stop.routeIds.includes(routeId));
     }
 
+    async getStop(agencyId: string, stopId: string): Promise<Stop | undefined> {
+        return (await this.getStopsFromAgency(agencyId)).find(stop => stop.id === stopId);
+    }
+
     async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<ScheduledTime[]> {
         const times: ScheduledTime[] = [];
         const trips = await this.getTodayTripsFromRoute(agencyId, routeId);
@@ -71,6 +75,16 @@ export class StaticDataService {
                 times.push({ ...time, tripId: trip.id, stopId, routeId });
             });
         });
+        return times;
+    }
+
+    async getTimesFromStop(agencyId: string, stopId: string): Promise<ScheduledTime[]> {
+        let times: ScheduledTime[] = [];
+        const stop = await this.getStop(agencyId, stopId);
+
+        for (let routeId of stop ? stop.routeIds : []) {
+            times = times.concat(await this.getTimesFromStopOfRoute(agencyId, routeId, stopId));
+        }
         return times;
     }
 
