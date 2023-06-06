@@ -80,13 +80,13 @@ export class StaticDataService {
 
     private async getTodayServiceId(agencyId: string): Promise<string> {
         const now = new Date(Date.now());
-        const calendarDates = (await this.getDocumentFromAgency(agencyId, 'calendar-dates')).data()?.arr as CalendarExceptionElement[];
+        const calendarDates = await this.getCalendarDatesFromAgency(agencyId);
         const specialService = calendarDates.find(element => 
             this.isTheSameDate(now, new Date(element.date.seconds * ONE_SEC_IN_MS)) && element.exceptionType === DateException.Replacing
         );
         if (specialService) return specialService.serviceId;
 
-        const calendar = (await this.getDocumentFromAgency(agencyId, 'calendar')).data()?.arr as CalendarElement[];
+        const calendar = await this.getCalendarFromAgency(agencyId);
         const service = calendar.find(element => {
             if (this.isBetweenTwoDates(now, new Date(element.startDate.seconds * ONE_SEC_IN_MS), new Date(element.endDate.seconds * ONE_SEC_IN_MS)))
                 return this.isServiceOfDay(element, now.getUTCDay());
@@ -94,6 +94,26 @@ export class StaticDataService {
         });
 
         return service ? service.serviceId : '';
+    }
+
+    private async getCalendarFromAgency(agencyId: string) {
+        const storedContent = sessionStorage.getItem(`${agencyId}/calendar`);
+        if (storedContent) return JSON.parse(storedContent) as CalendarElement[];
+
+        const content = (await this.getDocumentFromAgency(agencyId, 'calendar')).data()?.arr as CalendarElement[];
+        sessionStorage.setItem(`${agencyId}/calendar`, JSON.stringify(content));
+    
+        return content;
+    }
+
+    private async getCalendarDatesFromAgency(agencyId: string) {
+        const storedContent = sessionStorage.getItem(`${agencyId}/calendar-dates`);
+        if (storedContent) return JSON.parse(storedContent) as CalendarExceptionElement[];
+
+        const content = (await this.getDocumentFromAgency(agencyId, 'calendar-dates')).data()?.arr as CalendarExceptionElement[];
+        sessionStorage.setItem(`${agencyId}/calendar-dates`, JSON.stringify(content));
+
+        return content;
     }
 
     private async getTripsFromRoute(agencyId: string, routeId: string, serviceId: string): Promise<Trip[]> {
