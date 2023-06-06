@@ -35,7 +35,7 @@ export class StaticDataService {
         return content;
     }
 
-    async getStopsFromAgency(agencyId: string) {
+    async getStopsFromAgency(agencyId: string): Promise<Stop[]> {
         const storedContent = sessionStorage.getItem(`${agencyId}/stops`);
         if (storedContent) return JSON.parse(storedContent) as Stop[];
 
@@ -43,6 +43,10 @@ export class StaticDataService {
         sessionStorage.setItem(`${agencyId}/stops`, JSON.stringify(content));
     
         return content;
+    }
+
+    async getStopsFromRoute(agencyId: string, routeId: string): Promise<Stop[]> {
+        return (await this.getStopsFromAgency(agencyId)).filter(stop => stop.routeIds.includes(routeId));
     }
 
     async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<ScheduledTime[]> {
@@ -53,7 +57,18 @@ export class StaticDataService {
             const time = trip.times.find(time => time.stopId === stopId);
             if (time) times.push({ ...time, tripId: trip.id, stopId, routeId });
         });
+        return times;
+    }
 
+    async getTimesFromRoute(agencyId: string, routeId: string, stopId: string): Promise<ScheduledTime[]> {
+        const times: ScheduledTime[] = [];
+        const trips = await this.getTodayTripsFromRoute(agencyId, routeId);
+    
+        trips.forEach(trip => {
+            trip.times.forEach(time => {
+                times.push({ ...time, tripId: trip.id, stopId, routeId });
+            });
+        });
         return times;
     }
 

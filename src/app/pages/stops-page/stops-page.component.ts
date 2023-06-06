@@ -10,7 +10,6 @@ import { StaticDataService } from '@app/services/static-data.service';
 })
 export class StopsPageComponent {
     stops: Stop[] = [];
-
     agencyId: string | undefined;
     routeId: string | undefined;
     
@@ -20,14 +19,15 @@ export class StopsPageComponent {
     
     private async setStops() {
         const agencyId = this.route.snapshot.paramMap.get('agency-name');
-        const routeId = this.route.snapshot.paramMap.get('route-id');
-
         if (!agencyId) return;
         this.agencyId = agencyId;
-        const stops = await this.stDataService.getStopsFromAgency(agencyId);
 
-        if (!stops || !routeId) return;
+        const routeId = this.route.snapshot.paramMap.get('route-id');
+        if (!routeId) {
+            this.stops = await this.stDataService.getStopsFromAgency(agencyId);
+            return;
+        }
         this.routeId = routeId;
-        this.stops = routeId ? stops.filter(r => r.routeIds.includes(routeId)) : stops;
+        this.stops = await this.stDataService.getStopsFromRoute(agencyId, routeId);
     }
 }
