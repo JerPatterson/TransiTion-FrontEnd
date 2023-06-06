@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Route, Stop, Trip } from '@app/interfaces/concepts';
+import { Route, ScheduledTime, Stop, Trip } from '@app/interfaces/concepts';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc } from 'firebase/firestore';
 
@@ -43,6 +43,18 @@ export class StaticDataService {
         sessionStorage.setItem(`${agencyId}/stops`, JSON.stringify(content));
     
         return content;
+    }
+
+    async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<ScheduledTime[]> {
+        const times: ScheduledTime[] = [];
+        const trips = await this.getTodayTripsFromRoute(agencyId, routeId);
+    
+        trips.forEach(trip => {
+            const time = trip.times.find(time => time.stopId === stopId);
+            if (time) times.push({ ...time, tripId: trip.id, stopId, routeId });
+        });
+
+        return times;
     }
 
     async getTodayTripsFromRoute(agencyId: string, routeId: string): Promise<Trip[]> {

@@ -45,7 +45,9 @@ export interface PredictedTime {
 }
 
 export interface ScheduledTime {
+    tripId: string;
     stopId: string;
+    routeId: string;
     scheduledTime: string;
     pickupType: PickupType;
     dropOffType: DropOffType;

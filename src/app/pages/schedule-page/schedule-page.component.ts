@@ -14,6 +14,10 @@ export class SchedulePageComponent {
     times: Time[] = [];
     stops: Map<string, Stop> = new Map();
 
+    agencyId: string | undefined;
+    routeId: string | undefined;
+    stopId: string | undefined;
+
     constructor(
         private route: ActivatedRoute,
         private scheduleService: ScheduleService,
@@ -27,6 +31,9 @@ export class SchedulePageComponent {
         const stopId = this.route.snapshot.paramMap.get('stop-id');
 
         if (!agencyId || !routeId || !stopId) return;
+        this.agencyId = agencyId;
+        this.routeId = routeId;
+        this.stopId = stopId;
         this.times = await this.scheduleService.getTimesFromStopOfRoute(agencyId, routeId, stopId)
     }
 

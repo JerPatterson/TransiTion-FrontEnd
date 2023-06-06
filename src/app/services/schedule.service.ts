@@ -14,15 +14,13 @@ export class ScheduleService {
     ) {}
 
     async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
-        const trips = await this.stDataService.getTodayTripsFromRoute(agencyId, routeId);
+        const expectations = await this.stDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
         const predictions = await this.rtDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
         
-        const stopTimes: Time[] = [];
-        trips.forEach(trip => {
-            const time = trip.times.find(time => time.stopId === stopId);
+        const stopTimes: Time[] = expectations.map(expectation => {
             const prediction = predictions.find(prediction => 
-                prediction.tripId === trip.id && time?.stopId.includes(stopId));
-            if (time) stopTimes.push(this.computeTimeObject(time, prediction));
+                prediction.tripId === expectation.tripId && expectation?.stopId.includes(stopId));
+            return this.computeTimeObject(expectation, prediction);
         });
         
         return stopTimes
