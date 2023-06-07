@@ -1,0 +1,28 @@
+.header {
+    position: relative;
+    z-index: 1;
+    padding: 10px;
+    padding-bottom: 5px;
+    border-radius: 10px;
+    background-color: aliceblue;
+}
+
+.delimitation {
+    position: relative;
+    z-index: 1;
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+.page-title {
+    position: relative;
+    z-index: 1;
+    color: #0a2196;
+    margin: 0px;
+    padding-bottom: 5px;
+}
+
+#map-area {
+    height: 400px;
+    width: 1000px;
+}

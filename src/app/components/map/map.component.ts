@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { StaticDataService } from '@app/services/static-data.service';
 import L from 'leaflet';
 
 @Component({
@@ -7,22 +8,27 @@ import L from 'leaflet';
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-    @Input() lat: number = 45.50;
-    @Input() lon: number = -73.60;
-    @Input() zoom: number = 13;
+    @Input() lat: number = 45.6;
+    @Input() lon: number = -73.75;
+    @Input() zoom: number = 12;
+
+    @Input() agencyId: string = '';
 
     private map!: L.Map;
+    private stopLayer!: L.LayerGroup;
 
-    constructor() {}
+    constructor(private stDataService: StaticDataService) {}
 
     ngOnInit(): void {
         this.initMap();
+        this.addStops();
     }
     
     private initMap(): void {
         this.map = L.map('map', {
             minZoom: 6,
             maxZoom: 18,
+            zoomControl: false,
         }).setView([this.lat, this.lon], this.zoom);
         
         L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -38,6 +44,30 @@ export class MapComponent implements OnInit {
         //     attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
         //     subdomains: 'abcd',
         // }).addTo(this.map);
-    }    
+    }
+
+    private async addStops(): Promise<void> {
+        this.stopLayer = L.layerGroup();
+        (await this.stDataService.getStopsFromRoute(this.agencyId, '42E')).slice(0, 100).forEach(stop => {
+            const marker = L.marker([stop.location.lat, stop.location.lon], {
+                icon: L.icon({
+                    iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign-2.png',
+                    iconSize: [50, 50],
+                    iconAnchor: [25, 25],
+                    popupAnchor: [0, -25]
+                }),
+            });
+            this.stopLayer.addLayer(marker.bindPopup(stop.id + ' ' + stop.name));
+        });
+
+        this.map.addEventListener('zoomend', () => {
+            const currentZoomLevel = this.map.getZoom();
+            if (currentZoomLevel <= 12) {
+                this.map.removeLayer(this.stopLayer);
+            } else if (!this.map.hasLayer(this.stopLayer)) {
+                this.map.addLayer(this.stopLayer);
+            }
+        })
+    }
 }
     
