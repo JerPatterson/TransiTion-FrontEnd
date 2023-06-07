@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import L from 'leaflet';
 
 @Component({
@@ -7,6 +7,10 @@ import L from 'leaflet';
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
+    @Input() lat: number = 45.50;
+    @Input() lon: number = -73.60;
+    @Input() zoom: number = 13;
+
     private map!: L.Map;
 
     constructor() {}
@@ -17,16 +21,16 @@ export class MapComponent implements OnInit {
     
     private initMap(): void {
         this.map = L.map('map', {
-            minZoom: 10,
-            maxZoom: 16,
-        }).setView([45.50, -73.60], 13);
+            minZoom: 6,
+            maxZoom: 18,
+        }).setView([this.lat, this.lon], this.zoom);
         
         L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(this.map);
 
         // L.tileLayer('https://navigoservprod.stl.laval.qc.ca/FCT/mbtiles-1.php?id=routier_stl_couleur/{z}/{x}/{y}.png', {
-        //     attribution: '<a href="https://https://stlaval.ca/">© STL 2023</a>'
+        //     attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',
         // }).addTo(this.map);
 
         // L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
