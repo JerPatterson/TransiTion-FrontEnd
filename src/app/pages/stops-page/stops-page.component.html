@@ -2,10 +2,10 @@
 <hr class="delimitation">
 
 <div *ngIf="routeId">
-    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.code]">
+    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.id]">
         <span class="stop-name">
             <span class="stop-icon">
-                <span>{{ stop.code }}</span>
+                <span>{{ stop.id }}</span>
             </span>
             <span>{{ stop.name }}</span>
         </span>
@@ -19,10 +19,10 @@
 </div>
 
 <div *ngIf="!routeId">
-    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.code]">
+    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.id]">
         <span class="stop-name">
             <span class="stop-icon">
-                <span>{{ stop.code }}</span>
+                <span>{{ stop.id }}</span>
             </span>
             <span>{{ stop.name }}</span>
         </span>

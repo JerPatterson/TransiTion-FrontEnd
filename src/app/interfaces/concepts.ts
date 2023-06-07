@@ -16,7 +16,6 @@ export interface Location {
 
 export interface Stop {
     id: string;
-    code: string;
     name: string;
     location: Location;
     hasShelter: boolean;
