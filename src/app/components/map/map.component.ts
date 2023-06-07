@@ -13,6 +13,7 @@ export class MapComponent implements OnInit {
     @Input() zoom: number = 12;
 
     @Input() agencyId: string = '';
+    @Input() routeId: string = '';
 
     private map!: L.Map;
     private stopLayer!: L.LayerGroup;
@@ -48,7 +49,7 @@ export class MapComponent implements OnInit {
 
     private async addStops(): Promise<void> {
         this.stopLayer = L.layerGroup();
-        (await this.stDataService.getStopsFromRoute(this.agencyId, '42E')).slice(0, 100).forEach(stop => {
+        (await this.stDataService.getStopsFromRoute(this.agencyId, this.routeId)).forEach(stop => {
             const marker = L.marker([stop.location.lat, stop.location.lon], {
                 icon: L.icon({
                     iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign-2.png',

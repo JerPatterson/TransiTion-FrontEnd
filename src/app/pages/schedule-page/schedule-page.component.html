@@ -1,5 +1,7 @@
-<h1 class="page-title">Horaire des passages</h1>
-<hr class="delimitation">
+<nav class="header">
+    <h1 class="page-title">Horaire des passages</h1>
+    <hr class="delimitation">
+</nav>
 
 <div class="schedule-container">
     <div class="schedule-column">
@@ -44,3 +46,5 @@
         </p>
     </div>
 </div>
+
+<app-map [agencyId]="agencyId ? agencyId : ''" [routeId]="routeId ? routeId : ''"></app-map>

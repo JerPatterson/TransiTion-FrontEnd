@@ -50,7 +50,7 @@ export class SchedulePageComponent {
         const waitMin = minutes % ONE_HOUR_IN_MIN;
         const waitSec = seconds - minutes * ONE_MINUTE_IN_SEC;
         stringContent += `${this.convertToTwoDigit(waitSec < 0 ? waitMin - 1 : waitMin)}min `;
-        stringContent += `${this.convertToTwoDigit(waitSec < 0 ? ONE_MINUTE_IN_SEC + waitSec : waitSec)}sec`
+        stringContent += `${this.convertToTwoDigit(waitSec < 0 ? ONE_MINUTE_IN_SEC + waitSec : waitSec)}s`
 
         return stringContent;
     }
