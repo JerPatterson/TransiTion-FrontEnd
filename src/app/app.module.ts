@@ -3,11 +3,12 @@ import { BrowserModule } from '@angular/platform-browser';
 
 import { AppComponent } from '@app/app/app.component';
 import { AppRoutingModule } from '@app/app-routing.module';
-import { AgencyPageComponent } from './pages/agency-page/agency-page.component';
-import { MainPageComponent } from './pages/main-page/main-page.component';
-import { RoutesPageComponent } from './pages/routes-page/routes-page.component';
-import { StopsPageComponent } from './pages/stops-page/stops-page.component';
-import { SchedulePageComponent } from './pages/schedule-page/schedule-page.component';
+import { AgencyPageComponent } from '@app/pages/agency-page/agency-page.component';
+import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { RoutesPageComponent } from '@app/pages/routes-page/routes-page.component';
+import { StopsPageComponent } from '@app/pages/stops-page/stops-page.component';
+import { SchedulePageComponent } from '@app/pages/schedule-page/schedule-page.component';
+import { MapComponent } from '@app/components/map/map.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { SchedulePageComponent } from './pages/schedule-page/schedule-page.compo
     AgencyPageComponent,
     RoutesPageComponent,
     StopsPageComponent,
-    SchedulePageComponent
+    SchedulePageComponent,
+    MapComponent
   ],
   imports: [
     AppRoutingModule,

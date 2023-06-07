@@ -5,6 +5,7 @@ import { AgencyPageComponent } from '@app/pages/agency-page/agency-page.componen
 import { RoutesPageComponent } from '@app/pages/routes-page/routes-page.component';
 import { StopsPageComponent } from '@app/pages/stops-page/stops-page.component';
 import { SchedulePageComponent } from '@app/pages/schedule-page/schedule-page.component';
+import { MapComponent } from './components/map/map.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/agency-list', pathMatch: 'full' },
@@ -15,6 +16,7 @@ const routes: Routes = [
     { path: 'stops/:agency-name/:route-id', component: StopsPageComponent },
     { path: 'schedule/:agency-name/:stop-id', component: SchedulePageComponent },
     { path: 'schedule/:agency-name/:route-id/:stop-id', component: SchedulePageComponent },
+    { path: 'maps', component: MapComponent },
     { path: '**', redirectTo: '/agency-list' },
 ];
 
