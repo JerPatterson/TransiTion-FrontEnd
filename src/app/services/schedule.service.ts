@@ -48,6 +48,7 @@ export class ScheduleService {
         const timeAhead = this.getTimeAheadInMilliseconds(stData.scheduledTime);
         return {
             stopId: stData.stopId,
+            routeId: stData.routeId,
             stEpochTime: Date.now() + timeAhead,
             stSecondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
             stMinutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),

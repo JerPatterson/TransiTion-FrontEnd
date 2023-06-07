@@ -2,6 +2,13 @@
 <hr class="delimitation">
 
 <div class="schedule-container">
+    <div class="schedule-column">
+        <h3 class="column-title">&nbsp;</h3>
+        <p *ngFor="let time of times" class="route-icon">
+            <span>{{ time.routeId }}</span>
+        </p>
+    </div>
+
     <div class="schedule-column schedule-based">
         <h3 class="column-title">Planifiés</h3>
         <p *ngFor="let time of times">

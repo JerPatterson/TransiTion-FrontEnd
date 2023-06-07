@@ -16,9 +16,9 @@
 
 
 .schedule-container {
-    max-width: 36%;
+    max-width: 44%;
     display: grid;
-    grid-template-columns: 29% 29% 42%;
+    grid-template-columns: 10% 25% 25% 40%;
     border-radius: 5px;
     border: 2px solid transparent;
     background-color: #cfcfcf;
@@ -28,16 +28,31 @@
     padding: 8px;
 }
 
-.schedule-based {
+.route-icon {
     grid-column: 1;
+    display: flex;
+    justify-content: center;
+    margin-right: 0.5%;
+    border-radius: 10%;
+    background-color: #0a2196;
 }
 
-.realtime-based {
+.route-icon > span {
+    color: aliceblue;
+    font-size: 100%;
+    font-weight: bold;
+}
+
+.schedule-based {
     grid-column: 2;
 }
 
-.service-state {
+.realtime-based {
     grid-column: 3;
+}
+
+.service-state {
+    grid-column: 4;
 }
 
 p, span {
