@@ -88,3 +88,12 @@ export interface ShapePt {
     location: Location;
     sequenceNb: number;
 }
+
+export interface Vehicle {
+    id: number;
+    speed: number;
+    dirTag: string;
+    location: Location;
+    secsSinceReport: number;
+    heading: number;
+}

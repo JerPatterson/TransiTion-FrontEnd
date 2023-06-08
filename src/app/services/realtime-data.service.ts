@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PredictedTime } from '@app/interfaces/concepts';
+import { PredictedTime, Vehicle } from '@app/interfaces/concepts';
 
 @Injectable({
     providedIn: 'root'
@@ -57,6 +57,32 @@ export class RealtimeDataService {
         );
 
         return timeList.sort((a, b) => a.epochTime - b.epochTime);
+    }
+
+    async getVehiclesFromAgency(agencyId: string): Promise<Vehicle[]> {
+        const vehicleList: Vehicle[] = [];
+        const url = this.addCommandToURL('vehicleLocations', `a=${agencyId}`);
+
+        const res = await fetch(url);
+        const xmlString = await res.text();
+        const xmlDocument = new DOMParser().parseFromString(xmlString, 'text/xml');
+        const vehicles = xmlDocument.querySelectorAll('vehicle');
+
+        vehicles.forEach((vehicle) => 
+            vehicleList.push({
+                id: Number(vehicle.getAttribute('id')),
+                speed: Number(vehicle.getAttribute('speedKmHr')),
+                dirTag: String(vehicle.getAttribute('dirTag')),
+                location: {
+                    lat: Number(vehicle.getAttribute('lat')),
+                    lon: Number(vehicle.getAttribute('lon')),
+                },
+                secsSinceReport: Number(vehicle.getAttribute('secsSinceReport')),
+                heading: Number(vehicle.getAttribute('heading')),
+            })
+        );
+        console.log(xmlDocument);
+        return vehicleList;
     }
     
     private addCommandToURL(commandName: string, ...params: string[]): string {

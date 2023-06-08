@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ShapePt, Stop } from '@app/interfaces/concepts';
+import { ShapePt, Stop, Vehicle } from '@app/interfaces/concepts';
+import { RealtimeDataService } from '@app/services/realtime-data.service';
 import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
 import L from 'leaflet';
@@ -28,15 +29,18 @@ export class MapComponent implements OnInit {
 
     private map!: L.Map;
     private stopLayer!: L.LayerGroup;
+    private vehicleLayer!: L.LayerGroup;
     private tripShapeLayer!: L.LayerGroup;
 
     constructor(
         private stStopDataService: StaticStopDataService,
         private stTripDataService: StaticTripDataService,
+        private rtDataService: RealtimeDataService,
     ) {}
 
     ngOnInit(): void {
         this.initMap();
+        if (!this.stopId) setTimeout(() => this.addVehicles(), 1000);
     }
     
     private initMap(): void {
@@ -106,6 +110,29 @@ export class MapComponent implements OnInit {
         });
         return marker.bindPopup(`${stop.name} [${stop.id}]`);
     }
+
+    private async addVehicles(): Promise<void> {
+        const vehicleMarkers = L.layerGroup();
+        (await this.rtDataService.getVehiclesFromAgency(this.agencyId)).forEach(async vehicle => {
+            vehicleMarkers.addLayer(await this.buildVehicleMarker(vehicle));
+        });
+
+        this.vehicleLayer = L.layerGroup().addLayer(vehicleMarkers);
+        this.map.addLayer(this.vehicleLayer);
+    }
+
+    private async buildVehicleMarker(vehicle: Vehicle): Promise<L.Marker> {
+        const marker = L.marker([vehicle.location.lat, vehicle.location.lon], {
+            icon: L.icon({
+                iconUrl: './assets/icons/bus.png',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25],
+            }),
+        });
+        return marker.bindPopup(`${vehicle.id}`);
+    }
+
 
     private async addTripShape(shapeIdValue: string): Promise<void> {
         const shapePtList = await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue);
