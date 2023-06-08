@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ACCEPTABLE_DELAY_IN_SEC, ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/constants/time';
 import { TripArrivalState } from '@app/enums/states';
-import { Stop, Time } from '@app/interfaces/concepts';
+import { Time } from '@app/interfaces/concepts';
 import { ScheduleService } from '@app/services/schedule.service';
 
 @Component({
@@ -12,11 +12,11 @@ import { ScheduleService } from '@app/services/schedule.service';
 })
 export class SchedulePageComponent {
     times: Time[] = [];
-    stops: Map<string, Stop> = new Map();
 
     agencyId: string | undefined;
     routeId: string | undefined;
     stopId: string | undefined;
+    time: Time | undefined;
 
     constructor(
         private route: ActivatedRoute,
@@ -40,6 +40,11 @@ export class SchedulePageComponent {
         } else {
             this.times = await this.scheduleService.getTimesFromStop(agencyId, stopId);
         }
+        this.time = this.times[0];
+    }
+
+    onClick(time: Time) {
+        this.time = time;
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

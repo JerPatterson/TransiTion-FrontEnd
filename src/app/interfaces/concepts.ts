@@ -28,6 +28,8 @@ export interface Stop {
 export interface Time {
     stopId: string;
     routeId: string;
+    tripId: string;
+    shapeId: string;
     stEpochTime: number;
     stMinutesAhead: number;
     stSecondsAhead: number;
@@ -45,6 +47,7 @@ export interface PredictedTime {
 }
 
 export interface ScheduledTime {
+    shapeId: string;
     tripId: string;
     stopId: string;
     routeId: string;

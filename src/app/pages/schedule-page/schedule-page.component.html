@@ -3,32 +3,37 @@
     <hr class="delimitation">
 </nav>
 
-<div class="schedule-container">
-    <div class="schedule-element">
+<div class="container">
+    <div class="row">
         <h3 class="column-title route">&nbsp;</h3>
-        <h3 class="column-title schedule-time">Planifiés</h3>
-        <h3 class="column-title prediction-time">Temps réel</h3>
-        <h3 class="column-title service-state">État du service</h3>
+        <h3 class="column-title schedule">Planifiés</h3>
+        <h3 class="column-title prediction">Temps réel</h3>
+        <h3 class="column-title state">État du service</h3>
     </div>
+    <hr class="delimitation">
 
-    <div class="schedule-container-content">
-        <div *ngFor="let time of times" class="schedule-element">
+    <ul class="container-content">
+        <li *ngFor="let time of times" 
+            class="row row-element" 
+            (click)="onClick(time)"
+            [ngClass]="time.tripId === this.time.tripId ? 'selected' : ''" 
+        >
             <p class="route route-icon">
                 <span>{{ time.routeId }}</span>
             </p>
 
-            <p class="schedule-time">
+            <p class="schedule">
                 {{ this.formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
             </p>
 
-            <p class="prediction-time">
+            <p class="prediction">
                 <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
                 <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
                     {{ this.formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
                 </span>
             </p>
 
-            <p class="service-state">
+            <p class="state">
                 <br *ngIf="getTripArrivalState(time) === 4">
                 <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
                     <span *ngIf="getTripArrivalState(time) === 0">
@@ -42,8 +47,12 @@
                     </span>
                 </span>
             </p>
-        </div>
-    </div>
+        </li>
+    </ul>
 </div>
 
-<app-map [agencyId]="agencyId ? agencyId : ''" [routeId]="routeId ? routeId : ''"></app-map>
+<app-map 
+    [agencyId]="agencyId ? agencyId : ''" 
+    [routeId]="routeId ? routeId : ''"
+    [shapeId]="time ? time.shapeId : ''">
+</app-map>

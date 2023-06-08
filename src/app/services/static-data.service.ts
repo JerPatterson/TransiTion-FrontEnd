@@ -61,7 +61,7 @@ export class StaticDataService {
     
         trips.forEach(trip => {
             const time = trip.times.find(time => time.stopId === stopId);
-            if (time) times.push({ ...time, tripId: trip.id, stopId, routeId });
+            if (time) times.push({ ...time, shapeId: trip.shapeId, tripId: trip.id, stopId, routeId });
         });
         return times;
     }
@@ -72,7 +72,7 @@ export class StaticDataService {
     
         trips.forEach(trip => {
             trip.times.forEach(time => {
-                times.push({ ...time, tripId: trip.id, stopId, routeId });
+                times.push({ ...time, shapeId: trip.shapeId, tripId: trip.id, stopId, routeId });
             });
         });
         return times;
@@ -88,8 +88,8 @@ export class StaticDataService {
         return times;
     }
 
-    async getShapeOfTrip(agencyId: string, tripId: string): Promise<ShapePt[]> {
-        return (await this.getDocumentFromAgency(agencyId, `/trips/shapes/${tripId}`)).data()?.arr as ShapePt[];
+    async getShapeOfTrip(agencyId: string, shapeId: string): Promise<ShapePt[]> {
+        return (await this.getDocumentFromAgency(agencyId, `/trips/shapes/${shapeId}`)).data()?.arr as ShapePt[];
     }
 
     async getTodayTripsFromRoute(agencyId: string, routeId: string): Promise<Trip[]> {

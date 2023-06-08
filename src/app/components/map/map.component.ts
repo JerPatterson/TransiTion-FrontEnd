@@ -14,17 +14,19 @@ export class MapComponent implements OnInit {
 
     @Input() agencyId: string = '';
     @Input() routeId: string = '';
-    @Input() tripId: string = '';
+    @Input() set shapeId(value: string) {
+        if (value) this.addTripShape(value);
+    };
 
     private map!: L.Map;
     private stopLayer!: L.LayerGroup;
+    private tripShapeLayer!: L.LayerGroup;
 
     constructor(private stDataService: StaticDataService) {}
 
     ngOnInit(): void {
         this.initMap();
         this.addStops();
-        this.addTripShape();
     }
     
     private initMap(): void {
@@ -73,9 +75,9 @@ export class MapComponent implements OnInit {
         })
     }
 
-    private async addTripShape(): Promise<void> {
+    private async addTripShape(shapeIdValue: string): Promise<void> {
         const pointList: L.LatLng[] = [];
-        (await this.stDataService.getShapeOfTrip(this.agencyId, '42O2')).forEach(shapePt =>
+        (await this.stDataService.getShapeOfTrip(this.agencyId, shapeIdValue)).forEach(shapePt =>
             pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon))
         );
         const tripShape = new L.Polyline(pointList, {
@@ -84,7 +86,11 @@ export class MapComponent implements OnInit {
             opacity: 0.5,
             smoothFactor: 1,
         });
-        tripShape.addTo(this.map);
+
+        if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
+            this.map.removeLayer(this.tripShapeLayer);
+        this.tripShapeLayer = L.layerGroup().addLayer(tripShape);
+        this.map.addLayer(this.tripShapeLayer);
     }
 }
     

@@ -47,6 +47,8 @@ export class ScheduleService {
     private computeTimeObject(stData: ScheduledTime, rtData?: PredictedTime): Time {
         const timeAhead = this.getTimeAheadInMilliseconds(stData.scheduledTime);
         return {
+            tripId: stData.tripId,
+            shapeId: stData.shapeId,
             stopId: stData.stopId,
             routeId: stData.routeId,
             stEpochTime: Date.now() + timeAhead,

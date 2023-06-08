@@ -29,7 +29,7 @@
 }
 
 
-.schedule-container {
+.container {
     position: relative;
     z-index: 1;
     max-height: 300px;
@@ -40,31 +40,51 @@
     background-color: #cfcfcf;
 }
 
-.schedule-container-content {
+.container-content {
     position: relative;
     z-index: 1;
     max-height: 270px;
     overflow-y: scroll;
     max-width: 580px;
+    margin: 0px;
+    margin-left: 4px;
+    padding: 0px;
 }
 
-.schedule-container-content::-webkit-scrollbar {
+.container-content::-webkit-scrollbar {
     width: 10px;
 }
 
-.schedule-container-content::-webkit-scrollbar-thumb {
+.container-content::-webkit-scrollbar-thumb {
     border-radius: 8px;
     background-color: #bababa;
 }
 
 
-.schedule-element {
+.row {
     display: grid;
     grid-template-columns: 10% 24% 22% 44%;
 }
 
-.schedule-element > p {
-    margin: 4px;    
+.row > p {
+    margin: 4px;   
+}
+
+.row-element {
+    border-radius: 5px;
+    border: 2px solid transparent;
+}
+
+.row-element:hover {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
+.row-element::selection {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
 }
 
 .route-icon {
@@ -84,15 +104,15 @@
     grid-column: 1;
 }
 
-.schedule-time {
+.time {
     grid-column: 2;
 }
 
-.prediction-time {
+.prediction {
     grid-column: 3;
 }
 
-.service-state {
+.state {
     grid-column: 4;
 }
 
