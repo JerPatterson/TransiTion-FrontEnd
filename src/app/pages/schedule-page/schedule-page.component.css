@@ -18,9 +18,9 @@
 .page-title, .column-title {
     position: relative;
     z-index: 1;
-    color: #0a2196;
     margin: 0px;
     padding-bottom: 5px;
+    color: #0a2196;
 }
 
 .column-title {
@@ -33,35 +33,43 @@
     position: relative;
     z-index: 1;
     max-height: 300px;
-    overflow-y: scroll;
     max-width: 580px;
     padding-right: 0px;
-    display: grid;
-    grid-template-columns: 10% 24% 22% 44%;
     border-radius: 5px;
     border: 2px solid transparent;
     background-color: #cfcfcf;
 }
 
-.schedule-container::-webkit-scrollbar {
+.schedule-container-content {
+    position: relative;
+    z-index: 1;
+    max-height: 270px;
+    overflow-y: scroll;
+    max-width: 580px;
+}
+
+.schedule-container-content::-webkit-scrollbar {
     width: 10px;
 }
 
-.schedule-container::-webkit-scrollbar-thumb {
+.schedule-container-content::-webkit-scrollbar-thumb {
     border-radius: 8px;
     background-color: #bababa;
 }
 
 
-.schedule-column {
-    padding: 8px;
+.schedule-element {
+    display: grid;
+    grid-template-columns: 10% 24% 22% 44%;
+}
+
+.schedule-element > p {
+    margin: 4px;    
 }
 
 .route-icon {
-    grid-column: 1;
     display: flex;
     justify-content: center;
-    margin-right: 0.5%;
     border-radius: 10%;
     background-color: #0a2196;
 }
@@ -72,11 +80,15 @@
     font-weight: bold;
 }
 
-.schedule-based {
+.route {
+    grid-column: 1;
+}
+
+.schedule-time {
     grid-column: 2;
 }
 
-.realtime-based {
+.prediction-time {
     grid-column: 3;
 }
 

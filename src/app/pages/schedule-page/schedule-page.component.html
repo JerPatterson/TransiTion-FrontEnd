@@ -4,46 +4,45 @@
 </nav>
 
 <div class="schedule-container">
-    <div class="schedule-column">
-        <h3 class="column-title">&nbsp;</h3>
-        <p *ngFor="let time of times" class="route-icon">
-            <span>{{ time.routeId }}</span>
-        </p>
+    <div class="schedule-element">
+        <h3 class="column-title route">&nbsp;</h3>
+        <h3 class="column-title schedule-time">Planifiés</h3>
+        <h3 class="column-title prediction-time">Temps réel</h3>
+        <h3 class="column-title service-state">État du service</h3>
     </div>
 
-    <div class="schedule-column schedule-based">
-        <h3 class="column-title">Planifiés</h3>
-        <p *ngFor="let time of times">
-            {{ this.formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
-        </p>
-    </div>
+    <div class="schedule-container-content">
+        <div *ngFor="let time of times" class="schedule-element">
+            <p class="route route-icon">
+                <span>{{ time.routeId }}</span>
+            </p>
 
-    <div class="schedule-column realtime-based">
-        <h3 class="column-title">Temps réel</h3>
-        <p *ngFor="let time of times">
-            <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
-            <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
-                {{ this.formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
-            </span>
-        </p>
-    </div>
+            <p class="schedule-time">
+                {{ this.formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
+            </p>
 
-    <div class="schedule-column service-state">
-        <h3 class="column-title">État du service</h3>
-        <p *ngFor="let time of times">
-            <br *ngIf="getTripArrivalState(time) === 4">
-            <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
-                <span *ngIf="getTripArrivalState(time) === 0">
-                    En avance de {{ this.formatTimeDifference(time) }}
+            <p class="prediction-time">
+                <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
+                <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
+                    {{ this.formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
                 </span>
-                <span *ngIf="getTripArrivalState(time) === 1">
-                    À l'heure
+            </p>
+
+            <p class="service-state">
+                <br *ngIf="getTripArrivalState(time) === 4">
+                <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
+                    <span *ngIf="getTripArrivalState(time) === 0">
+                        En avance de {{ this.formatTimeDifference(time) }}
+                    </span>
+                    <span *ngIf="getTripArrivalState(time) === 1">
+                        À l'heure
+                    </span>
+                    <span *ngIf="getTripArrivalState(time) === 2">
+                        En retard de {{ this.formatTimeDifference(time) }}
+                    </span>
                 </span>
-                <span *ngIf="getTripArrivalState(time) === 2">
-                    En retard de {{ this.formatTimeDifference(time) }}
-                </span>
-            </span>
-        </p>
+            </p>
+        </div>
     </div>
 </div>
 
