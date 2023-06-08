@@ -40,11 +40,14 @@ export class SchedulePageComponent {
         } else {
             this.times = await this.scheduleService.getTimesFromStop(agencyId, stopId);
         }
+
         this.timeSelected = this.times[0];
+        this.routeId = this.times[0].routeId;
     }
 
     onClick(time: Time) {
         this.timeSelected = time;
+        this.routeId = time.routeId;
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

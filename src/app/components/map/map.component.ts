@@ -9,12 +9,16 @@ import L from 'leaflet';
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
+    private readonly zoomLevelThatHideStops = 14;
+
     @Input() lat: number = 45.6;
     @Input() lon: number = -73.75;
     @Input() zoom: number = 12;
 
     @Input() agencyId: string = '';
-    @Input() routeId: string = '';
+    @Input() set routeId(value: string) {
+        if (value) this.addStops(value);
+    };
     @Input() set shapeId(value: string) {
         if (value) this.addTripShape(value);
     };
@@ -30,7 +34,6 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
-        this.addStops();
     }
     
     private initMap(): void {
@@ -55,9 +58,9 @@ export class MapComponent implements OnInit {
         // }).addTo(this.map);
     }
 
-    private async addStops(): Promise<void> {
-        this.stopLayer = L.layerGroup();
-        (await this.stStopDataService.getStopsFromRoute(this.agencyId, this.routeId)).forEach(stop => {
+    private async addStops(routeIdValue: string): Promise<void> {
+        const stopMarkers = L.layerGroup();
+        (await this.stStopDataService.getStopsFromRoute(this.agencyId, routeIdValue)).forEach(stop => {
             const marker = L.marker([stop.location.lat, stop.location.lon], {
                 icon: L.icon({
                     iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
@@ -66,12 +69,16 @@ export class MapComponent implements OnInit {
                     popupAnchor: [0, -25],
                 }),
             });
-            this.stopLayer.addLayer(marker.bindPopup(stop.id + ' ' + stop.name));
+            stopMarkers.addLayer(marker.bindPopup(stop.id + ' ' + stop.name));
         });
 
+        if (this.stopLayer && this.map.hasLayer(this.stopLayer))
+            this.map.removeLayer(this.stopLayer);
+        this.stopLayer = L.layerGroup().addLayer(stopMarkers);
+        if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
+
         this.map.addEventListener('zoomend', () => {
-            const currentZoomLevel = this.map.getZoom();
-            if (currentZoomLevel <= 14) {
+            if (this.map.getZoom() <= this.zoomLevelThatHideStops) {
                 this.map.removeLayer(this.stopLayer);
             } else if (!this.map.hasLayer(this.stopLayer)) {
                 this.map.addLayer(this.stopLayer);
