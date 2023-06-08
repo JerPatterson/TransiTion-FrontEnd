@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ONE_SEC_IN_MS } from '@app/constants/time';
 import { Day, DateException } from '@app/enums/attributes';
-import { CalendarElement, CalendarExceptionElement, Route, ScheduledTime, Stop, Trip } from '@app/interfaces/concepts';
+import { CalendarElement, CalendarExceptionElement, Route, ScheduledTime, ShapePt, Stop, Trip } from '@app/interfaces/concepts';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc } from 'firebase/firestore';
 
@@ -86,6 +86,10 @@ export class StaticDataService {
             times = times.concat(await this.getTimesFromStopOfRoute(agencyId, routeId, stopId));
         }
         return times;
+    }
+
+    async getShapeOfTrip(agencyId: string, tripId: string): Promise<ShapePt[]> {
+        return (await this.getDocumentFromAgency(agencyId, `/trips/shapes/${tripId}`)).data()?.arr as ShapePt[];
     }
 
     async getTodayTripsFromRoute(agencyId: string, routeId: string): Promise<Trip[]> {

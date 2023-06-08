@@ -80,3 +80,8 @@ export interface CalendarExceptionElement {
     exceptionType: DateException;
     serviceId: string;
 }
+
+export interface ShapePt {
+    location: Location;
+    sequenceNb: number;
+}

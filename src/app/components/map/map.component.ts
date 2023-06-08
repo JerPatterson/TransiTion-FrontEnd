@@ -14,6 +14,7 @@ export class MapComponent implements OnInit {
 
     @Input() agencyId: string = '';
     @Input() routeId: string = '';
+    @Input() tripId: string = '';
 
     private map!: L.Map;
     private stopLayer!: L.LayerGroup;
@@ -23,6 +24,7 @@ export class MapComponent implements OnInit {
     ngOnInit(): void {
         this.initMap();
         this.addStops();
+        this.addTripShape();
     }
     
     private initMap(): void {
@@ -63,12 +65,26 @@ export class MapComponent implements OnInit {
 
         this.map.addEventListener('zoomend', () => {
             const currentZoomLevel = this.map.getZoom();
-            if (currentZoomLevel <= 12) {
+            if (currentZoomLevel <= 14) {
                 this.map.removeLayer(this.stopLayer);
             } else if (!this.map.hasLayer(this.stopLayer)) {
                 this.map.addLayer(this.stopLayer);
             }
         })
+    }
+
+    private async addTripShape(): Promise<void> {
+        const pointList: L.LatLng[] = [];
+        (await this.stDataService.getShapeOfTrip(this.agencyId, '42O2')).forEach(shapePt =>
+            pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon))
+        );
+        const tripShape = new L.Polyline(pointList, {
+            color: 'red',
+            weight: 8,
+            opacity: 0.5,
+            smoothFactor: 1,
+        });
+        tripShape.addTo(this.map);
     }
 }
     
