@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ONE_SEC_IN_MS } from '@app/constants/time';
+import { ONE_SEC_IN_MS, SECONDS_IN_DAY } from '@app/constants/time';
 import { DateException, Day } from '@app/enums/attributes';
 import { CalendarElement, CalendarExceptionElement } from '@app/interfaces/concepts';
 import { StaticDataService } from '@app/services/static/static-data.service';
@@ -13,40 +13,46 @@ export class StaticServiceDataService {
 
     async getTodayServiceId(agencyId: string): Promise<string> {
         const now = new Date(Date.now());
-        const calendarDates = await this.getCalendarDatesFromAgency(agencyId);
-        const specialService = calendarDates.find(element => 
-            this.isTheSameDate(now, new Date(element.date.seconds * ONE_SEC_IN_MS)) && element.exceptionType === DateException.Replacing
-        );
-        if (specialService) return specialService.serviceId;
+        const specialServiceId = await this.checkForExceptionServiceId(agencyId, now);
+        if (specialServiceId) return specialServiceId;
 
+        const serviceId = await this.checkForServiceId(agencyId, now);
+        return serviceId ? serviceId : '';
+    }
+
+    async getTomorrowServiceId(agencyId: string): Promise<string> {
+        const now = new Date(Date.now() + SECONDS_IN_DAY * ONE_SEC_IN_MS);
+        const specialServiceId = await this.checkForExceptionServiceId(agencyId, now);
+        if (specialServiceId) return specialServiceId;
+
+        const serviceId = await this.checkForServiceId(agencyId, now);
+        return serviceId ? serviceId : '';
+    }
+
+    private async checkForServiceId(agencyId: string, date: Date): Promise<string | undefined> {
         const calendar = await this.getCalendarFromAgency(agencyId);
-        const service = calendar.find(element => {
-            if (this.isBetweenTwoDates(now, new Date(element.startDate.seconds * ONE_SEC_IN_MS), new Date(element.endDate.seconds * ONE_SEC_IN_MS)))
-                return this.isServiceOfDay(element, now.getUTCDay());
-            return false;
-        });
+        return calendar.find((e: CalendarElement) => {
+            let startDate = new Date(e.startDate.seconds * ONE_SEC_IN_MS);
+            let endDate = new Date(e.endDate.seconds * ONE_SEC_IN_MS);
+            return this.isBetweenTwoDates(date, startDate, endDate) && this.isServiceOfDay(e, date.getUTCDay());
+        })?.serviceId;
+    }
 
-        return service ? service.serviceId : '';
+    private async checkForExceptionServiceId(agencyId: string, date: Date): Promise<string | undefined> {
+        const calendarDates = await this.getCalendarDatesFromAgency(agencyId);
+        return calendarDates.find((e: CalendarExceptionElement) => {
+            let specialDate = new Date(e.date.seconds * ONE_SEC_IN_MS);
+            return this.isTheSameDate(date, specialDate) 
+                && e.exceptionType === DateException.Replacing;
+        })?.serviceId;
     }
 
     private async getCalendarFromAgency(agencyId: string) {
-        const storedContent = sessionStorage.getItem(`${agencyId}/calendar`);
-        if (storedContent) return JSON.parse(storedContent) as CalendarElement[];
-
-        const content = (await this.staticDataService.getDocumentFromAgency(agencyId, 'calendar')).data()?.arr as CalendarElement[];
-        sessionStorage.setItem(`${agencyId}/calendar`, JSON.stringify(content));
-    
-        return content;
+        return await this.staticDataService.getArrayFromDocument(agencyId, 'calendar') as CalendarElement[];
     }
 
-    private async getCalendarDatesFromAgency(agencyId: string) {
-        const storedContent = sessionStorage.getItem(`${agencyId}/calendar-dates`);
-        if (storedContent) return JSON.parse(storedContent) as CalendarExceptionElement[];
-
-        const content = (await this.staticDataService.getDocumentFromAgency(agencyId, 'calendar-dates')).data()?.arr as CalendarExceptionElement[];
-        sessionStorage.setItem(`${agencyId}/calendar-dates`, JSON.stringify(content));
-
-        return content;
+    private async getCalendarDatesFromAgency(agencyId: string): Promise<CalendarExceptionElement[]> {
+        return await this.staticDataService.getArrayFromDocument(agencyId, 'calendar-dates') as CalendarExceptionElement[];
     }
 
     private isTheSameDate(a: Date, b: Date) {

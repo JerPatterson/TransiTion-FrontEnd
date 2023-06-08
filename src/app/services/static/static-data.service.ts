@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Route } from '@app/interfaces/concepts';
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import { getFirestore, Firestore, doc, collection, getDoc } from 'firebase/firestore';
+import { getFirestore, Firestore, doc, collection, getDoc, DocumentSnapshot, DocumentData } from 'firebase/firestore';
 
 @Injectable({
     providedIn: 'root'
@@ -35,7 +35,17 @@ export class StaticDataService {
         return content;
     }
 
-    async getDocumentFromAgency(agencyId: string, documentId: string) {
+    async getArrayFromDocument(agencyId: string, documentId: string): Promise<any[]> {
+        const storedContent = sessionStorage.getItem(`${agencyId}/${documentId}`);
+        if (storedContent) return JSON.parse(storedContent) as any[];
+
+        const content = (await this.getDocumentFromAgency(agencyId, documentId)).data()?.arr as any[];
+        sessionStorage.setItem(`${agencyId}/${documentId}`, JSON.stringify(content));
+
+        return content;
+    }
+
+    async getDocumentFromAgency(agencyId: string, documentId: string): Promise<DocumentSnapshot<DocumentData>> {
         return getDoc(doc(collection(this.db, agencyId), documentId));
     }
 }
