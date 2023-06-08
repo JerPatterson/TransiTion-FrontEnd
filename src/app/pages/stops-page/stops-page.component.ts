@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Stop } from '@app/interfaces/concepts';
-import { StaticDataService } from '@app/services/static-data.service';
+import { StaticStopDataService } from '@app/services/static-stop-data.service';
 
 @Component({
     selector: 'app-stops-page',
@@ -13,7 +13,7 @@ export class StopsPageComponent {
     agencyId: string | undefined;
     routeId: string | undefined;
     
-    constructor(private route: ActivatedRoute, private stDataService: StaticDataService) {
+    constructor(private route: ActivatedRoute, private stStopDataService: StaticStopDataService) {
         this.setStops();
     }
     
@@ -24,10 +24,10 @@ export class StopsPageComponent {
 
         const routeId = this.route.snapshot.paramMap.get('route-id');
         if (!routeId) {
-            this.stops = await this.stDataService.getStopsFromAgency(agencyId);
+            this.stops = await this.stStopDataService.getStopsFromAgency(agencyId);
             return;
         }
         this.routeId = routeId;
-        this.stops = await this.stDataService.getStopsFromRoute(agencyId, routeId);
+        this.stops = await this.stStopDataService.getStopsFromRoute(agencyId, routeId);
     }
 }

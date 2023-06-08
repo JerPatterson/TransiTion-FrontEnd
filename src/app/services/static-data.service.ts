@@ -96,6 +96,10 @@ export class StaticDataService {
         return this.getTripsFromRoute(agencyId, routeId, await this.getTodayServiceId(agencyId));
     }
 
+    async getDocumentFromAgency(agencyId: string, documentId: string) {
+        return getDoc(doc(collection(this.db, agencyId), documentId));
+    }
+
     private async getTodayServiceId(agencyId: string): Promise<string> {
         const now = new Date(Date.now());
         const calendarDates = await this.getCalendarDatesFromAgency(agencyId);
@@ -136,10 +140,6 @@ export class StaticDataService {
 
     private async getTripsFromRoute(agencyId: string, routeId: string, serviceId: string): Promise<Trip[]> {
         return (await this.getDocumentFromAgency(agencyId, `trips/${routeId}/${serviceId}`)).data()?.arr as Trip[];
-    }
-
-    private async getDocumentFromAgency(agencyId: string, documentId: string) {
-        return getDoc(doc(collection(this.db, agencyId), documentId));
     }
 
     private isTheSameDate(a: Date, b: Date) {
