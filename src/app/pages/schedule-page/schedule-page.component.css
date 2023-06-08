@@ -43,7 +43,7 @@
 .container-content {
     position: relative;
     z-index: 1;
-    max-height: 270px;
+    max-height: 250px;
     overflow-y: scroll;
     max-width: 580px;
     margin: 0px;
@@ -71,11 +71,13 @@
 }
 
 .row-element {
+    margin-right: 4px;
+    margin-bottom: 2px;
     border-radius: 5px;
     border: 2px solid transparent;
 }
 
-.row-element:hover {
+.row-element:hover, .selected {
     cursor: pointer;
     border: 2px solid #000000;
     background-color: #bababa;

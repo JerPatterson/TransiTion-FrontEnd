@@ -16,7 +16,7 @@ export class SchedulePageComponent {
     agencyId: string | undefined;
     routeId: string | undefined;
     stopId: string | undefined;
-    time: Time | undefined;
+    timeSelected: Time | undefined;
 
     constructor(
         private route: ActivatedRoute,
@@ -40,11 +40,11 @@ export class SchedulePageComponent {
         } else {
             this.times = await this.scheduleService.getTimesFromStop(agencyId, stopId);
         }
-        this.time = this.times[0];
+        this.timeSelected = this.times[0];
     }
 
     onClick(time: Time) {
-        this.time = time;
+        this.timeSelected = time;
     }
 
     formatTimeToWait(minutes: number, seconds: number): string {

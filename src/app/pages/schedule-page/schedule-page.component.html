@@ -16,7 +16,7 @@
         <li *ngFor="let time of times" 
             class="row row-element" 
             (click)="onClick(time)"
-            [ngClass]="time.tripId === this.time.tripId ? 'selected' : ''" 
+            [ngClass]="time.tripId === this.timeSelected?.tripId ? 'selected' : ''" 
         >
             <p class="route route-icon">
                 <span>{{ time.routeId }}</span>
@@ -54,5 +54,5 @@
 <app-map 
     [agencyId]="agencyId ? agencyId : ''" 
     [routeId]="routeId ? routeId : ''"
-    [shapeId]="time ? time.shapeId : ''">
+    [shapeId]="timeSelected ? timeSelected.shapeId : ''">
 </app-map>
