@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { StaticDataService } from './static-data.service';
+import { StaticTripDataService } from './static-trip-data.service';
 import { RealtimeDataService } from './realtime-data.service';
 import { PredictedTime, ScheduledTime, Time } from '@app/interfaces/concepts';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '@app/constants/time';
@@ -9,12 +9,12 @@ import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '@app/constant
 })
 export class ScheduleService {
     constructor(
-        private stDataService: StaticDataService,
+        private stTripDataService: StaticTripDataService,
         private rtDataService: RealtimeDataService,
     ) {}
 
     async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
-        const expectations = await this.stDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
+        const expectations = await this.stTripDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
         const predictions = await this.rtDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
         
         const stopTimes: Time[] = expectations.map(expectation => {
@@ -29,7 +29,7 @@ export class ScheduleService {
     }
 
     async getTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
-        const expectations = await this.stDataService.getTimesFromStop(agencyId, stopId);
+        const expectations = await this.stTripDataService.getTimesFromStop(agencyId, stopId);
         const predictions = await this.rtDataService.getTimesFromStop(agencyId, stopId);
         
         const stopTimes: Time[] = expectations.map(expectation => {

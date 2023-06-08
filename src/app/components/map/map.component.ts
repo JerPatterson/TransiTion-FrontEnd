@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { StaticDataService } from '@app/services/static-data.service';
+import { StaticStopDataService } from '@app/services/static-stop-data.service';
+import { StaticTripDataService } from '@app/services/static-trip-data.service';
 import L from 'leaflet';
 
 @Component({
@@ -22,7 +23,10 @@ export class MapComponent implements OnInit {
     private stopLayer!: L.LayerGroup;
     private tripShapeLayer!: L.LayerGroup;
 
-    constructor(private stDataService: StaticDataService) {}
+    constructor(
+        private stStopDataService: StaticStopDataService,
+        private stTripDataService: StaticTripDataService,
+    ) {}
 
     ngOnInit(): void {
         this.initMap();
@@ -53,7 +57,7 @@ export class MapComponent implements OnInit {
 
     private async addStops(): Promise<void> {
         this.stopLayer = L.layerGroup();
-        (await this.stDataService.getStopsFromRoute(this.agencyId, this.routeId)).forEach(stop => {
+        (await this.stStopDataService.getStopsFromRoute(this.agencyId, this.routeId)).forEach(stop => {
             const marker = L.marker([stop.location.lat, stop.location.lon], {
                 icon: L.icon({
                     iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
@@ -77,7 +81,7 @@ export class MapComponent implements OnInit {
 
     private async addTripShape(shapeIdValue: string): Promise<void> {
         const pointList: L.LatLng[] = [];
-        (await this.stDataService.getShapeOfTrip(this.agencyId, shapeIdValue)).forEach(shapePt =>
+        (await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue)).forEach(shapePt =>
             pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon))
         );
         const tripShape = new L.Polyline(pointList, {
