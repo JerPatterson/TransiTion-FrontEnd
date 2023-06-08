@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { ShapePt, Stop } from '@app/interfaces/concepts';
 import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
 import L from 'leaflet';
@@ -9,13 +10,15 @@ import L from 'leaflet';
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-    private readonly zoomLevelThatHideStops = 14;
+    private readonly zoomLevelThatHideStops = 15;
 
     @Input() lat: number = 45.6;
     @Input() lon: number = -73.75;
     @Input() zoom: number = 12;
 
     @Input() agencyId: string = '';
+
+    @Input() stopId: string = '';
     @Input() set routeId(value: string) {
         if (value) this.addStops(value);
     };
@@ -38,7 +41,7 @@ export class MapComponent implements OnInit {
     
     private initMap(): void {
         this.map = L.map('map', {
-            minZoom: 6,
+            minZoom: 8,
             maxZoom: 18,
             zoomControl: false,
         }).setView([this.lat, this.lon], this.zoom);
@@ -60,16 +63,9 @@ export class MapComponent implements OnInit {
 
     private async addStops(routeIdValue: string): Promise<void> {
         const stopMarkers = L.layerGroup();
-        (await this.stStopDataService.getStopsFromRoute(this.agencyId, routeIdValue)).forEach(stop => {
-            const marker = L.marker([stop.location.lat, stop.location.lon], {
-                icon: L.icon({
-                    iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
-                    iconSize: [50, 50],
-                    iconAnchor: [25, 25],
-                    popupAnchor: [0, -25],
-                }),
-            });
-            stopMarkers.addLayer(marker.bindPopup(stop.id + ' ' + stop.name));
+        (await this.stStopDataService.getStopsFromRoute(this.agencyId, routeIdValue)).forEach(async stop => {
+            if (stop.id !== this.stopId) stopMarkers.addLayer(await this.buildStopMarker(stop));
+            else this.map.addLayer(await this.buildCurrentStopMarker(stop));
         });
 
         if (this.stopLayer && this.map.hasLayer(this.stopLayer))
@@ -86,22 +82,55 @@ export class MapComponent implements OnInit {
         })
     }
 
-    private async addTripShape(shapeIdValue: string): Promise<void> {
-        const pointList: L.LatLng[] = [];
-        (await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue)).forEach(shapePt =>
-            pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon))
-        );
-        const tripShape = new L.Polyline(pointList, {
-            color: 'red',
-            weight: 8,
-            opacity: 0.5,
-            smoothFactor: 1,
+    private async buildCurrentStopMarker(stop: Stop): Promise<L.Marker> {
+        const marker = L.marker([stop.location.lat, stop.location.lon], {
+            icon: L.icon({
+                iconUrl: stop.hasShelter ? './assets/icons/stop-selected.png' : './assets/icons/stop-sign-selected.png',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25],
+            }),
         });
+
+        return marker.bindPopup(`${stop.name} [${stop.id}]`);
+    }
+
+    private async buildStopMarker(stop: Stop): Promise<L.Marker> {
+        const marker = L.marker([stop.location.lat, stop.location.lon], {
+            icon: L.icon({
+                iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
+                iconSize: [50, 50],
+                iconAnchor: [25, 25],
+                popupAnchor: [0, -25],
+            }),
+        });
+        return marker.bindPopup(`${stop.name} [${stop.id}]`);
+    }
+
+    private async addTripShape(shapeIdValue: string): Promise<void> {
+        const shapePtList = await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue);
+        const tripShape = await this.buildTripShape(shapePtList, '#0a2196', 1);
 
         if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
             this.map.removeLayer(this.tripShapeLayer);
         this.tripShapeLayer = L.layerGroup().addLayer(tripShape);
         this.map.addLayer(this.tripShapeLayer);
+    }
+
+    // private async addSecondaryTripShape(shapeIdValue: string): Promise<void> {
+    //     const shapePtList = await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue);
+    //     const tripShape = await this.buildTripShape(shapePtList, '#0a2196', 0.4);
+
+    //     if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
+    //         this.map.removeLayer(this.tripShapeLayer);
+    //     this.tripShapeLayer = L.layerGroup().addLayer(tripShape);
+    //     this.map.addLayer(this.tripShapeLayer);
+    // }
+
+    private async buildTripShape(shapePtList: ShapePt[], color: string, opacity: number): Promise<L.Polyline> {
+        const pointList: L.LatLng[] = [];
+        shapePtList.forEach(shapePt => pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon)));
+        return new L.Polyline(pointList, { color, opacity, weight: 8, smoothFactor: 1 });
     }
 }
     

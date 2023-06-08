@@ -15,13 +15,13 @@ export class StaticTripDataService {
         private staticServiceDataService: StaticServiceDataService,
     ) {}
 
-    async getTimesFromRoute(agencyId: string, routeId: string, stopId: string): Promise<ScheduledTime[]> {
+    async getTimesFromRoute(agencyId: string, routeId: string): Promise<ScheduledTime[]> {
         const times: ScheduledTime[] = [];
         const trips = await this.getTodayTripsFromRoute(agencyId, routeId);
     
         trips.forEach(trip => {
             trip.times.forEach(time => {
-                times.push({ ...time, shapeId: trip.shapeId, tripId: trip.id, stopId, routeId });
+                times.push({ ...time, shapeId: trip.shapeId, tripId: trip.id, routeId });
             });
         });
         return times;
@@ -43,7 +43,7 @@ export class StaticTripDataService {
     
         trips.forEach(trip => {
             const time = trip.times.find(time => time.stopId === stopId);
-            if (time) times.push({ ...time, shapeId: trip.shapeId, tripId: trip.id, stopId, routeId });
+            if (time) times.push({ ...time, shapeId: trip.shapeId, tripId: trip.id, routeId });
         });
         return times;
     }
