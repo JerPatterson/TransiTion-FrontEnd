@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ONE_SEC_IN_MS } from '@app/constants/time';
 import { DateException, Day } from '@app/enums/attributes';
 import { CalendarElement, CalendarExceptionElement } from '@app/interfaces/concepts';
-import { StaticDataService } from '@app/services/static-data.service';
+import { StaticDataService } from '@app/services/static/static-data.service';
 
 @Injectable({
     providedIn: 'root'

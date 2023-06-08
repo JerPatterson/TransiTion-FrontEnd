@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ScheduledTime, ShapePt, Trip } from '@app/interfaces/concepts';
-import { StaticDataService } from '@app/services/static-data.service';
-import { StaticStopDataService } from '@app/services/static-stop-data.service';
-import { StaticServiceDataService } from '@app/services/static-service-data.service';
+import { StaticDataService } from '@app/services/static/static-data.service';
+import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
+import { StaticServiceDataService } from '@app/services/static/static-service-data.service';
 
 @Injectable({
     providedIn: 'root'

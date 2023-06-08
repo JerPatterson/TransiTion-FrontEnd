@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Route } from '@app/interfaces/concepts';
-import { StaticDataService } from '@app/services/static-data.service';
+import { StaticDataService } from '@app/services/static/static-data.service';
 
 @Component({
     selector: 'app-routes-page',

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Stop } from '@app/interfaces/concepts';
-import { StaticStopDataService } from '@app/services/static-stop-data.service';
+import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 
 @Component({
     selector: 'app-stops-page',

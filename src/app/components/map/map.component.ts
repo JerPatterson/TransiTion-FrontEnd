@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { StaticStopDataService } from '@app/services/static-stop-data.service';
-import { StaticTripDataService } from '@app/services/static-trip-data.service';
+import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
+import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
 import L from 'leaflet';
 
 @Component({
