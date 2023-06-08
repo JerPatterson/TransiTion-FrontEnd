@@ -52,10 +52,10 @@ export class MapComponent implements OnInit {
         (await this.stDataService.getStopsFromRoute(this.agencyId, this.routeId)).forEach(stop => {
             const marker = L.marker([stop.location.lat, stop.location.lon], {
                 icon: L.icon({
-                    iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign-2.png',
+                    iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
                     iconSize: [50, 50],
                     iconAnchor: [25, 25],
-                    popupAnchor: [0, -25]
+                    popupAnchor: [0, -25],
                 }),
             });
             this.stopLayer.addLayer(marker.bindPopup(stop.id + ' ' + stop.name));
