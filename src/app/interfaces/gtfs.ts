@@ -1,4 +1,9 @@
-import { DropOffType, PickupType, RouteType, DateException } from '@app/enums/attributes';
+import { DateException, DropOffType, PickupType, RouteType } from "@app/enums/attributes";
+
+export interface Location {
+    lon: number;
+    lat: number;
+}
 
 export interface Route {
     id: string;
@@ -7,11 +12,6 @@ export interface Route {
     color: string;
     nightOnly: boolean;
     accessible: boolean;
-}
-
-export interface Location {
-    lon: number;
-    lat: number;
 }
 
 export interface Stop {
@@ -25,25 +25,17 @@ export interface Stop {
     tripIds: string[];
 }
 
-export interface Time {
-    stopId: string;
-    routeId: string;
-    tripId: string;
-    shapeId: string;
-    stEpochTime: number;
-    stMinutesAhead: number;
-    stSecondsAhead: number;
-    rtEpochTime?: number;
-    rtMinutesAhead?: number;
-    rtSecondsAhead?: number;
+export interface ShapePt {
+    location: Location;
+    sequenceNb: number;
 }
 
-export interface PredictedTime {
-    routeId: string;
-    tripId: string;
-    epochTime: number;
-    minutesAhead: number;
-    secondsAhead: number;
+export interface Trip {
+    id: string;
+    shapeId: string;
+    destination: string;
+    wheelchairAccessibility: number;
+    times: ScheduledTime[];
 }
 
 export interface ScheduledTime {
@@ -55,14 +47,6 @@ export interface ScheduledTime {
     pickupType: PickupType;
     dropOffType: DropOffType;
     sequenceNb: number;
-}
-
-export interface Trip {
-    id: string;
-    shapeId: string;
-    destination: string;
-    wheelchairAccessibility: number;
-    times: ScheduledTime[];
 }
 
 export interface CalendarElement {
@@ -82,18 +66,4 @@ export interface CalendarExceptionElement {
     date: { seconds: number };
     exceptionType: DateException;
     serviceId: string;
-}
-
-export interface ShapePt {
-    location: Location;
-    sequenceNb: number;
-}
-
-export interface Vehicle {
-    id: number;
-    speed: number;
-    dirTag: string;
-    location: Location;
-    secsSinceReport: number;
-    heading: number;
 }

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Route } from '@app/interfaces/concepts';
+import { Route } from '@app/interfaces/gtfs';
 import { StaticDataService } from '@app/services/static/static-data.service';
 
 @Component({

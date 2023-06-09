@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ShapePt, Stop, Vehicle } from '@app/interfaces/concepts';
+import { Vehicle } from '@app/interfaces/vehicle';
+import { ShapePt, Stop } from '@app/interfaces/gtfs';
 import { RealtimeDataService } from '@app/services/realtime-data.service';
 import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 import { StaticTripDataService } from '@app/services/static/static-trip-data.service';

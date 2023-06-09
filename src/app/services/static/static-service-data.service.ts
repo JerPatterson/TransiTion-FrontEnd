@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ONE_SEC_IN_MS, SECONDS_IN_DAY } from '@app/constants/time';
 import { DateException, Day } from '@app/enums/attributes';
-import { CalendarElement, CalendarExceptionElement } from '@app/interfaces/concepts';
+import { CalendarElement, CalendarExceptionElement } from '@app/interfaces/gtfs';
 import { StaticDataService } from '@app/services/static/static-data.service';
 
 @Injectable({

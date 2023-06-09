@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StaticDataService } from './static-data.service';
-import { Stop } from '@app/interfaces/concepts';
+import { Stop } from '@app/interfaces/gtfs';
 
 @Injectable({
     providedIn: 'root'

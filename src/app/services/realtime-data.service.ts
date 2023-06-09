@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PredictedTime, Vehicle } from '@app/interfaces/concepts';
+import { PredictedTime } from '@app/interfaces/time-concepts';
+import { Vehicle } from '@app/interfaces/vehicle';
 
 @Injectable({
     providedIn: 'root'

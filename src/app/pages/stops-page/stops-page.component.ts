@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Stop } from '@app/interfaces/concepts';
+import { Stop } from '@app/interfaces/gtfs';
 import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 
 @Component({

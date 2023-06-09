@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Route } from '@app/interfaces/concepts';
+import { Route } from '@app/interfaces/gtfs';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc, DocumentSnapshot, DocumentData } from 'firebase/firestore';
 

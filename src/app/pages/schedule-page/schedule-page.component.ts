@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ACCEPTABLE_DELAY_IN_SEC, ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/constants/time';
 import { TripArrivalState } from '@app/enums/states';
-import { Time } from '@app/interfaces/concepts';
+import { Time } from '@app/interfaces/time-concepts';
 import { ScheduleService } from '@app/services/schedule.service';
 
 @Component({
