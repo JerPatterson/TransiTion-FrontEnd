@@ -1,8 +1,6 @@
 export interface Time {
-    stopId: string;
-    routeId: string;
     tripId: string;
-    shapeId: string;
+    routeId: string;
     stEpochTime: number;
     stMinutesAhead: number;
     stSecondsAhead: number;

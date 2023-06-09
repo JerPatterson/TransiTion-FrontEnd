@@ -3,61 +3,79 @@ import { StaticTripDataService } from '@app/services/static/static-trip-data.ser
 import { RealtimeDataService } from '@app/services/realtime-data.service';
 import { PredictedTime, Time } from '@app/interfaces/time-concepts';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '@app/constants/time';
-import { ScheduledTime } from '@app/interfaces/gtfs';
+import { StaticStopDataService } from './static/static-stop-data.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ScheduleService {
     constructor(
-        private stTripDataService: StaticTripDataService,
         private rtDataService: RealtimeDataService,
+        private staticTripDataService: StaticTripDataService,
+        private staticStopDataService: StaticStopDataService,
     ) {}
 
-    async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
-        const expectations = await this.stTripDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
-        const predictions = await this.rtDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
-        
-        const stopTimes: Time[] = expectations.map(expectation => {
-            const prediction = predictions.find(prediction => 
-                prediction.tripId === expectation.tripId && expectation?.stopId.includes(stopId));
-            return this.computeTimeObject(expectation, prediction);
-        });
-        
-        return stopTimes
-            .filter(time => time.stEpochTime > Date.now())
-            .sort((a, b) => a.stEpochTime - b.stEpochTime);
-    }
-
     async getTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
-        const expectations = await this.stTripDataService.getTimesFromStop(agencyId, stopId);
+        const expectations = await this.getSaticTimesFromStop(agencyId, stopId);
         const predictions = await this.rtDataService.getTimesFromStop(agencyId, stopId);
         
-        const stopTimes: Time[] = expectations.map(expectation => {
-            const prediction = predictions.find(prediction => {
-                return prediction.tripId === expectation.tripId;
-            });
-            return this.computeTimeObject(expectation, prediction);
-        });
+        return this.mergeTimes(expectations, predictions);
+    }
 
+    async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
+        const expectations = await this.getStaticTimesFromStopOfRoute(agencyId, routeId, stopId);
+        const predictions = await this.rtDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
+
+        return this.mergeTimes(expectations, predictions);
+    }
+
+    private async mergeTimes(expectations: Time[], predictions: PredictedTime[]) {
+        const stopTimes: Time[] = expectations.map(expectation => {
+            const prediction = predictions.find(prediction => 
+                prediction.tripId === expectation.tripId
+            );
+            return {
+                ...expectation,
+                rtEpochTime: prediction?.epochTime,
+                rtSecondsAhead: prediction?.secondsAhead,
+                rtMinutesAhead: prediction?.minutesAhead,
+            };
+        });
+        
         return stopTimes
             .filter(time => time.stEpochTime > Date.now())
             .sort((a, b) => a.stEpochTime - b.stEpochTime);
     }
 
-    private computeTimeObject(stData: ScheduledTime, rtData?: PredictedTime): Time {
-        const timeAhead = this.getTimeAheadInMilliseconds(stData.scheduledTime);
+    private async getSaticTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
+        let times: Time[] = [];
+        const stop = await this.staticStopDataService.getStop(agencyId, stopId);
+        for (let routeId of stop ? stop.routeIds : []) {
+            times = times.concat(await this.getTimesFromStopOfRoute(agencyId, routeId, stopId));
+        }
+
+        return times;
+    }
+
+    private async getStaticTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
+        const times: Time[] = [];
+        const trips = await this.staticTripDataService.getTodayTripsFromRoute(agencyId, routeId);
+        trips.forEach(trip => {
+            const staticTime = trip.times.get(stopId);
+            if (staticTime) times.push(this.computeTimeObject(trip.id, routeId, staticTime.scheduledTime));
+        });
+
+        return times;
+    }
+
+    private computeTimeObject(tripId: string, routeId: string, scheduledTime: string): Time {
+        const timeAhead = this.getTimeAheadInMilliseconds(scheduledTime);
         return {
-            tripId: stData.tripId,
-            shapeId: stData.shapeId,
-            stopId: stData.stopId,
-            routeId: stData.routeId,
+            tripId, 
+            routeId,
             stEpochTime: Date.now() + timeAhead,
             stSecondsAhead: Math.floor(timeAhead / ONE_SEC_IN_MS),
             stMinutesAhead: Math.floor(timeAhead / (ONE_MINUTE_IN_SEC * ONE_SEC_IN_MS)),
-            rtEpochTime: rtData?.epochTime,
-            rtSecondsAhead: rtData?.secondsAhead,
-            rtMinutesAhead: rtData?.minutesAhead,
         }
     }
 

@@ -35,14 +35,10 @@ export interface Trip {
     shapeId: string;
     destination: string;
     wheelchairAccessibility: number;
-    times: ScheduledTime[];
+    times: Map<string, ScheduledTime>;
 }
 
 export interface ScheduledTime {
-    shapeId: string;
-    tripId: string;
-    stopId: string;
-    routeId: string;
     scheduledTime: string;
     pickupType: PickupType;
     dropOffType: DropOffType;
