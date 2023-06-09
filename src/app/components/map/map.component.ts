@@ -97,6 +97,9 @@ export class MapComponent implements OnInit {
                 iconSize: [50, 50],
                 iconAnchor: [25, 25],
                 popupAnchor: [0, -25],
+                shadowUrl: './assets/icons/shadow.png',
+                shadowSize: [80, 80],
+                shadowAnchor: [40, 40],
             }),
         });
 
@@ -107,9 +110,12 @@ export class MapComponent implements OnInit {
         const marker = L.marker([stop.location.lat, stop.location.lon], {
             icon: L.icon({
                 iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
-                iconSize: [50, 50],
-                iconAnchor: [25, 25],
+                iconSize: stop.hasShelter ? [40, 40] : [50, 50],
+                iconAnchor: stop.hasShelter ? [20, 20] : [25, 25],
                 popupAnchor: [0, -25],
+                shadowUrl: './assets/icons/shadow.png',
+                shadowSize: [80, 80],
+                shadowAnchor: [40, 40],
             }),
         });
         return marker.bindPopup(`${stop.name} [${stop.id}]`);
