@@ -1,10 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Vehicle } from '@app/interfaces/vehicle';
-import { Stop } from '@app/interfaces/gtfs';
 import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
-import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 import L from 'leaflet';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
+import { StopMarkerService } from '@app/services/layer/stop-marker.service';
 
 @Component({
     selector: 'app-map',
@@ -19,14 +18,14 @@ export class MapComponent implements OnInit {
     @Input() zoom: number = 12;
 
     @Input() agencyId: string = '';
-
     @Input() stopId: string = '';
-    @Input() set routeId(value: string) {
-        if (value) this.addStops(value);
-    };
+
     @Input() set tripId(value: string) {
-        if (value) this.addTripShape(value);
+        if (!value) return; 
+        this.addTripShape(value);
+        this.addStopMarkers(value);
     };
+
     @Input() set tripIds(value: string[]) {
         if (value) this.addSecondaryTripsShape(value);
     };
@@ -37,9 +36,9 @@ export class MapComponent implements OnInit {
     private tripShapeLayer!: L.LayerGroup;
 
     constructor(
-        private stStopDataService: StaticStopDataService,
         private rtDataService: RealtimeDataService,
         private tripShapeService: TripShapeService,
+        private stopMarkerService: StopMarkerService,
     ) {}
 
     ngOnInit(): void {
@@ -67,58 +66,6 @@ export class MapComponent implements OnInit {
         //     attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
         //     subdomains: 'abcd',
         // }).addTo(this.map);
-    }
-
-    private async addStops(routeIdValue: string): Promise<void> {
-        const stopMarkers = L.layerGroup();
-        (await this.stStopDataService.getStopsFromRoute(this.agencyId, routeIdValue)).forEach(async stop => {
-            if (stop.id !== this.stopId) stopMarkers.addLayer(await this.buildStopMarker(stop));
-            else this.map.addLayer(await this.buildCurrentStopMarker(stop));
-        });
-
-        if (this.stopLayer && this.map.hasLayer(this.stopLayer))
-            this.map.removeLayer(this.stopLayer);
-        this.stopLayer = L.layerGroup().addLayer(stopMarkers);
-        if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
-
-        this.map.addEventListener('zoomend', () => {
-            if (this.map.getZoom() <= this.zoomLevelThatHideStops) {
-                this.map.removeLayer(this.stopLayer);
-            } else if (!this.map.hasLayer(this.stopLayer)) {
-                this.map.addLayer(this.stopLayer);
-            }
-        })
-    }
-
-    private async buildCurrentStopMarker(stop: Stop): Promise<L.Marker> {
-        const marker = L.marker([stop.location.lat, stop.location.lon], {
-            icon: L.icon({
-                iconUrl: stop.hasShelter ? './assets/icons/stop-selected.png' : './assets/icons/stop-sign-selected.png',
-                iconSize: [50, 50],
-                iconAnchor: [25, 25],
-                popupAnchor: [0, -25],
-                shadowUrl: './assets/icons/shadow.png',
-                shadowSize: [80, 80],
-                shadowAnchor: [40, 40],
-            }),
-        });
-
-        return marker.bindPopup(`${stop.name} [${stop.id}]`);
-    }
-
-    private async buildStopMarker(stop: Stop): Promise<L.Marker> {
-        const marker = L.marker([stop.location.lat, stop.location.lon], {
-            icon: L.icon({
-                iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
-                iconSize: stop.hasShelter ? [40, 40] : [50, 50],
-                iconAnchor: stop.hasShelter ? [20, 20] : [25, 25],
-                popupAnchor: [0, -25],
-                shadowUrl: './assets/icons/shadow.png',
-                shadowSize: [80, 80],
-                shadowAnchor: [40, 40],
-            }),
-        });
-        return marker.bindPopup(`${stop.name} [${stop.id}]`);
     }
 
     private async addVehicles(): Promise<void> {
@@ -156,6 +103,20 @@ export class MapComponent implements OnInit {
         if (layer) this.map.addLayer(layer);
         const pane = this.map.createPane('semitransparent');
         pane.style.opacity = '0.5';
+    }
+
+    private async addStopMarkers(tripId: string): Promise<void> {
+        this.map.addLayer(await this.stopMarkerService.createCurrentStopLayer(this.agencyId, this.stopId));
+        this.stopLayer = await this.stopMarkerService.createOtherStopLayer(this.agencyId, tripId, this.stopId)
+        if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
+
+        this.map.addEventListener('zoomend', () => {
+            if (this.map.getZoom() <= this.zoomLevelThatHideStops) {
+                this.map.removeLayer(this.stopLayer);
+            } else if (!this.map.hasLayer(this.stopLayer)) {
+                this.map.addLayer(this.stopLayer);
+            }
+        })
     }
 }
     

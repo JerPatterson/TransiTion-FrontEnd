@@ -26,6 +26,13 @@ export class StaticTripDataService {
         return pointList ? pointList : [];
     }
 
+    async getStopIds(tripId: string): Promise<string[]> {
+        const stopIds: string[] = [];
+        (await this.getTrip(tripId))?.times.forEach((_, key) => stopIds.push(key));
+
+        return stopIds;
+    }
+
     async getTodayTripsFromStop(agencyId: string, stopId: string): Promise<Trip[]> {
         let trips: Trip[] = [];
         const routeIds = (await this.staticStopDataService.getStop(agencyId, stopId))?.routeIds;
