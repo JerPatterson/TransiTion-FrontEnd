@@ -138,7 +138,7 @@ export class MapComponent implements OnInit {
     }
 
     private async addTripShape(tripId: string): Promise<void> {
-        const shapeLayer = await this.tripShapeService.createTripShapeLayer(this.agencyId, tripId);
+        const shapeLayer = await this.tripShapeService.createTripShapeLayer(this.agencyId, tripId, '#0a2196');
         if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
             this.map.removeLayer(this.tripShapeLayer);
         this.tripShapeLayer = shapeLayer;
@@ -146,8 +146,10 @@ export class MapComponent implements OnInit {
     }
 
     private async addSecondaryTripsShape(tripIds: string[]): Promise<void> {
-        const layer = await this.tripShapeService.createSecondaryTripShapeLayer(this.agencyId, tripIds)
+        const layer = await this.tripShapeService.createSecondaryTripShapeLayer(this.agencyId, tripIds, '#0a2196')
         if (layer) this.map.addLayer(layer);
+        const pane = this.map.createPane('semitransparent');
+        pane.style.opacity = '0.5';
     }
 }
     
