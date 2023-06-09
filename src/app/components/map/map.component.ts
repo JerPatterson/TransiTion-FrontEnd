@@ -31,6 +31,7 @@ export class MapComponent implements OnInit {
     };
 
     private map!: L.Map;
+    private currentStopLayer!: L.LayerGroup;
     private stopLayer!: L.LayerGroup;
     private vehicleLayer!: L.LayerGroup;
     private tripShapeLayer!: L.LayerGroup;
@@ -106,8 +107,13 @@ export class MapComponent implements OnInit {
     }
 
     private async addStopMarkers(tripId: string): Promise<void> {
-        this.map.addLayer(await this.stopMarkerService.createCurrentStopLayer(this.agencyId, this.stopId));
-        this.stopLayer = await this.stopMarkerService.createOtherStopLayer(this.agencyId, tripId, this.stopId)
+        if (!this.currentStopLayer) {
+            this.currentStopLayer = await this.stopMarkerService.createCurrentStopLayer(this.agencyId, this.stopId)
+            this.map.addLayer(this.currentStopLayer);
+        }
+        
+        if (this.stopLayer) this.map.removeLayer(this.stopLayer);
+        this.stopLayer = await this.stopMarkerService.createOtherStopLayer(this.agencyId, tripId, this.stopId);
         if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
 
         this.map.addEventListener('zoomend', () => {
