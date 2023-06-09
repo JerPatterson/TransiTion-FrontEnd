@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Vehicle } from '@app/interfaces/vehicle';
-import { ShapePt, Stop } from '@app/interfaces/gtfs';
+import { Stop } from '@app/interfaces/gtfs';
 import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
-import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
 import L from 'leaflet';
+import { TripShapeService } from '@app/services/layer/trip-shape.service';
 
 @Component({
     selector: 'app-map',
@@ -24,7 +24,7 @@ export class MapComponent implements OnInit {
     @Input() set routeId(value: string) {
         if (value) this.addStops(value);
     };
-    @Input() set shapeId(value: string) {
+    @Input() set tripId(value: string) {
         if (value) this.addTripShape(value);
     };
 
@@ -35,8 +35,8 @@ export class MapComponent implements OnInit {
 
     constructor(
         private stStopDataService: StaticStopDataService,
-        private stTripDataService: StaticTripDataService,
         private rtDataService: RealtimeDataService,
+        private tripShapeService: TripShapeService,
     ) {}
 
     ngOnInit(): void {
@@ -135,30 +135,12 @@ export class MapComponent implements OnInit {
     }
 
 
-    private async addTripShape(shapeIdValue: string): Promise<void> {
-        const shapePtList = await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue);
-        const tripShape = await this.buildTripShape(shapePtList, '#0a2196', 1);
-
+    private async addTripShape(tripId: string): Promise<void> {
+        const tripShape = await this.tripShapeService.createTripShapeLayer(this.agencyId, tripId)
         if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
             this.map.removeLayer(this.tripShapeLayer);
         this.tripShapeLayer = L.layerGroup().addLayer(tripShape);
         this.map.addLayer(this.tripShapeLayer);
-    }
-
-    // private async addSecondaryTripShape(shapeIdValue: string): Promise<void> {
-    //     const shapePtList = await this.stTripDataService.getShapeOfTrip(this.agencyId, shapeIdValue);
-    //     const tripShape = await this.buildTripShape(shapePtList, '#0a2196', 0.4);
-
-    //     if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
-    //         this.map.removeLayer(this.tripShapeLayer);
-    //     this.tripShapeLayer = L.layerGroup().addLayer(tripShape);
-    //     this.map.addLayer(this.tripShapeLayer);
-    // }
-
-    private async buildTripShape(shapePtList: ShapePt[], color: string, opacity: number): Promise<L.Polyline> {
-        const pointList: L.LatLng[] = [];
-        shapePtList.forEach(shapePt => pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon)));
-        return new L.Polyline(pointList, { color, opacity, weight: 8, smoothFactor: 1 });
     }
 }
     

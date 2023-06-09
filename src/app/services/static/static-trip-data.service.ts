@@ -16,8 +16,11 @@ export class StaticTripDataService {
         private staticServiceDataService: StaticServiceDataService,
     ) {}
 
-    async getShapeOfTrip(agencyId: string, shapeId: string): Promise<ShapePt[]> {
-        return (await this.staticDataService.getDocumentFromAgency(agencyId, `/trips/shapes/${shapeId}`)).data()?.arr as ShapePt[];
+    async getShapeOfTrip(agencyId: string, tripId: string): Promise<ShapePt[]> {
+        const shapeId = (await this.getTrip(tripId))?.shapeId;
+        const pointList = (await this.staticDataService.getDocumentFromAgency(agencyId, `/trips/shapes/${shapeId}`)).data()?.arr as ShapePt[];
+        
+        return pointList ? pointList : [];
     }
 
     async getTrip(tripId: string): Promise<Trip | undefined> {
