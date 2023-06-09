@@ -18,6 +18,8 @@ export class SchedulePageComponent {
     stopId: string | undefined;
     timeSelected: Time | undefined;
 
+    tripIds: string[] = [];
+
     constructor(
         private route: ActivatedRoute,
         private scheduleService: ScheduleService,
@@ -43,6 +45,7 @@ export class SchedulePageComponent {
 
         this.timeSelected = this.times[0];
         this.routeId = this.times[0].routeId;
+        this.tripIds = this.times.map(time => time.tripId);
     }
 
     onClick(time: Time) {

@@ -27,6 +27,9 @@ export class MapComponent implements OnInit {
     @Input() set tripId(value: string) {
         if (value) this.addTripShape(value);
     };
+    @Input() set tripIds(value: string[]) {
+        if (value) this.addSecondaryTripsShape(value);
+    };
 
     private map!: L.Map;
     private stopLayer!: L.LayerGroup;
@@ -134,13 +137,17 @@ export class MapComponent implements OnInit {
         return marker.bindPopup(`${vehicle.id}`);
     }
 
-
     private async addTripShape(tripId: string): Promise<void> {
-        const tripShape = await this.tripShapeService.createTripShapeLayer(this.agencyId, tripId)
+        const shapeLayer = await this.tripShapeService.createTripShapeLayer(this.agencyId, tripId);
         if (this.tripShapeLayer && this.map.hasLayer(this.tripShapeLayer))
             this.map.removeLayer(this.tripShapeLayer);
-        this.tripShapeLayer = L.layerGroup().addLayer(tripShape);
+        this.tripShapeLayer = shapeLayer;
         this.map.addLayer(this.tripShapeLayer);
+    }
+
+    private async addSecondaryTripsShape(tripIds: string[]): Promise<void> {
+        const layer = await this.tripShapeService.createSecondaryTripShapeLayer(this.agencyId, tripIds)
+        if (layer) this.map.addLayer(layer);
     }
 }
     
