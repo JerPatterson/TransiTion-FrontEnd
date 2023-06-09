@@ -19,10 +19,9 @@ export class StopMarkerService {
         return stop? L.layerGroup().addLayer(await this.buildStopMarker(stop)) : L.layerGroup();
     }
 
-    async createOtherStopLayer(agencyId: string, tripId: string, currentStopId: string): Promise<L.LayerGroup> {
+    async createOtherStopsLayer(agencyId: string, tripId: string, currentStopId: string): Promise<L.LayerGroup> {
         const stopMarkers = L.layerGroup();
         const stopIds = await this.staticTripDataService.getStopIds(tripId);
-        console.log(stopIds);
         stopIds.forEach(async stopId => {
             if (stopId === currentStopId) return;
             const stop = await this.staticStopDataService.getStop(agencyId, stopId);
@@ -36,8 +35,8 @@ export class StopMarkerService {
         const marker = L.marker([stop.location.lat, stop.location.lon], {
             icon: L.icon({
                 iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
-                iconSize: stop.hasShelter ? [40, 40] : [50, 50],
-                iconAnchor: stop.hasShelter ? [20, 20] : [25, 25],
+                iconSize: stop.hasShelter ? [35, 35] : [40, 40],
+                iconAnchor: stop.hasShelter ? [17, 17] : [20, 20],
                 popupAnchor: [0, -25],
                 shadowUrl: './assets/icons/shadow.png',
                 shadowSize: [80, 80],

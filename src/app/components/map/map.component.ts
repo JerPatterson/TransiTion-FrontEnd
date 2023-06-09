@@ -1,9 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Vehicle } from '@app/interfaces/vehicle';
-import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import L from 'leaflet';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 import { StopMarkerService } from '@app/services/layer/stop-marker.service';
+import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
 
 @Component({
     selector: 'app-map',
@@ -19,6 +18,10 @@ export class MapComponent implements OnInit {
 
     @Input() agencyId: string = '';
     @Input() stopId: string = '';
+
+    @Input() set routeId(value: string) {
+        if (value) this.addVehicleMarkers(value);
+    };
 
     @Input() set tripId(value: string) {
         if (!value) return; 
@@ -37,14 +40,13 @@ export class MapComponent implements OnInit {
     private tripShapeLayer!: L.LayerGroup;
 
     constructor(
-        private rtDataService: RealtimeDataService,
         private tripShapeService: TripShapeService,
         private stopMarkerService: StopMarkerService,
+        private vehicleMarkerService: VehicleMarkerService,
     ) {}
 
     ngOnInit(): void {
         this.initMap();
-        if (!this.stopId) setTimeout(() => this.addVehicles(), 1000);
     }
     
     private initMap(): void {
@@ -69,26 +71,10 @@ export class MapComponent implements OnInit {
         // }).addTo(this.map);
     }
 
-    private async addVehicles(): Promise<void> {
-        const vehicleMarkers = L.layerGroup();
-        (await this.rtDataService.getVehiclesFromAgency(this.agencyId)).forEach(async vehicle => {
-            vehicleMarkers.addLayer(await this.buildVehicleMarker(vehicle));
-        });
-
-        this.vehicleLayer = L.layerGroup().addLayer(vehicleMarkers);
+    private async addVehicleMarkers(routeId: string): Promise<void> {
+        if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
+        this.vehicleLayer = await this.vehicleMarkerService.createVehiclesLayer(this.agencyId, routeId);
         this.map.addLayer(this.vehicleLayer);
-    }
-
-    private async buildVehicleMarker(vehicle: Vehicle): Promise<L.Marker> {
-        const marker = L.marker([vehicle.location.lat, vehicle.location.lon], {
-            icon: L.icon({
-                iconUrl: './assets/icons/bus.png',
-                iconSize: [50, 50],
-                iconAnchor: [25, 25],
-                popupAnchor: [0, -25],
-            }),
-        });
-        return marker.bindPopup(`${vehicle.id}`);
     }
 
     private async addTripShape(tripId: string): Promise<void> {
@@ -113,7 +99,7 @@ export class MapComponent implements OnInit {
         }
         
         if (this.stopLayer) this.map.removeLayer(this.stopLayer);
-        this.stopLayer = await this.stopMarkerService.createOtherStopLayer(this.agencyId, tripId, this.stopId);
+        this.stopLayer = await this.stopMarkerService.createOtherStopsLayer(this.agencyId, tripId, this.stopId);
         if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
 
         this.map.addEventListener('zoomend', () => {
