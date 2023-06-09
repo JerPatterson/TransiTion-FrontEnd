@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
-import { RealtimeDataService } from '@app/services/realtime-data.service';
+import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { PredictedTime, Time } from '@app/interfaces/time-concepts';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '@app/constants/time';
-import { StaticStopDataService } from './static/static-stop-data.service';
+import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
 
 @Injectable({
     providedIn: 'root'
