@@ -8,6 +8,7 @@ import { ScheduledTime, ShapePt, Trip } from '@app/interfaces/gtfs';
     providedIn: 'root'
 })
 export class StaticTripDataService {
+    private tripIdToTrip: Map<string, Trip> = new Map(); // <tripId, Trip>
     
     constructor(
         private staticDataService: StaticDataService,
@@ -17,6 +18,10 @@ export class StaticTripDataService {
 
     async getShapeOfTrip(agencyId: string, shapeId: string): Promise<ShapePt[]> {
         return (await this.staticDataService.getDocumentFromAgency(agencyId, `/trips/shapes/${shapeId}`)).data()?.arr as ShapePt[];
+    }
+
+    async getTrip(tripId: string): Promise<Trip | undefined> {
+        return this.tripIdToTrip.get(tripId);
     }
 
     async getTodayTripsFromStop(agencyId: string, stopId: string): Promise<Trip[]> {
@@ -33,6 +38,19 @@ export class StaticTripDataService {
 
     private async getTripsFromRoute(agencyId: string, routeId: string, serviceId: string): Promise<Trip[]> {
         const doc = (await this.staticDataService.getDocumentFromAgency(agencyId, `trips/${routeId}/${serviceId}`)).data()?.arr as Trip[];
-        return doc.map(trip => { return { ...trip, times: new Map(Object.entries(trip.times)) as Map<string, ScheduledTime> }; });
+        const trips = doc.map(trip => { 
+            return { 
+                ...trip, times: new Map(Object.entries(trip.times)) as Map<string, ScheduledTime> 
+            }; 
+        });
+        this.setTripsData(trips);
+
+        return trips;
+    }
+
+    private async setTripsData(trips: Trip[]): Promise<void> {
+        trips.forEach(trip => {
+            this.tripIdToTrip.set(trip.id, trip);
+        });
     }
 }
