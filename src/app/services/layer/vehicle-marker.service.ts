@@ -7,12 +7,21 @@ import { Vehicle } from '@app/interfaces/vehicle';
     providedIn: 'root'
 })
 export class VehicleMarkerService {
-    
+
     constructor(private rtDataService: RealtimeDataService) {}
 
     async createVehiclesLayer(agencyId: string, routeId: string): Promise<L.LayerGroup> {
         const vehicleMarkers = L.layerGroup();
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
+            vehicleMarkers.addLayer(await this.buildVehicleMarker(vehicle));
+        });
+
+        return L.layerGroup().addLayer(vehicleMarkers);
+    }
+
+    async createAllVehiclesLayer(agencyId: string): Promise<L.LayerGroup> {
+        const vehicleMarkers = L.layerGroup();
+        (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
             vehicleMarkers.addLayer(await this.buildVehicleMarker(vehicle));
         });
 

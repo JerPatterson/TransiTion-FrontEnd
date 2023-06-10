@@ -10,6 +10,7 @@ import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
+    private readonly stopsLoadingDelay = 4000;
     private readonly zoomLevelThatHideStops = 15;
 
     @Input() lat: number = 45.6;
@@ -47,6 +48,7 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
+        if (!this.stopId) setTimeout(() => this.addAllVehicleMarkers(), 1000);
     }
     
     private initMap(): void {
@@ -71,6 +73,12 @@ export class MapComponent implements OnInit {
         // }).addTo(this.map);
     }
 
+    private async addAllVehicleMarkers(): Promise<void> {
+        if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
+        this.vehicleLayer = await this.vehicleMarkerService.createAllVehiclesLayer(this.agencyId);
+        this.map.addLayer(this.vehicleLayer);
+    }
+
     private async addVehicleMarkers(routeId: string): Promise<void> {
         if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
         this.vehicleLayer = await this.vehicleMarkerService.createVehiclesLayer(this.agencyId, routeId);
@@ -93,11 +101,18 @@ export class MapComponent implements OnInit {
     }
 
     private async addStopMarkers(tripId: string): Promise<void> {
+        this.addCurrentStopMarker();
+        setTimeout(() => this.addOtherStopMarkers(tripId), this.stopsLoadingDelay);
+    }
+
+    private async addCurrentStopMarker(): Promise<void> {
         if (!this.currentStopLayer) {
             this.currentStopLayer = await this.stopMarkerService.createCurrentStopLayer(this.agencyId, this.stopId)
             this.map.addLayer(this.currentStopLayer);
         }
-        
+    }
+
+    private async addOtherStopMarkers(tripId: string): Promise<void> {
         if (this.stopLayer) this.map.removeLayer(this.stopLayer);
         this.stopLayer = await this.stopMarkerService.createOtherStopsLayer(this.agencyId, tripId, this.stopId);
         if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
@@ -108,7 +123,7 @@ export class MapComponent implements OnInit {
             } else if (!this.map.hasLayer(this.stopLayer)) {
                 this.map.addLayer(this.stopLayer);
             }
-        })
+        });
     }
 }
     
