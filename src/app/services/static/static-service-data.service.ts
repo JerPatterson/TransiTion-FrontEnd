@@ -34,7 +34,7 @@ export class StaticServiceDataService {
         return calendar.find((e: CalendarElement) => {
             let startDate = new Date(e.startDate.seconds * ONE_SEC_IN_MS);
             let endDate = new Date(e.endDate.seconds * ONE_SEC_IN_MS);
-            return this.isBetweenTwoDates(date, startDate, endDate) && this.isServiceOfDay(e, date.getUTCDay());
+            return this.isBetweenTwoDates(date, startDate, endDate) && this.isServiceOfDay(e, date.getDay());
         })?.serviceId;
     }
 
