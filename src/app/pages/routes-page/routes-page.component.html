@@ -1,16 +1,16 @@
 <h1 class="page-title">Les lignes de transport en commun</h1>
 <hr class="delimitation">
 
-<div *ngFor="let route of this.routes" class="route-container" [routerLink]="['/stops', agency, route.id]">
+<div *ngFor="let route of this.routes" class="route-container" [routerLink]="['/stops', agency, route.route_id]">
     <span class="route-name">
         <span class="route-icon">
-            <span>{{ route.id }}</span>
+            <span>{{ route.route_short_name }}</span>
         </span>
-        <span>{{ route.name }}</span>
+        <span>{{ route.route_long_name }}</span>
     </span>
     <span class="route-info">
-        <img *ngIf="route.nightOnly" class="route-info-icon" src="./assets/icons/night.png"/>
-        <img *ngIf="route.accessible" class="route-info-icon" src="./assets/icons/accessible.png"/>
-        <img *ngIf="route.type === 3" class="route-info-icon" src="./assets/icons/bus.png"/>
+        <!-- <img *ngIf="route.nightOnly" class="route-info-icon" src="./assets/icons/night.png"/>
+        <img *ngIf="route." class="route-info-icon" src="./assets/icons/accessible.png"/> -->
+        <img *ngIf="route.route_type === 3" class="route-info-icon" src="./assets/icons/bus.png"/>
     </span>
 </div>

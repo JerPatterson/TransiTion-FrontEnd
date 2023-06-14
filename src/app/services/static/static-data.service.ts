@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Route } from '@app/interfaces/gtfs';
+import { RouteDto } from '@app/utils/dtos';
+import { SERVER_URL } from '@app/utils/env';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc, DocumentSnapshot, DocumentData } from 'firebase/firestore';
 
@@ -25,14 +26,9 @@ export class StaticDataService {
         this.db = getFirestore(this.app);
     }
 
-    async getRoutesFromAgency(agencyId: string): Promise<Route[]> {
-        const storedContent = sessionStorage.getItem(`${agencyId}/routes`);
-        if (storedContent) return JSON.parse(storedContent) as Route[];
-
-        const content = (await this.getDocumentFromAgency(agencyId, 'routes')).data()?.arr as Route[];
-        sessionStorage.setItem(`${agencyId}/routes`, JSON.stringify(content));
-    
-        return content;
+    async getRoutesFromAgency(agencyId: string): Promise<RouteDto[]> {
+        const res = await fetch(`${SERVER_URL}/routes/${agencyId}`);
+        return res.json();
     }
 
     async getArrayFromDocument(agencyId: string, documentId: string): Promise<any[]> {
