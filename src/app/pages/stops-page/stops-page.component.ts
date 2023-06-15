@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Stop } from '@app/interfaces/gtfs';
-import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
+import { StaticDataService } from '@app/services/static/static-data.service';
+import { StopDto } from '@app/utils/dtos';
 
 @Component({
     selector: 'app-stops-page',
@@ -9,11 +9,11 @@ import { StaticStopDataService } from '@app/services/static/static-stop-data.ser
     styleUrls: ['./stops-page.component.css']
 })
 export class StopsPageComponent {
-    stops: Stop[] = [];
+    stops: StopDto[] = [];
     agencyId: string | undefined;
     routeId: string | undefined;
     
-    constructor(private route: ActivatedRoute, private stStopDataService: StaticStopDataService) {
+    constructor(private route: ActivatedRoute, private staticDataService: StaticDataService) {
         this.setStops();
     }
     
@@ -24,10 +24,10 @@ export class StopsPageComponent {
 
         const routeId = this.route.snapshot.paramMap.get('route-id');
         if (!routeId) {
-            this.stops = await this.stStopDataService.getStopsFromAgency(agencyId);
+            this.stops = await this.staticDataService.getStopsFromAgency(agencyId);
             return;
         }
         this.routeId = routeId;
-        this.stops = await this.stStopDataService.getStopsFromRoute(agencyId, routeId);
+        this.stops = await this.staticDataService.getStopsFromRoute(agencyId, routeId);
     }
 }

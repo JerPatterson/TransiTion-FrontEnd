@@ -1,38 +1,37 @@
 import { Injectable } from '@angular/core';
-import { ShapePt } from '@app/interfaces/gtfs';
 import L from 'leaflet';
-import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
+import { StaticDataService } from '@app/services/static/static-data.service';
+import { ShapeDto } from '@app/utils/dtos';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TripShapeService {
     
-    constructor(private staticTripDataService: StaticTripDataService) {}
+    constructor(private staticDataService: StaticDataService) {}
     
     async createTripShapeLayer(agencyId: string, tripId: string, shapeColor: string): Promise<L.LayerGroup> {
         const shapeLayer = L.layerGroup();
-        const shapeId = (await this.staticTripDataService.getTrip(tripId))?.shapeId;
-        const shapePtList = await this.staticTripDataService.getShape(agencyId, shapeId ? shapeId : '');
-        return shapeLayer.addLayer(await this.buildTripShape(shapePtList, shapeColor));
+        const shapeId = (await this.staticDataService.getTrip(agencyId, tripId)).shape_id;
+        const shapePts = await this.staticDataService.getShape(agencyId, shapeId);
+        return shapeLayer.addLayer(await this.buildTripShape(shapePts, shapeColor));
     }
     
     async createSecondaryTripShapeLayer(agencyId: string, tripIds: string[], shapeColor: string): Promise<L.LayerGroup> {
         const shapeLayer = L.layerGroup();
         const canvasRenderer = L.canvas({pane: 'semitransparent'});
-        const shapeIds = tripIds.map(async tripId => (await this.staticTripDataService.getTrip(tripId))?.shapeId);
+        const shapeIds = tripIds.map(async tripId => (await this.staticDataService.getTrip(agencyId, tripId)).shape_id);
         const uniqueShapeIds = [...new Set(await Promise.all(shapeIds))];
         uniqueShapeIds.forEach(async id => {
-            if (!id) return;
-            const shapePtList = await this.staticTripDataService.getShape(agencyId, id);
-            shapeLayer.addLayer(await this.buildTripShape(shapePtList, shapeColor, canvasRenderer));
+            const shapePts = await this.staticDataService.getShape(agencyId, id);
+            shapeLayer.addLayer(await this.buildTripShape(shapePts, shapeColor, canvasRenderer));
         });
         return shapeLayer;
     }
     
-    private async buildTripShape(shapePtList: ShapePt[], color: string, renderer?: L.Renderer): Promise<L.Polyline> {
+    private async buildTripShape(shapePts: ShapeDto[], color: string, renderer?: L.Renderer): Promise<L.Polyline> {
         const pointList: L.LatLng[] = [];
-        shapePtList.forEach(shapePt => pointList.push(L.latLng(shapePt.location.lat, shapePt.location.lon)));
+        shapePts.forEach(shape => pointList.push(L.latLng(shape.shape_pt_lat, shape.shape_pt_lon)));
         return new L.Polyline(pointList, { color, weight: 8, opacity: 1, smoothFactor: 1, renderer });
     }
 }

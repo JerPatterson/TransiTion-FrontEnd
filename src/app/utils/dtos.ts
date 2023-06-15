@@ -72,6 +72,8 @@ export interface TimeDto {
   continuous_drop_off?: number;
   shape_dist_traveled?: number;
   timepoint?: number;
+  trip?: TripDto;
+  stop?: StopDto;
 }
 
 export interface ShapeDto {

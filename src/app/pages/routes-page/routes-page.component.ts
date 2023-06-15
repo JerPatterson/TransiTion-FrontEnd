@@ -12,13 +12,13 @@ export class RoutesPageComponent {
     agency: string | null;
     routes: RouteDto[] = [];
 
-    constructor(private route: ActivatedRoute, private stDataService: StaticDataService) {
+    constructor(private route: ActivatedRoute, private staticDataService: StaticDataService) {
         this.agency = this.route.snapshot.paramMap.get('agency-name');
         this.setRoutes();
     }
 
     private async setRoutes() {
         if (!this.agency) return;
-        this.routes = (await this.stDataService.getRoutesFromAgency(this.agency));
+        this.routes = (await this.staticDataService.getRoutesFromAgency(this.agency));
     }
 }

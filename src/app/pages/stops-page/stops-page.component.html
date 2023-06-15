@@ -2,35 +2,33 @@
 <hr class="delimitation">
 
 <div *ngIf="routeId">
-    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.id]">
+    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.stop_id]">
         <span class="stop-name">
             <span class="stop-icon">
-                <span>{{ stop.id }}</span>
+                <span>{{ stop.stop_code }}</span>
             </span>
-            <span>{{ stop.name }}</span>
+            <span>{{ stop.stop_name }}</span>
         </span>
         <span class="stop-info">
-            
-            <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/icons/accessible.png"/>
-            <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-            <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
+            <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/>
+            <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
+            <img *ngIf="!stop.stop_display" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
         </span>
     </div>
 </div>
 
 <div *ngIf="!routeId">
-    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.id]">
+    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.stop_id]">
         <span class="stop-name">
             <span class="stop-icon">
-                <span>{{ stop.id }}</span>
+                <span>{{ stop.stop_code }}</span>
             </span>
-            <span>{{ stop.name }}</span>
+            <span>{{ stop.stop_name }}</span>
         </span>
-        <span class="stop-info">
-            
-            <img *ngIf="stop.accessible" class="stop-info-icon" src="./assets/icons/accessible.png"/>
-            <img *ngIf="stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-            <img *ngIf="!stop.hasShelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
+        <span class="stop-info"> 
+            <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/>
+            <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
+            <img *ngIf="!stop.stop_display" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
         </span>
     </div>
 </div>

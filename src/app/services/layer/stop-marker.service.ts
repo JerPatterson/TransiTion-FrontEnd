@@ -1,42 +1,37 @@
 import { Injectable } from '@angular/core';
-import { Stop } from '@app/interfaces/gtfs';
 import L from 'leaflet';
-import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
-import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
+import { StopDto } from '@app/utils/dtos';
+import { StaticDataService } from '@app/services/static/static-data.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class StopMarkerService {
     
-    constructor(
-        private staticStopDataService: StaticStopDataService,
-        private staticTripDataService: StaticTripDataService,
-    ) {}
+    constructor(private staticDataService: StaticDataService) {}
 
     async createCurrentStopLayer(agencyId: string, stopId: string): Promise<L.LayerGroup> {
-        const stop = await this.staticStopDataService.getStop(agencyId, stopId);
+        const stop = await this.staticDataService.getStop(agencyId, stopId);
         return stop? L.layerGroup().addLayer(await this.buildStopMarker(stop)) : L.layerGroup();
     }
 
     async createOtherStopsLayer(agencyId: string, tripId: string, currentStopId: string): Promise<L.LayerGroup> {
         const stopMarkers = L.layerGroup();
-        const stopIds = await this.staticTripDataService.getStopIds(tripId);
-        stopIds.forEach(async stopId => {
-            if (stopId === currentStopId) return;
-            const stop = await this.staticStopDataService.getStop(agencyId, stopId);
-            if (stop) stopMarkers.addLayer(await this.buildStopMarker(stop));
+        const stops = await this.staticDataService.getStopsFromTrip(agencyId, tripId);
+        stops.forEach(async stop => {
+            if (stop.stop_id === currentStopId) return;
+            stopMarkers.addLayer(await this.buildStopMarker(stop));
         });
 
         return stopMarkers;
     }
 
-    private async buildStopMarker(stop: Stop): Promise<L.Marker> {
-        const marker = L.marker([stop.location.lat, stop.location.lon], {
+    private async buildStopMarker(stop: StopDto): Promise<L.Marker> {
+        const marker = L.marker([stop.stop_lat, stop.stop_lon], {
             icon: L.icon({
-                iconUrl: stop.hasShelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
-                iconSize: stop.hasShelter ? [35, 35] : [40, 40],
-                iconAnchor: stop.hasShelter ? [17, 17] : [20, 20],
+                iconUrl: stop.stop_shelter ? './assets/icons/stop.png' : './assets/icons/stop-sign.png',
+                iconSize: stop.stop_shelter ? [35, 35] : [40, 40],
+                iconAnchor: stop.stop_shelter ? [17, 17] : [20, 20],
                 popupAnchor: [0, -25],
                 shadowUrl: './assets/icons/shadow.png',
                 shadowSize: [80, 80],
@@ -44,6 +39,6 @@ export class StopMarkerService {
             }),
         });
 
-        return marker.bindPopup(`${stop.name} [${stop.id}]`);
+        return marker.bindPopup(`${stop.stop_name} [${stop.stop_code}]`);
     }
 }

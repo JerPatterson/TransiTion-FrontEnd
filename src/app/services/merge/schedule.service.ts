@@ -1,19 +1,15 @@
 import { Injectable } from '@angular/core';
-import { StaticTripDataService } from '@app/services/static/static-trip-data.service';
 import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { PredictedTime, Time } from '@app/interfaces/time-concepts';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '@app/constants/time';
-import { StaticStopDataService } from '@app/services/static/static-stop-data.service';
+import { SERVER_URL } from '@app/utils/env';
+import { TimeDto } from '@app/utils/dtos';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ScheduleService {
-    constructor(
-        private rtDataService: RealtimeDataService,
-        private staticTripDataService: StaticTripDataService,
-        private staticStopDataService: StaticStopDataService,
-    ) {}
+    constructor(private rtDataService: RealtimeDataService) {}
 
     async getTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
         const expectations = await this.getSaticTimesFromStop(agencyId, stopId);
@@ -48,24 +44,15 @@ export class ScheduleService {
     }
 
     private async getSaticTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
-        let times: Time[] = [];
-        const stop = await this.staticStopDataService.getStop(agencyId, stopId);
-        for (let routeId of stop ? stop.routeIds : []) {
-            times = times.concat(await this.getTimesFromStopOfRoute(agencyId, routeId, stopId));
-        }
-
-        return times;
+        const res = await fetch(`${SERVER_URL}/times/stop/today/${agencyId}/${stopId}`);
+        const times: TimeDto[] = await res.json();
+        return times.map((time) => this.computeTimeObject(time.trip_id, time.trip ? time.trip.route_id : '', time.arrival_time))
     }
 
     private async getStaticTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
-        const times: Time[] = [];
-        const trips = await this.staticTripDataService.getTodayTripsFromRoute(agencyId, routeId);
-        trips.forEach(trip => {
-            const staticTime = trip.times.get(stopId);
-            if (staticTime) times.push(this.computeTimeObject(trip.id, routeId, staticTime.scheduledTime));
-        });
-
-        return times;
+        const res = await fetch(`${SERVER_URL}/times/route/stop/today/${agencyId}/${routeId}/${stopId}`);
+        const times: TimeDto[] = await res.json();
+        return times.map((time) => this.computeTimeObject(time.trip_id, routeId, time.arrival_time))
     }
 
     private computeTimeObject(tripId: string, routeId: string, scheduledTime: string): Time {
