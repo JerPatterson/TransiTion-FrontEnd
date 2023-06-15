@@ -2,14 +2,16 @@ import { Injectable } from '@angular/core';
 import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { PredictedTime, Time } from '@app/interfaces/time-concepts';
 import { ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS } from '@app/constants/time';
-import { SERVER_URL } from '@app/utils/env';
-import { TimeDto } from '@app/utils/dtos';
+import { StaticDataService } from '@app/services/static/static-data.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ScheduleService {
-    constructor(private rtDataService: RealtimeDataService) {}
+    constructor(
+        private stDataService: StaticDataService,
+        private rtDataService: RealtimeDataService
+    ) {}
 
     async getTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
         const expectations = await this.getSaticTimesFromStop(agencyId, stopId);
@@ -44,14 +46,12 @@ export class ScheduleService {
     }
 
     private async getSaticTimesFromStop(agencyId: string, stopId: string): Promise<Time[]> {
-        const res = await fetch(`${SERVER_URL}/times/stop/today/${agencyId}/${stopId}`);
-        const times: TimeDto[] = await res.json();
+        const times = await this.stDataService.getTimesFromStop(agencyId, stopId);
         return times.map((time) => this.computeTimeObject(time.trip_id, time.trip ? time.trip.route_id : '', time.arrival_time))
     }
 
     private async getStaticTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<Time[]> {
-        const res = await fetch(`${SERVER_URL}/times/route/stop/today/${agencyId}/${routeId}/${stopId}`);
-        const times: TimeDto[] = await res.json();
+        const times = await this.stDataService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
         return times.map((time) => this.computeTimeObject(time.trip_id, routeId, time.arrival_time))
     }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RouteDto, ShapeDto, StopDto, TripDto } from '@app/utils/dtos';
+import { RouteDto, ShapeDto, StopDto, TimeDto, TripDto } from '@app/utils/dtos';
 import { SERVER_URL } from '@app/utils/env';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc, DocumentSnapshot, DocumentData } from 'firebase/firestore';
@@ -69,6 +69,16 @@ export class StaticDataService {
     async getTodayTripsFromRoute(agencyId: string, routeId: string): Promise<TripDto[]> {
         const res = await fetch(`${SERVER_URL}/trips/route/today/${agencyId}/${routeId}`);
         return res.json();
+    }
+
+    async getTimesFromStop(agencyId: string, stopId: string): Promise<TimeDto[]> {
+        const res = await fetch(`${SERVER_URL}/times/stop/today/${agencyId}/${stopId}`);
+        return await res.json();
+    }
+
+    async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<TimeDto[]> {
+        const res = await fetch(`${SERVER_URL}/times/route/stop/today/${agencyId}/${routeId}/${stopId}`);
+        return await res.json();
     }
 
     async getArrayFromDocument(agencyId: string, documentId: string): Promise<any[]> {
