@@ -13,12 +13,15 @@ export class MapComponent implements OnInit {
     private readonly stopsLoadingDelay = 4000;
     private readonly zoomLevelThatHideStops = 15;
 
+    private currentStopId: string = '';
+
     @Input() lat: number = 45.6;
     @Input() lon: number = -73.75;
     @Input() zoom: number = 12;
 
     @Input() agencyId: string = '';
     @Input() set stopId(value: string) {
+        this.currentStopId = value;
         if (value) this.addSecondaryTripsShape(value);
     }
 
@@ -105,7 +108,7 @@ export class MapComponent implements OnInit {
 
     private async addCurrentStopMarker(): Promise<void> {
         if (!this.currentStopLayer) {
-            this.currentStopLayer = await this.stopMarkerService.createCurrentStopLayer(this.agencyId, this.stopId)
+            this.currentStopLayer = await this.stopMarkerService.createCurrentStopLayer(this.agencyId, this.currentStopId)
             this.map.addLayer(this.currentStopLayer);
         }
     }
