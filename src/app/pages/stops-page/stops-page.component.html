@@ -12,7 +12,7 @@
         <span class="stop-info">
             <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/>
             <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-            <img *ngIf="!stop.stop_display" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
+            <img *ngIf="!stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
         </span>
     </div>
 </div>
@@ -28,7 +28,7 @@
         <span class="stop-info"> 
             <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/>
             <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-            <img *ngIf="!stop.stop_display" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
+            <img *ngIf="!stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
         </span>
     </div>
 </div>

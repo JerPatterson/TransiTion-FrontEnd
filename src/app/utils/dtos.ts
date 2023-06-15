@@ -44,6 +44,7 @@ export interface RouteDto {
   continuous_pickup?: number;
   continuous_drop_off?: number;
   wheelchair_boarding?: number;
+  night_only?: boolean;
 }
 
 export interface TripDto {

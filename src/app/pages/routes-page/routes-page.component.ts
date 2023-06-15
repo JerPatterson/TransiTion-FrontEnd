@@ -19,6 +19,6 @@ export class RoutesPageComponent {
 
     private async setRoutes() {
         if (!this.agency) return;
-        this.routes = (await this.staticDataService.getRoutesFromAgency(this.agency));
+        this.routes = await this.staticDataService.getRoutesFromAgency(this.agency);
     }
 }

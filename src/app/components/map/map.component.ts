@@ -59,9 +59,9 @@ export class MapComponent implements OnInit {
             zoomControl: false,
         }).setView([this.lat, this.lon], this.zoom);
         
-        L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        }).addTo(this.map);
+        // L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        // }).addTo(this.map);
 
         // L.tileLayer('https://navigoservprod.stl.laval.qc.ca/FCT/mbtiles-1.php?id=routier_stl_couleur/{z}/{x}/{y}.png', {
         //     attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',

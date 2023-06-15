@@ -9,8 +9,8 @@
         <span>{{ route.route_long_name }}</span>
     </span>
     <span class="route-info">
-        <!-- <img *ngIf="route.nightOnly" class="route-info-icon" src="./assets/icons/night.png"/>
-        <img *ngIf="route." class="route-info-icon" src="./assets/icons/accessible.png"/> -->
+        <img *ngIf="route.night_only" class="route-info-icon" src="./assets/icons/night.png"/>
+        <img *ngIf="route.wheelchair_boarding === 1" class="route-info-icon" src="./assets/icons/accessible.png"/>
         <img *ngIf="route.route_type === 3" class="route-info-icon" src="./assets/icons/bus.png"/>
     </span>
 </div>
