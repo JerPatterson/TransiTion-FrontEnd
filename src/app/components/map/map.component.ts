@@ -18,7 +18,9 @@ export class MapComponent implements OnInit {
     @Input() zoom: number = 12;
 
     @Input() agencyId: string = '';
-    @Input() stopId: string = '';
+    @Input() set stopId(value: string) {
+        if (value) this.addSecondaryTripsShape(value);
+    }
 
     @Input() set routeId(value: string) {
         if (value) this.addVehicleMarkers(value);
@@ -28,10 +30,6 @@ export class MapComponent implements OnInit {
         if (!value) return; 
         this.addTripShape(value);
         this.addStopMarkers(value);
-    };
-
-    @Input() set tripIds(value: string[]) {
-        if (value) this.addSecondaryTripsShape(value);
     };
 
     private map!: L.Map;
@@ -48,7 +46,7 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
-        if (!this.stopId) setTimeout(() => this.addAllVehicleMarkers(), 1000);
+        // if (!this.stopId) setTimeout(() => this.addAllVehicleMarkers(), 1000);
     }
     
     private initMap(): void {
@@ -66,18 +64,18 @@ export class MapComponent implements OnInit {
         //     attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',
         // }).addTo(this.map);
 
-        // L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
-        //     maxZoom: 22,
-        //     attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
-        //     subdomains: 'abcd',
-        // }).addTo(this.map);
+        L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
+            maxZoom: 22,
+            attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
+            subdomains: 'abcd',
+        }).addTo(this.map);
     }
 
-    private async addAllVehicleMarkers(): Promise<void> {
-        if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
-        this.vehicleLayer = await this.vehicleMarkerService.createAllVehiclesLayer(this.agencyId);
-        this.map.addLayer(this.vehicleLayer);
-    }
+    // private async addAllVehicleMarkers(): Promise<void> {
+    //     if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
+    //     this.vehicleLayer = await this.vehicleMarkerService.createAllVehiclesLayer(this.agencyId);
+    //     this.map.addLayer(this.vehicleLayer);
+    // }
 
     private async addVehicleMarkers(routeId: string): Promise<void> {
         if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
@@ -93,8 +91,8 @@ export class MapComponent implements OnInit {
         this.map.addLayer(this.tripShapeLayer);
     }
 
-    private async addSecondaryTripsShape(tripIds: string[]): Promise<void> {
-        const layer = await this.tripShapeService.createSecondaryTripShapeLayer(this.agencyId, tripIds, '#0a2196')
+    private async addSecondaryTripsShape(stopId: string): Promise<void> {
+        const layer = await this.tripShapeService.createSecondaryTripShapeLayer(this.agencyId, stopId, '#0a2196')
         if (layer) this.map.addLayer(layer);
         const pane = this.map.createPane('semitransparent');
         pane.style.opacity = '0.5';

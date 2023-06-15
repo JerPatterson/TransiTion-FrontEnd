@@ -30,7 +30,7 @@ export class ScheduleService {
     private async mergeTimes(expectations: Time[], predictions: PredictedTime[]) {
         const stopTimes: Time[] = expectations.map(expectation => {
             const prediction = predictions.find(prediction => 
-                prediction.tripId === expectation.tripId
+                expectation.tripId.includes(prediction.tripId)
             );
             return {
                 ...expectation,
