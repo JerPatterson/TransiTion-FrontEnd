@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { AgencyDto } from '@app/utils/dtos';
 
@@ -7,15 +7,20 @@ import { AgencyDto } from '@app/utils/dtos';
     templateUrl: './agency-list.component.html',
     styleUrls: ['./agency-list.component.css']
 })
-export class MainPageComponent {
+export class MainPageComponent implements AfterViewInit {
     agencies: AgencyDto[] = [];
 
-    constructor(private staticDataService: StaticDataService) {
+    @Input() agencyId: string = '';
+    @Output() newAgencyId = new EventEmitter<string>();
+
+    constructor(private staticDataService: StaticDataService) {}
+
+    ngAfterViewInit() {
         this.setAgencies();
     }
 
-    onClick() {
-        () => {};
+    onClick(agencyId: string) {
+        this.newAgencyId.emit(agencyId);
     }
  
     private async setAgencies() {

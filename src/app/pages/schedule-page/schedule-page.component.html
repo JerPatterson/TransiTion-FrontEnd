@@ -17,12 +17,26 @@
     <app-time-comparison
         *ngIf="this.times.length" 
         [times]="this.times"
-        [selectedTripId]="this.tripId">
+        [selectedTripId]="this.tripId"
+        (newTripEvent)="this.changeCurrentTripId($event)">
     </app-time-comparison>
 
     <app-agency-list
-        *ngIf="this.agencySelected && !this.agencyId">
+        *ngIf="this.agencySelected"
+        [agencyId]="this.agencyId"
+        (newAgencyId)="this.changeCurrentAgencyId($event)">
     </app-agency-list>
+
+    <app-routes-page
+        *ngIf="this.routeSelected"
+        [agencyId]="this.agencyId">
+    </app-routes-page>
+
+    <app-stops-page
+        *ngIf="this.stopSelected"
+        [agencyId]="this.agencyId"
+        [routeId]="this.routeId">
+    </app-stops-page>
 </div>
 
 <app-map 

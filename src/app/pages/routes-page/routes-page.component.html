@@ -1,16 +1,25 @@
-<h1 class="page-title">Les lignes de transport en commun</h1>
+<div class="row">
+    <div class="column-item route-name">
+        <h3 class="column-title">Les lignes de transport</h3>
+    </div>
+    <div class="column-item route-info">
+        <h3 class="column-title">&nbsp;</h3>
+    </div>
+</div>
 <hr class="delimitation">
 
-<div *ngFor="let route of this.routes" class="route-container" [routerLink]="['/stops', agency, route.route_id]">
-    <span class="route-name">
-        <span class="route-icon">
-            <span>{{ route.route_short_name }}</span>
-        </span>
-        <span>{{ route.route_long_name }}</span>
-    </span>
-    <span class="route-info">
-        <img *ngIf="route.night_only" class="route-info-icon" src="./assets/icons/night.png"/>
-        <img *ngIf="route.wheelchair_boarding === 1" class="route-info-icon" src="./assets/icons/accessible.png"/>
-        <img *ngIf="route.route_type === 3" class="route-info-icon" src="./assets/icons/bus.png"/>
-    </span>
-</div>
+<ul class="container-content">
+    <li *ngFor="let route of this.routes" class="row row-element">
+        <div class="column-item route-name">
+            <span class="route-icon">
+                <span>{{ route.route_short_name }}</span>
+            </span>
+            <span>{{ route.route_long_name }}</span>
+        </div>
+        <div class="column-item route-info">
+            <img *ngIf="route.night_only" class="route-info-icon" src="./assets/icons/night.png"/>
+            <img *ngIf="route.wheelchair_boarding === 1" class="route-info-icon" src="./assets/icons/accessible.png"/>
+            <img *ngIf="route.route_type === 3" class="route-info-icon" src="./assets/icons/bus.png"/>
+        </div>
+    </li>
+</ul>

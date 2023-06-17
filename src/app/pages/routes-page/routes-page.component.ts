@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteDto } from '@app/utils/dtos';
 
@@ -9,16 +8,22 @@ import { RouteDto } from '@app/utils/dtos';
     styleUrls: ['./routes-page.component.css']
 })
 export class RoutesPageComponent {
-    agency: string | null;
     routes: RouteDto[] = [];
 
-    constructor(private route: ActivatedRoute, private staticDataService: StaticDataService) {
-        this.agency = this.route.snapshot.paramMap.get('agency-name');
-        this.setRoutes();
-    }
+    @Input() set agencyId(value: string) {
+        if (value !== this.currentAgencyId) {
+            this.currentAgencyId = value;
+            this.setRoutes();
+        }
+    };
+
+    private currentAgencyId: string = '';
+
+    constructor(private staticDataService: StaticDataService) {}
 
     private async setRoutes() {
-        if (!this.agency) return;
-        this.routes = await this.staticDataService.getRoutesFromAgency(this.agency);
+        if (this.currentAgencyId) {
+            this.routes = await this.staticDataService.getRoutesFromAgency(this.currentAgencyId);
+        }
     }
 }

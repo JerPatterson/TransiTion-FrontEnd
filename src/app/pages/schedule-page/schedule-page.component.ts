@@ -48,4 +48,15 @@ export class SchedulePageComponent {
 
         this.tripId = this.times[0].tripId;
     }
+
+    changeCurrentTripId(time: Time) {
+        this.tripId = time.tripId;
+        this.routeId = time.routeId;
+    }
+
+    changeCurrentAgencyId(value: string) {
+        this.agencyId = value;
+        this.agencySelected = false;
+        this.routeSelected = true;
+    }
 }

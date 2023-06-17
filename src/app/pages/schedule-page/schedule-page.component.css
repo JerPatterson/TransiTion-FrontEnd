@@ -32,7 +32,7 @@ img.sidebar-icon {
 .container {
     position: relative;
     z-index: 1;
-    max-height: 300px;
+    min-height: fit-content;
     max-width: 580px;
     padding-right: 0px;
     margin-top: 0%;

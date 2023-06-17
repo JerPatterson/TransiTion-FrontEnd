@@ -12,7 +12,7 @@
 <ul class="container-content">
     <li *ngFor="let agency of this.agencies" 
         class="row row-element" 
-        (click)="onClick()"
+        (click)="onClick(agency.agency_id)"
     >
         <div class="column-item agency-id">
             <span>{{ agency.agency_id }}</span>

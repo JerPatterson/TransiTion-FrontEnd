@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, Input } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopDto } from '@app/utils/dtos';
 
@@ -10,24 +9,31 @@ import { StopDto } from '@app/utils/dtos';
 })
 export class StopsPageComponent {
     stops: StopDto[] = [];
-    agencyId: string | undefined;
-    routeId: string | undefined;
+
+    @Input() set agencyId(value: string) {
+        if (value !== this.currentAgencyId) {
+            this.currentAgencyId = value;
+            this.setStops();
+        }
+    };
+
+    @Input() set routeId(value: string) {
+        if (value !== this.currentRouteId) {
+            this.currentRouteId = value;
+            this.setStops();
+        }
+    };
+
+    private currentAgencyId: string = '';
+    private currentRouteId: string = '';
     
-    constructor(private route: ActivatedRoute, private staticDataService: StaticDataService) {
-        this.setStops();
-    }
+    constructor(private staticDataService: StaticDataService) {}
     
     private async setStops() {
-        const agencyId = this.route.snapshot.paramMap.get('agency-name');
-        if (!agencyId) return;
-        this.agencyId = agencyId;
-
-        const routeId = this.route.snapshot.paramMap.get('route-id');
-        if (!routeId) {
-            this.stops = await this.staticDataService.getStopsFromAgency(agencyId);
-            return;
+        if (this.currentAgencyId && this.currentRouteId) {
+            this.stops = await this.staticDataService.getStopsFromRoute(this.currentAgencyId, this.currentRouteId);
+        } else if (this.currentAgencyId) {
+            this.stops = await this.staticDataService.getStopsFromAgency(this.currentAgencyId);
         }
-        this.routeId = routeId;
-        this.stops = await this.staticDataService.getStopsFromRoute(agencyId, routeId);
     }
 }

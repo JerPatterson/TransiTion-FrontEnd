@@ -32,6 +32,10 @@
     grid-template-columns: 12% 58% 30%;
 }
 
+.row > .column-item {
+    margin-left: 5px;
+}
+
 .row > p {
     margin: 4px;   
 }
@@ -55,22 +59,17 @@
     background-color: #bababa;
 }
 
-.route-icon {
-    display: flex;
-    justify-content: center;
-    border-radius: 10%;
-    background-color: #0a2196;
-}
-
 .column-item {
-    min-width: 40%;
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .column-item.agency-logo {
     justify-content: end;
+}
+
+span.agency-id {
+    font-size: 150%;
 }
 
 .agency-logo > img {
