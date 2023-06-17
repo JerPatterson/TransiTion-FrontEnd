@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Time } from '@app/interfaces/time-concepts';
 import { ScheduleService } from '@app/services/merge/schedule.service';
 
@@ -21,22 +20,9 @@ export class SchedulePageComponent {
     stopSelected: boolean = false;
     vehicleSelected: boolean = false;
 
-    constructor(
-        private route: ActivatedRoute,
-        private scheduleService: ScheduleService,
-    ) {
-        // this.setTimes();
-    }
+    constructor(private scheduleService: ScheduleService) {}
 
     async setTimes() {
-        const agencyIdParam = this.route.snapshot.paramMap.get('agency-name');
-        const routeIdParam = this.route.snapshot.paramMap.get('route-id');
-        const stopIdParam = this.route.snapshot.paramMap.get('stop-id');
-
-        this.agencyId = agencyIdParam ? agencyIdParam : '';
-        this.routeId = routeIdParam ? routeIdParam : '';
-        this.stopId = stopIdParam ? stopIdParam : '';
-
         if (!this.stopId) return;
 
         if (!this.routeId) {
@@ -47,6 +33,25 @@ export class SchedulePageComponent {
         }
 
         this.tripId = this.times[0].tripId;
+    }
+
+    displayAgencyList() {
+        this.routeSelected = this.stopSelected = false;
+        this.routeId = this.stopId = '';
+        this.agencySelected = true;
+        this.times = [];
+    }
+
+    displayRouteList() {
+        this.agencySelected = this.stopSelected = false;
+        this.routeSelected = true;
+        this.times = [];
+    }
+
+    displayStopList() {
+        this.agencySelected = this.routeSelected = false;
+        this.stopSelected = true;
+        this.times = [];
     }
 
     changeCurrentTripId(time: Time) {
@@ -64,5 +69,11 @@ export class SchedulePageComponent {
         this.routeId = value;
         this.routeSelected = false;
         this.stopSelected = true;
+    }
+
+    changeCurrentStopId(value: string) {
+        this.stopId = value;
+        this.stopSelected = false;
+        this.setTimes();
     }
 }

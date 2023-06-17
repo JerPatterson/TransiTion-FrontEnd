@@ -11,6 +11,7 @@
 <ul class="container-content">
     <li *ngFor="let stop of this.stops" 
         class="row row-element"
+        (click)="this.onClick(stop.stop_id)"
     >
         <div class="column-item stop-name">
             <span class="stop-icon">

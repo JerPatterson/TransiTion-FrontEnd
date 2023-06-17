@@ -1,11 +1,11 @@
 <div class="sidebar">
-    <button class="sidebar-icon" (click)="this.agencySelected = true">
+    <button class="sidebar-icon" (click)="this.displayAgencyList()">
         <img class="sidebar-icon" src="./assets/icons/agency.png">
     </button>
-    <button class="sidebar-icon">
+    <button class="sidebar-icon" (click)="this.displayRouteList()">
         <img class="sidebar-icon" src="./assets/icons/route.png">
     </button>
-    <button class="sidebar-icon">
+    <button class="sidebar-icon" (click)="this.displayStopList()">
         <img class="sidebar-icon" src="./assets/icons/stop-sign.png">
     </button>
     <button class="sidebar-icon">
@@ -36,7 +36,8 @@
     <app-stops-page
         *ngIf="this.stopSelected"
         [agencyId]="this.agencyId"
-        [routeId]="this.routeId">
+        [routeId]="this.routeId"
+        (newStopId)="this.changeCurrentStopId($event)">
     </app-stops-page>
 </div>
 

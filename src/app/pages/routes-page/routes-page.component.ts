@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteDto } from '@app/utils/dtos';
 
@@ -7,20 +7,24 @@ import { RouteDto } from '@app/utils/dtos';
     templateUrl: './routes-page.component.html',
     styleUrls: ['./routes-page.component.css']
 })
-export class RoutesPageComponent {
+export class RoutesPageComponent implements OnInit {
     routes: RouteDto[] = [];
 
     @Output() newRouteId = new EventEmitter<string>();
     @Input() set agencyId(value: string) {
         if (value !== this.currentAgencyId) {
             this.currentAgencyId = value;
-            this.setRoutes();
         }
     };
 
     private currentAgencyId: string = '';
 
     constructor(private staticDataService: StaticDataService) {}
+
+    
+    ngOnInit() {
+        this.setRoutes();
+    }
 
     onClick(agencyId: string) {
         this.newRouteId.emit(agencyId);
