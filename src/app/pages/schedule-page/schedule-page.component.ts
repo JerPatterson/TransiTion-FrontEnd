@@ -59,4 +59,10 @@ export class SchedulePageComponent {
         this.agencySelected = false;
         this.routeSelected = true;
     }
+
+    changeCurrentRouteId(value: string) {
+        this.routeId = value;
+        this.routeSelected = false;
+        this.stopSelected = true;
+    }
 }

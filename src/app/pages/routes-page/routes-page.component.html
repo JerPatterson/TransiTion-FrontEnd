@@ -9,7 +9,10 @@
 <hr class="delimitation">
 
 <ul class="container-content">
-    <li *ngFor="let route of this.routes" class="row row-element">
+    <li *ngFor="let route of this.routes" 
+        class="row row-element"
+        (click)="onClick(route.route_id)"
+    >
         <div class="column-item route-name">
             <span class="route-icon">
                 <span>{{ route.route_short_name }}</span>

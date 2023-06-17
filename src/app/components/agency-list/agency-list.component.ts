@@ -10,8 +10,8 @@ import { AgencyDto } from '@app/utils/dtos';
 export class MainPageComponent implements AfterViewInit {
     agencies: AgencyDto[] = [];
 
-    @Input() agencyId: string = '';
     @Output() newAgencyId = new EventEmitter<string>();
+    @Input() agencyId: string = '';
 
     constructor(private staticDataService: StaticDataService) {}
 

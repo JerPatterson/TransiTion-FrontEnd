@@ -29,7 +29,8 @@
 
     <app-routes-page
         *ngIf="this.routeSelected"
-        [agencyId]="this.agencyId">
+        [agencyId]="this.agencyId"
+        (newRouteId)="this.changeCurrentRouteId($event)">
     </app-routes-page>
 
     <app-stops-page
