@@ -10,22 +10,9 @@ import { StopDto } from '@app/utils/dtos';
 export class StopsPageComponent implements OnInit {
     stops: StopDto[] = [];
 
+    @Input() agencyId: string = '';
+    @Input() routeId: string = '';
     @Output() newStopId = new EventEmitter<string>();
-
-    @Input() set agencyId(value: string) {
-        if (value !== this.currentAgencyId) {
-            this.currentAgencyId = value;
-        }
-    };
-
-    @Input() set routeId(value: string) {
-        if (value !== this.currentRouteId) {
-            this.currentRouteId = value;
-        }
-    };
-
-    private currentAgencyId: string = '';
-    private currentRouteId: string = '';
     
     constructor(private staticDataService: StaticDataService) {}
 
@@ -38,11 +25,11 @@ export class StopsPageComponent implements OnInit {
     }
     
     private async setStops() {
-        console.log('Here', this.currentAgencyId, this.currentRouteId);
-        if (this.currentAgencyId && this.currentRouteId) {
-            this.stops = await this.staticDataService.getStopsFromRoute(this.currentAgencyId, this.currentRouteId);
-        } else if (this.currentAgencyId && !this.currentRouteId) {
-            this.stops = await this.staticDataService.getStopsFromAgency(this.currentAgencyId);
+        console.log('Here', this.agencyId, this.routeId);
+        if (this.agencyId && this.routeId) {
+            this.stops = await this.staticDataService.getStopsFromRoute(this.agencyId, this.routeId);
+        } else if (this.agencyId && !this.routeId) {
+            this.stops = await this.staticDataService.getStopsFromAgency(this.agencyId);
         }
     }
 }

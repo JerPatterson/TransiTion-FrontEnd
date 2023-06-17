@@ -10,14 +10,8 @@ import { RouteDto } from '@app/utils/dtos';
 export class RoutesPageComponent implements OnInit {
     routes: RouteDto[] = [];
 
+    @Input() agencyId: string = '';
     @Output() newRouteId = new EventEmitter<string>();
-    @Input() set agencyId(value: string) {
-        if (value !== this.currentAgencyId) {
-            this.currentAgencyId = value;
-        }
-    };
-
-    private currentAgencyId: string = '';
 
     constructor(private staticDataService: StaticDataService) {}
 
@@ -31,8 +25,8 @@ export class RoutesPageComponent implements OnInit {
     }
 
     private async setRoutes() {
-        if (this.currentAgencyId) {
-            this.routes = await this.staticDataService.getRoutesFromAgency(this.currentAgencyId);
+        if (this.agencyId) {
+            this.routes = await this.staticDataService.getRoutesFromAgency(this.agencyId);
         }
     }
 }
