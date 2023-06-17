@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { StopsPageComponent } from './stops-page.component';
+import { RouteListComponent } from './route-list.component';
 
-describe('StopsPageComponent', () => {
-  let component: StopsPageComponent;
-  let fixture: ComponentFixture<StopsPageComponent>;
+describe('RouteListComponent', () => {
+  let component: RouteListComponent;
+  let fixture: ComponentFixture<RouteListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StopsPageComponent ]
+      declarations: [ RouteListComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(StopsPageComponent);
+    fixture = TestBed.createComponent(RouteListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

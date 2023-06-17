@@ -3,11 +3,11 @@ import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteDto } from '@app/utils/dtos';
 
 @Component({
-    selector: 'app-routes-page',
-    templateUrl: './routes-page.component.html',
-    styleUrls: ['./routes-page.component.css']
+    selector: 'app-route-list',
+    templateUrl: './route-list.component.html',
+    styleUrls: ['./route-list.component.css']
 })
-export class RoutesPageComponent implements OnInit {
+export class RouteListComponent implements OnInit {
     routes: RouteDto[] = [];
 
     @Input() agencyId: string = '';

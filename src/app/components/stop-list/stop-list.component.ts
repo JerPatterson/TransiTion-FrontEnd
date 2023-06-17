@@ -3,11 +3,11 @@ import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopDto } from '@app/utils/dtos';
 
 @Component({
-    selector: 'app-stops-page',
-    templateUrl: './stops-page.component.html',
-    styleUrls: ['./stops-page.component.css']
+    selector: 'app-stop-list',
+    templateUrl: './stop-list.component.html',
+    styleUrls: ['./stop-list.component.css']
 })
-export class StopsPageComponent implements OnInit {
+export class StopListComponent implements OnInit {
     stops: StopDto[] = [];
 
     @Input() agencyId: string = '';
@@ -25,7 +25,6 @@ export class StopsPageComponent implements OnInit {
     }
     
     private async setStops() {
-        console.log('Here', this.agencyId, this.routeId);
         if (this.agencyId && this.routeId) {
             this.stops = await this.staticDataService.getStopsFromRoute(this.agencyId, this.routeId);
         } else if (this.agencyId && !this.routeId) {

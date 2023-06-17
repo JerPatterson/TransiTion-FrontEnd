@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MainPageComponent } from './agency-list.component';
+import { AgencyListComponent } from './agency-list.component';
 
-describe('MainPageComponent', () => {
-  let component: MainPageComponent;
-  let fixture: ComponentFixture<MainPageComponent>;
+describe('AgencyListComponent', () => {
+  let component: AgencyListComponent;
+  let fixture: ComponentFixture<AgencyListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MainPageComponent ]
+      declarations: [ AgencyListComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(MainPageComponent);
+    fixture = TestBed.createComponent(AgencyListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

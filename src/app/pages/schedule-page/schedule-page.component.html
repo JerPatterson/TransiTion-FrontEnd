@@ -27,18 +27,18 @@
         (newAgencyId)="this.changeCurrentAgencyId($event)">
     </app-agency-list>
 
-    <app-routes-page
+    <app-route-list
         *ngIf="this.routeSelected"
         [agencyId]="this.agencyId"
         (newRouteId)="this.changeCurrentRouteId($event)">
-    </app-routes-page>
+    </app-route-list>
 
-    <app-stops-page
+    <app-stop-list
         *ngIf="this.stopSelected"
         [agencyId]="this.agencyId"
         [routeId]="this.routeId"
         (newStopId)="this.changeCurrentStopId($event)">
-    </app-stops-page>
+    </app-stop-list>
 </div>
 
 <app-map 

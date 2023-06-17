@@ -7,7 +7,7 @@ import { AgencyDto } from '@app/utils/dtos';
     templateUrl: './agency-list.component.html',
     styleUrls: ['./agency-list.component.css']
 })
-export class MainPageComponent implements OnInit {
+export class AgencyListComponent implements OnInit {
     agencies: AgencyDto[] = [];
 
     @Input() agencyId: string = '';
