@@ -1,0 +1,89 @@
+.column-title {
+    position: relative;
+    z-index: 1;
+    padding-bottom: 5px;
+    color: #0a2196;
+    margin-bottom: 0%;
+}
+
+.container-content {
+    position: relative;
+    z-index: 1;
+    max-height: 250px;
+    overflow-y: scroll;
+    max-width: 580px;
+    margin: 0px;
+    margin-left: 4px;
+    padding: 0px;
+}
+
+.container-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.container-content::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #bababa;
+}
+
+
+.row {
+    display: grid;
+    grid-template-columns: 10% 24% 22% 44%;
+}
+
+.row > p {
+    margin: 4px;   
+}
+
+.row-element {
+    margin-right: 4px;
+    margin-bottom: 2px;
+    border-radius: 5px;
+    border: 2px solid transparent;
+}
+
+.row-element:hover, .selected {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
+.row-element::selection {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
+.route-icon {
+    display: flex;
+    justify-content: center;
+    border-radius: 10%;
+    background-color: #0a2196;
+}
+
+.route-icon > span {
+    color: aliceblue;
+    font-size: 100%;
+    font-weight: bold;
+}
+
+.route {
+    grid-column: 1;
+}
+
+.time {
+    grid-column: 2;
+}
+
+.prediction {
+    grid-column: 3;
+}
+
+.state {
+    grid-column: 4;
+}
+
+p, span {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}

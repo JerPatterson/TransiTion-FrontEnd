@@ -3,64 +3,23 @@
         <img class="sidebar-icon" src="./assets/icons/agency.png">
     </button>
     <button class="sidebar-icon">
+        <img class="sidebar-icon" src="./assets/icons/route.png">
+    </button>
+    <button class="sidebar-icon">
         <img class="sidebar-icon" src="./assets/icons/stop-sign.png">
     </button>
     <button class="sidebar-icon">
-        <img class="sidebar-icon" src="./assets/icons/route.png">
+        <img class="sidebar-icon" src="./assets/icons/bus.png">
     </button>
 </div>
 
 <div class="container">
-    <div class="row">
-        <h3 class="column-title route">&nbsp;</h3>
-        <h3 class="column-title schedule">Planifiés</h3>
-        <h3 class="column-title prediction">Temps réel</h3>
-        <h3 class="column-title state">État du service</h3>
-    </div>
-    <hr class="delimitation">
-
-    <ul class="container-content">
-        <li *ngFor="let time of times" 
-            class="row row-element" 
-            (click)="onClick(time)"
-            [ngClass]="time.tripId === this.timeSelected?.tripId ? 'selected' : ''" 
-        >
-            <p class="route route-icon">
-                <span>{{ time.routeId }}</span>
-            </p>
-
-            <p class="schedule">
-                {{ this.formatTimeToWait(time.stMinutesAhead, time.stSecondsAhead) }}
-            </p>
-
-            <p class="prediction">
-                <br *ngIf="!time.rtMinutesAhead || !time.rtSecondsAhead">
-                <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
-                    {{ this.formatTimeToWait(time.rtMinutesAhead, time.rtSecondsAhead) }}
-                </span>
-            </p>
-
-            <p class="state">
-                <br *ngIf="getTripArrivalState(time) === 4">
-                <span *ngIf="time.rtMinutesAhead && time.rtSecondsAhead">
-                    <span *ngIf="getTripArrivalState(time) === 0">
-                        En avance de {{ this.formatTimeDifference(time) }}
-                    </span>
-                    <span *ngIf="getTripArrivalState(time) === 1">
-                        À l'heure
-                    </span>
-                    <span *ngIf="getTripArrivalState(time) === 2">
-                        En retard de {{ this.formatTimeDifference(time) }}
-                    </span>
-                </span>
-            </p>
-        </li>
-    </ul>
+    <app-time-comparison [times]="this.times" [selectedTripId]="this.tripId"></app-time-comparison>
 </div>
 
 <app-map 
     [agencyId]="agencyId ? agencyId : ''"
     [stopId]="stopId ? stopId : ''"
     [routeId]="routeId ? routeId : ''"
-    [tripId]="timeSelected ? timeSelected.tripId : ''">
+    [tripId]="tripId">
 </app-map>

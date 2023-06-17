@@ -10,6 +10,7 @@ import { StopsPageComponent } from '@app/pages/stops-page/stops-page.component';
 import { SchedulePageComponent } from '@app/pages/schedule-page/schedule-page.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { MapPageComponent } from './pages/map-page/map-page.component';
+import { TimeComparisonComponent } from './components/time-comparison/time-comparison.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { MapPageComponent } from './pages/map-page/map-page.component';
     StopsPageComponent,
     SchedulePageComponent,
     MapComponent,
-    MapPageComponent
+    MapPageComponent,
+    TimeComparisonComponent
   ],
   imports: [
     AppRoutingModule,
