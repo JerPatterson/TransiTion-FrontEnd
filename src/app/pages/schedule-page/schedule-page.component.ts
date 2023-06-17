@@ -10,36 +10,42 @@ import { ScheduleService } from '@app/services/merge/schedule.service';
 })
 export class SchedulePageComponent {
     times: Time[] = [];
-    tripId: string = "";
+    tripId: string = '';
 
-    agencyId: string | undefined;
-    routeId: string | undefined;
-    stopId: string | undefined;
+    agencyId: string = '';
+    routeId: string = '';
+    stopId: string = '';
+
+    agencySelected: boolean = false;
+    routeSelected: boolean = false;
+    stopSelected: boolean = false;
+    vehicleSelected: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
         private scheduleService: ScheduleService,
     ) {
-        this.setTimes();
+        // this.setTimes();
     }
 
     async setTimes() {
-        const agencyId = this.route.snapshot.paramMap.get('agency-name');
-        const routeId = this.route.snapshot.paramMap.get('route-id');
-        const stopId = this.route.snapshot.paramMap.get('stop-id');
+        const agencyIdParam = this.route.snapshot.paramMap.get('agency-name');
+        const routeIdParam = this.route.snapshot.paramMap.get('route-id');
+        const stopIdParam = this.route.snapshot.paramMap.get('stop-id');
 
-        if (!agencyId || !stopId) return;
-        this.agencyId = agencyId;
-        this.stopId = stopId;
+        this.agencyId = agencyIdParam ? agencyIdParam : '';
+        this.routeId = routeIdParam ? routeIdParam : '';
+        this.stopId = stopIdParam ? stopIdParam : '';
 
-        if (routeId) {
-            this.routeId = routeId;
-            this.times = await this.scheduleService.getTimesFromStopOfRoute(agencyId, routeId, stopId);
+        if (!this.stopId) return;
+
+        if (!this.routeId) {
+            this.times = await this.scheduleService.getTimesFromStop(this.agencyId, this.stopId);
+            this.routeId = this.times[0].routeId;
         } else {
-            this.times = await this.scheduleService.getTimesFromStop(agencyId, stopId);
+            this.times = await this.scheduleService.getTimesFromStopOfRoute(this.agencyId, this.routeId, this.stopId);
         }
 
         this.tripId = this.times[0].tripId;
-        this.routeId = this.times[0].routeId;
     }
 }

@@ -1,5 +1,5 @@
 <div class="sidebar">
-    <button class="sidebar-icon">
+    <button class="sidebar-icon" (click)="this.agencySelected = true">
         <img class="sidebar-icon" src="./assets/icons/agency.png">
     </button>
     <button class="sidebar-icon">
@@ -14,12 +14,20 @@
 </div>
 
 <div class="container">
-    <app-time-comparison [times]="this.times" [selectedTripId]="this.tripId"></app-time-comparison>
+    <app-time-comparison
+        *ngIf="this.times.length" 
+        [times]="this.times"
+        [selectedTripId]="this.tripId">
+    </app-time-comparison>
+
+    <app-main-page
+        *ngIf="this.agencySelected && !this.agencyId">
+    </app-main-page>
 </div>
 
 <app-map 
-    [agencyId]="agencyId ? agencyId : ''"
-    [stopId]="stopId ? stopId : ''"
-    [routeId]="routeId ? routeId : ''"
+    [agencyId]="agencyId"
+    [stopId]="stopId"
+    [routeId]="routeId"
     [tripId]="tripId">
 </app-map>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RouteDto, ShapeDto, StopDto, TimeDto, TripDto } from '@app/utils/dtos';
+import { AgencyDto, RouteDto, ShapeDto, StopDto, TimeDto, TripDto } from '@app/utils/dtos';
 import { SERVER_URL } from '@app/utils/env';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import { getFirestore, Firestore, doc, collection, getDoc, DocumentSnapshot, DocumentData } from 'firebase/firestore';
@@ -24,6 +24,11 @@ export class StaticDataService {
     
         this.app = initializeApp(firebaseConfig);
         this.db = getFirestore(this.app);
+    }
+
+    async getAgencies(): Promise<AgencyDto[]> {
+        const res = await fetch(`${SERVER_URL}/agencies`);
+        return res.json();
     }
 
     async getRoutesFromAgency(agencyId: string): Promise<RouteDto[]> {
