@@ -14,7 +14,7 @@ export class RealtimeDataService {
 
     async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<PredictedTime[]> {
         const timeList: PredictedTime[] = [];
-        const url = this.addCommandToURL('predictions', `a=${agencyId}`, `stopId=${stopId}`, `routeTag=${routeId}`);
+        const url = this.addCommandToURL('predictions', `a=${agencyId.toLowerCase()}`, `stopId=${stopId}`, `routeTag=${routeId}`);
 
         const res = await fetch(url);
         const xmlString = await res.text();
@@ -38,7 +38,7 @@ export class RealtimeDataService {
     
     async getTimesFromStop(agencyId: string, stopId: string): Promise<PredictedTime[]> {
         const timeList: PredictedTime[] = [];
-        const url = this.addCommandToURL('predictions', `a=${agencyId}`, `stopId=${stopId}`);
+        const url = this.addCommandToURL('predictions', `a=${agencyId.toLowerCase()}`, `stopId=${stopId}`);
 
         const res = await fetch(url);
         const xmlString = await res.text();
@@ -62,7 +62,7 @@ export class RealtimeDataService {
 
     async getVehiclesFromRoute(agencyId: string, routeId: string): Promise<Vehicle[]> {
         const vehicleList: Vehicle[] = [];
-        const url = this.addCommandToURL('vehicleLocations', `a=${agencyId}`, `r=${routeId}`);
+        const url = this.addCommandToURL('vehicleLocations', `a=${agencyId.toLowerCase()}`, `r=${routeId}`);
 
         const res = await fetch(url);
         const xmlString = await res.text();
@@ -88,7 +88,7 @@ export class RealtimeDataService {
 
     async getVehiclesFromAgency(agencyId: string): Promise<Vehicle[]> {
         const vehicleList: Vehicle[] = [];
-        const url = this.addCommandToURL('vehicleLocations', `a=${agencyId}`);
+        const url = this.addCommandToURL('vehicleLocations', `a=${agencyId.toLowerCase()}`);
 
         const res = await fetch(url);
         const xmlString = await res.text();

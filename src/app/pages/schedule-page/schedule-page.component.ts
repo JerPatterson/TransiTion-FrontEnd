@@ -27,7 +27,7 @@ export class SchedulePageComponent {
 
         if (!this.routeId) {
             this.times = await this.scheduleService.getTimesFromStop(this.agencyId, this.stopId);
-            this.routeId = this.times[0].routeId;
+            this.routeId = this.times[0] ? this.times[0].routeId : '';
         } else {
             this.times = await this.scheduleService.getTimesFromStopOfRoute(this.agencyId, this.routeId, this.stopId);
         }
