@@ -3,9 +3,9 @@ import { StaticDataService } from '@app/services/static/static-data.service';
 import { AgencyDto } from '@app/utils/dtos';
 
 @Component({
-    selector: 'app-main-page',
-    templateUrl: './main-page.component.html',
-    styleUrls: ['./main-page.component.css']
+    selector: 'app-agency-list',
+    templateUrl: './agency-list.component.html',
+    styleUrls: ['./agency-list.component.css']
 })
 export class MainPageComponent {
     agencies: AgencyDto[] = [];

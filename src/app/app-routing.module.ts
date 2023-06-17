@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { MainPageComponent } from '@app/components/agency-list/agency-list.component';
 import { AgencyPageComponent } from '@app/pages/agency-page/agency-page.component';
 import { RoutesPageComponent } from '@app/pages/routes-page/routes-page.component';
 import { StopsPageComponent } from '@app/pages/stops-page/stops-page.component';
