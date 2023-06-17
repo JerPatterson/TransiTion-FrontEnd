@@ -1,39 +1,75 @@
-.delimitation {
-    margin-top: 0px;
-    padding-top: 0px;
-}
-
-.page-title {
-    color: #0a2196;
-    margin-bottom: 0px;
+.column-title {
+    position: relative;
+    z-index: 1;
     padding-bottom: 5px;
+    color: #0a2196;
+    margin-bottom: 0%;
 }
 
-.stop-container {
-    margin: 5px;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.container-content {
+    position: relative;
+    z-index: 1;
+    max-height: 250px;
+    overflow-y: scroll;
+    max-width: 580px;
+    margin: 0px;
+    margin-left: 4px;
+    padding: 0px;
+}
+
+.container-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.container-content::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #bababa;
+}
+
+
+.row {
+    display: grid;
+    grid-template-columns: 64% 36%;
+}
+
+.row > .column-item {
+    margin-left: 5px;
+}
+
+.row > p {
+    margin: 4px;   
+}
+
+.row-element {
+    margin-right: 4px;
+    margin-bottom: 2px;
     border-radius: 5px;
     border: 2px solid transparent;
-    background-color: #cfcfcf;
 }
 
-.stop-container:hover {
+.row-element:hover, .selected {
     cursor: pointer;
     border: 2px solid #000000;
     background-color: #bababa;
 }
 
-.stop-name {
-    width: 60%;
-    font-size: 150%;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+.row-element::selection {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
+.column-item {
+    display: flex;
+    align-items: center;
+}
+
+.column-item.stop-info {
+    justify-content: end;
 }
 
 .stop-icon {
-    margin-right: 0.5%;
+    margin-right: 1.5%;
     padding: 1%;
     border-radius: 5%;
     background-color: #0a2196;
@@ -45,8 +81,23 @@
     font-weight: bold;
 }
 
-.stop-info-icon {
-    max-width: 50px;
-    max-height: 50px;
+.stop-name {
+    font-size: 150%;
 }
 
+.stop-info img {
+    height: 50px;
+    margin: 4px;
+}
+
+.stop-name {
+    grid-column: 1;
+}
+
+.stop-info {
+    grid-column: 2;
+}
+
+p, span {
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}

@@ -1,34 +1,27 @@
-<h1 class="page-title">Les arrêts de transport en commun</h1>
+<div class="row">
+    <div class="column-item stop-name">
+        <h3 class="column-title">Les arrêts de transport</h3>
+    </div>
+    <div class="column-item stop-info">
+        <h3 class="column-title">&nbsp;</h3>
+    </div>
+</div>
 <hr class="delimitation">
 
-<div *ngIf="routeId">
-    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', routeId, stop.stop_id]">
-        <span class="stop-name">
+<ul class="container-content">
+    <li *ngFor="let stop of this.stops" 
+        class="row row-element"
+    >
+        <div class="column-item stop-name">
             <span class="stop-icon">
                 <span>{{ stop.stop_code }}</span>
             </span>
             <span>{{ stop.stop_name }}</span>
-        </span>
-        <span class="stop-info">
+        </div>
+        <div class="column-item stop-info">
             <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/>
             <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
             <img *ngIf="!stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
-        </span>
-    </div>
-</div>
-
-<div *ngIf="!routeId">
-    <div *ngFor="let stop of this.stops" class="stop-container" [routerLink]="['/schedule/stl', stop.stop_id]">
-        <span class="stop-name">
-            <span class="stop-icon">
-                <span>{{ stop.stop_code }}</span>
-            </span>
-            <span>{{ stop.stop_name }}</span>
-        </span>
-        <span class="stop-info"> 
-            <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/>
-            <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-            <img *ngIf="!stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
-        </span>
-    </div>
-</div>
+        </div>
+    </li>
+</ul>
