@@ -1,14 +1,20 @@
 <div class="sidebar">
-    <button class="sidebar-icon" (click)="this.displayAgencyList()">
+    <button class="sidebar-icon" 
+        (click)="this.displayAgencyList()"
+        [ngClass]="this.agencyId ? 'selected' : ''">
         <img class="sidebar-icon" src="./assets/icons/agency.png">
     </button>
-    <button class="sidebar-icon" (click)="this.displayRouteList()">
+    <button class="sidebar-icon"
+        (click)="this.displayRouteList()"
+        [ngClass]="this.routeId ? 'selected' : ''">
         <img class="sidebar-icon" src="./assets/icons/route.png">
     </button>
-    <button class="sidebar-icon" (click)="this.displayStopList()">
+    <button class="sidebar-icon"
+        (click)="this.displayStopList()"
+        [ngClass]="this.stopId ? 'selected' : ''">
         <img class="sidebar-icon" src="./assets/icons/stop-sign.png">
     </button>
-    <button class="sidebar-icon">
+    <button class="sidebar-icon" disabled>
         <img class="sidebar-icon" src="./assets/icons/bus.png">
     </button>
 </div>

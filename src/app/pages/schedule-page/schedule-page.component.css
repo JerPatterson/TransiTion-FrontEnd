@@ -24,6 +24,12 @@ button.sidebar-icon:enabled:hover {
     background-color: #bababa;
 }
 
+button.selected {
+    cursor: pointer;
+    border: 2px solid #000000;
+    background-color: #bababa;
+}
+
 img.sidebar-icon {
     max-width: 50px;
     max-height: 50px;
