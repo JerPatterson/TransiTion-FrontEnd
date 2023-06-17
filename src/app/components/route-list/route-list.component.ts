@@ -11,6 +11,7 @@ export class RouteListComponent implements OnInit {
     routes: RouteDto[] = [];
 
     @Input() agencyId: string = '';
+    @Input() routeId: string = '';
     @Output() newRouteId = new EventEmitter<string>();
 
     constructor(private staticDataService: StaticDataService) {}

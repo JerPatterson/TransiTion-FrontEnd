@@ -13,6 +13,7 @@
     <li *ngFor="let agency of this.agencies" 
         class="row row-element" 
         (click)="onClick(agency.agency_id)"
+        [ngClass]="agency.agency_id === this.agencyId ? 'selected' : ''"
     >
         <div class="column-item agency-id">
             <span>{{ agency.agency_id }}</span>

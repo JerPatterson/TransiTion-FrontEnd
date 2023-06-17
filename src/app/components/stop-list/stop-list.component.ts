@@ -12,6 +12,7 @@ export class StopListComponent implements OnInit {
 
     @Input() agencyId: string = '';
     @Input() routeId: string = '';
+    @Input() stopId: string = '';
     @Output() newStopId = new EventEmitter<string>();
     
     constructor(private staticDataService: StaticDataService) {}

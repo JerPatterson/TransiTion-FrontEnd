@@ -12,6 +12,7 @@
     <li *ngFor="let stop of this.stops" 
         class="row row-element"
         (click)="this.onClick(stop.stop_id)"
+        [ngClass]="stop.stop_id === this.stopId ? 'selected' : ''"
     >
         <div class="column-item stop-name">
             <span class="stop-icon">

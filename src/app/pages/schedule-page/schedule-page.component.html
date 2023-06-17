@@ -36,6 +36,7 @@
     <app-route-list
         *ngIf="this.routeSelected"
         [agencyId]="this.agencyId"
+        [routeId]="this.routeId"
         (newRouteId)="this.changeCurrentRouteId($event)">
     </app-route-list>
 
@@ -43,6 +44,7 @@
         *ngIf="this.stopSelected"
         [agencyId]="this.agencyId"
         [routeId]="this.routeId"
+        [stopId]="this.stopId"
         (newStopId)="this.changeCurrentStopId($event)">
     </app-stop-list>
 </div>

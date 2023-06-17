@@ -12,6 +12,7 @@
     <li *ngFor="let route of this.routes" 
         class="row row-element"
         (click)="onClick(route.route_id)"
+        [ngClass]="route.route_id === this.routeId ? 'selected' : ''"
     >
         <div class="column-item route-name">
             <span class="route-icon">
@@ -19,6 +20,7 @@
             </span>
             <span>{{ route.route_long_name }}</span>
         </div>
+
         <div class="column-item route-info">
             <img *ngIf="route.night_only" class="route-info-icon" src="./assets/icons/night.png"/>
             <img *ngIf="route.wheelchair_boarding === 1" class="route-info-icon" src="./assets/icons/accessible.png"/>

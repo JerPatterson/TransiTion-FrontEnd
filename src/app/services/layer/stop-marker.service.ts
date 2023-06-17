@@ -19,7 +19,6 @@ export class StopMarkerService {
         const stopMarkers = L.layerGroup();
         const stops = await this.staticDataService.getStopsFromTrip(agencyId, tripId);
         stops.forEach(async stop => {
-            if (stop.stop_id === currentStopId) return;
             stopMarkers.addLayer(await this.buildStopMarker(stop));
         });
 

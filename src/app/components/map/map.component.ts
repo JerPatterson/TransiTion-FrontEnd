@@ -10,7 +10,6 @@ import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-    private readonly stopsLoadingDelay = 4000;
     private readonly zoomLevelThatHideStops = 16;
 
     private currentAgencyId: string = '';
@@ -35,6 +34,7 @@ export class MapComponent implements OnInit {
 
     @Input() set stopId(value: string) {
         this.currentStopId = value;
+        this.addCurrentStopMarker();
         if (value && !this.currentRouteId) {
             this.addSecondaryTripsShape(value);
         }
@@ -126,18 +126,13 @@ export class MapComponent implements OnInit {
         this.map.createPane('semitransparent').style.opacity = '0.5';
     }
 
-    private async addStopMarkers(tripId: string): Promise<void> {
-        this.addCurrentStopMarker();
-        setTimeout(() => this.addOtherStopMarkers(tripId), this.stopsLoadingDelay);
-    }
-
     private async addCurrentStopMarker(): Promise<void> {
         this.clearLayer(this.currentStopLayer);
         this.currentStopLayer = await this.stopMarkerService.createCurrentStopLayer(this.currentAgencyId, this.currentStopId);
         this.map.addLayer(this.currentStopLayer);
     }
 
-    private async addOtherStopMarkers(tripId: string): Promise<void> {
+    private async addStopMarkers(tripId: string): Promise<void> {
         this.clearLayer(this.stopLayer);
         if (this.stopLayer && this.map.hasLayer(this.stopLayer)) {
             this.map.removeLayer(this.stopLayer);

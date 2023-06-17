@@ -18,13 +18,7 @@ button.sidebar-icon {
     border-radius: 5px;
 }
 
-button.sidebar-icon:enabled:hover {
-    cursor: pointer;
-    border: 2px solid #000000;
-    background-color: #bababa;
-}
-
-button.selected {
+button.sidebar-icon:enabled:hover, button.sidebar-icon.selected {
     cursor: pointer;
     border: 2px solid #000000;
     background-color: #bababa;
