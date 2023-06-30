@@ -1,30 +1,8 @@
-<div class="row">
-    <div class="column-item route-name">
-        <h3 class="column-title">Les lignes de transport</h3>
-    </div>
-    <div class="column-item route-info">
-        <h3 class="column-title">&nbsp;</h3>
-    </div>
+<div class="route-list">
+    <app-route 
+        class="route-element"
+        *ngFor="let route of this.routes" 
+        [route]="route"
+        (click)="onClick(route.route_id)">
+    </app-route>
 </div>
-<hr class="delimitation">
-
-<ul class="container-content">
-    <li *ngFor="let route of this.routes" 
-        class="row row-element"
-        (click)="onClick(route.route_id)"
-        [ngClass]="route.route_id === this.routeId ? 'selected' : ''"
-    >
-        <div class="column-item route-name">
-            <span class="route-icon">
-                <span>{{ route.route_short_name }}</span>
-            </span>
-            <span>{{ route.route_long_name }}</span>
-        </div>
-
-        <div class="column-item route-info">
-            <img *ngIf="route.night_only" class="route-info-icon" src="./assets/icons/night.png"/>
-            <img *ngIf="route.wheelchair_boarding === 1" class="route-info-icon" src="./assets/icons/accessible.png"/>
-            <img *ngIf="route.route_type === 3" class="route-info-icon" src="./assets/icons/bus.png"/>
-        </div>
-    </li>
-</ul>
