@@ -13,7 +13,7 @@ export class StaticDataService {
         if (ssAgencies) return JSON.parse(ssAgencies);
         const response = await fetch(`${SERVER_URL}/agencies`);
         const agencies = await response.json();
-        sessionStorage.setItem('agencies', agencies);
+        sessionStorage.setItem('agencies', JSON.stringify(agencies));
         return agencies;
     }
 
@@ -22,11 +22,11 @@ export class StaticDataService {
         if (ssRoutes) return JSON.parse(ssRoutes);
         const response = await fetch(`${SERVER_URL}/routes/${agencyId}`);
         const routes = await response.json();
-        sessionStorage.setItem(`routes/${agencyId}`, routes);
+        sessionStorage.setItem(`routes/${agencyId}`, JSON.stringify(routes));
         return routes;
     }
 
-    async getRoutesById(agencyId: string, routeId: string): Promise<RouteDto | undefined> {
+    async getRouteById(agencyId: string, routeId: string): Promise<RouteDto | undefined> {
         return (await this.getRoutes(agencyId)).find((route) => route.route_id === routeId);
     }
 
@@ -35,7 +35,7 @@ export class StaticDataService {
         if (ssShape) return JSON.parse(ssShape);
         const response = await fetch(`${SERVER_URL}/shapes/${agencyId}/${shapeId}`);
         const shape = await response.json();
-        sessionStorage.setItem(`shapes/${agencyId}/${shapeId}`, shape);
+        sessionStorage.setItem(`shapes/${agencyId}/${shapeId}`, JSON.stringify(shape));
         return shape;
     }
 
@@ -44,7 +44,7 @@ export class StaticDataService {
         if (ssTrip) return JSON.parse(ssTrip);
         const response = await fetch(`${SERVER_URL}/trips/${agencyId}/${tripId}`);
         const trip = await response.json();
-        sessionStorage.setItem(`trips/${agencyId}/${tripId}`, trip);
+        sessionStorage.setItem(`trips/${agencyId}/${tripId}`, JSON.stringify(trip));
         return trip;
     }
 

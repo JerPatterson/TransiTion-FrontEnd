@@ -1,0 +1,34 @@
+<div 
+    class="route-container"
+    [ngStyle]="{'background-color': '#' + route.route_color }"
+>
+    <div class="route-type">
+        <img
+            class="route-type-icon"
+            *ngIf="route.route_type === 1"
+            src="./assets/icons/subway.png"
+        />
+        <img
+            class="route-type-icon"
+            *ngIf="route.route_type === 2"
+            src="./assets/icons/train.png"
+        />
+        <img
+            class="route-type-icon"
+            *ngIf="route.route_type === 3"
+            src="./assets/icons/bus.png"
+        />
+    </div>
+    <div class="route-info">
+        <div 
+            class="route-identifier"
+            [ngStyle]="{'color': '#' + route.route_text_color }"
+        >
+            {{ route.route_short_name }}
+        </div>
+        <div 
+            class="route-name"
+            [ngStyle]="{'color': '#' + route.route_text_color }">
+            {{ route.route_long_name }}
+        </div>
+</div>

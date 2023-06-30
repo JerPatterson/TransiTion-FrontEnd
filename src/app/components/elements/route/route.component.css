@@ -1,0 +1,35 @@
+.route-container {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid black;
+}
+
+.route-info {
+    padding: 2% 0%;
+}
+
+.route-identifier {
+    font-size: 3em;
+    font-weight: bolder;
+    margin: 0px;
+    padding: 0px;
+    line-height: 80%;
+}
+
+.route-name {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin: 0px;
+    padding: 0px;
+}
+
+.route-type {
+    margin: 0px;
+    padding: 1.5vh;
+    align-items: center;
+}
+
+.route-type-icon {
+    max-width: 8.5vh;
+    max-height: 8.5vh;
+}
