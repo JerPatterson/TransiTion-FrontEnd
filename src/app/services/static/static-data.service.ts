@@ -9,13 +9,34 @@ export class StaticDataService {
     constructor() {}
 
     async getAgencies(): Promise<AgencyDto[]> {
-        const res = await fetch(`${SERVER_URL}/agencies`);
-        return res.json();
+        const ssAgencies = sessionStorage.getItem('agencies');
+        if (ssAgencies) return JSON.parse(ssAgencies);
+        const response = await fetch(`${SERVER_URL}/agencies`);
+        const agencies = await response.json();
+        sessionStorage.setItem('agencies', agencies);
+        return agencies;
     }
 
-    async getRoutesFromAgency(agencyId: string): Promise<RouteDto[]> {
-        const res = await fetch(`${SERVER_URL}/routes/${agencyId}`);
-        return res.json();
+    async getRoutes(agencyId: string): Promise<RouteDto[]> {
+        const ssRoutes = sessionStorage.getItem(`routes/${agencyId}`);
+        if (ssRoutes) return JSON.parse(ssRoutes);
+        const response = await fetch(`${SERVER_URL}/routes/${agencyId}`);
+        const routes = await response.json();
+        sessionStorage.setItem(`routes/${agencyId}`, routes);
+        return routes;
+    }
+
+    async getRoutesById(agencyId: string, routeId: string): Promise<RouteDto | undefined> {
+        return (await this.getRoutes(agencyId)).find((route) => route.route_id === routeId);
+    }
+
+    async getShapeById(agencyId: string, shapeId: string): Promise<ShapeDto[]> {
+        const ssShape = sessionStorage.getItem(`shapes/${agencyId}/${shapeId}`);
+        if (ssShape) return JSON.parse(ssShape);
+        const response = await fetch(`${SERVER_URL}/shapes/${agencyId}/${shapeId}`);
+        const shape = await response.json();
+        sessionStorage.setItem(`shapes/${agencyId}/${shapeId}`, shape);
+        return shape;
     }
 
     async getStopsFromAgency(agencyId: string): Promise<StopDto[]> {
@@ -35,11 +56,6 @@ export class StaticDataService {
 
     async getStopsFromTrip(agencyId: string, tripId: string): Promise<StopDto[]> {
         const res = await fetch(`${SERVER_URL}/stops/trip/${agencyId}/${tripId}`);
-        return res.json();
-    }
-
-    async getShape(agencyId: string, shapeId: string): Promise<ShapeDto[]> {
-        const res = await fetch(`${SERVER_URL}/shapes/${agencyId}/${shapeId}`);
         return res.json();
     }
 

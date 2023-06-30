@@ -27,7 +27,7 @@ export class RouteListComponent implements OnInit {
 
     private async setRoutes() {
         if (this.agencyId) {
-            this.routes = await this.staticDataService.getRoutesFromAgency(this.agencyId);
+            this.routes = await this.staticDataService.getRoutes(this.agencyId);
         }
     }
 }
