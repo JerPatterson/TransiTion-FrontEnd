@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SchedulePageComponent } from '@app/pages/schedule-page.component';
-import { RouteComponent } from './components/elements/route/route.component';
+import { StopComponent } from './components/elements/stop/stop.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/schedule', pathMatch: 'full' },
     { path: 'schedule', component: SchedulePageComponent },
-    { path: 'route', component: RouteComponent },
+    { path: 'stop', component: StopComponent },
     { path: '**', redirectTo: '/schedule' },
 ];
 

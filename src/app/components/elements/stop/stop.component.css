@@ -1,0 +1,47 @@
+.stop-container {
+    max-width: 90vw;
+    display: flex;
+    flex-direction: row;
+    border: 1px solid black;
+}
+
+.stop-info {
+    margin-top: 1.1em;
+    padding: 0%;
+}
+
+.stop-name-row {
+    display: flex;
+}
+
+.stop-name {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 0px;
+    padding: 0px;
+}
+
+.stop-feature {
+    max-width: 4vh;
+    max-height: 4vh;
+    margin-left: 4%;
+}
+
+.stop-identifier {
+    font-size: 1.3em;
+    font-weight: bolder;
+    margin: 0px;
+    padding: 0px;
+    line-height: 88%;
+}
+
+.stop-type {
+    margin: 0px;
+    padding: 1.5vh;
+    align-items: center;
+}
+
+.stop-type-icon {
+    max-width: 8.5vh;
+    max-height: 8.5vh;
+}
