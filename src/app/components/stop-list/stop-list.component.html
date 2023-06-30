@@ -1,29 +1,8 @@
-<div class="row">
-    <div class="column-item stop-name">
-        <h3 class="column-title">Les arrêts de transport</h3>
-    </div>
-    <div class="column-item stop-info">
-        <h3 class="column-title">&nbsp;</h3>
-    </div>
+<div class="stop-list">
+    <app-stop 
+        class="stop-element"
+        *ngFor="let stop of this.stops" 
+        [stop]="stop"
+        (click)="onClick(stop.stop_id)">
+    </app-stop>
 </div>
-<hr class="delimitation">
-
-<ul class="container-content">
-    <li *ngFor="let stop of this.stops" 
-        class="row row-element"
-        (click)="this.onClick(stop.stop_id)"
-        [ngClass]="stop.stop_id === this.stopId ? 'selected' : ''"
-    >
-        <div class="column-item stop-name">
-            <span class="stop-icon">
-                <span>{{ stop.stop_code }}</span>
-            </span>
-            <span>{{ stop.stop_name }}</span>
-        </div>
-        <div class="column-item stop-info">
-            <!-- <img *ngIf="stop.wheelchair_boarding === 1" class="stop-info-icon" src="./assets/icons/accessible.png"/> -->
-            <img *ngIf="stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop.png"/>
-            <img *ngIf="!stop.stop_shelter" class="stop-info-icon" src="./assets/icons/stop-sign.png"/>
-        </div>
-    </li>
-</ul>

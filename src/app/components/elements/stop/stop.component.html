@@ -89,13 +89,13 @@
 
     <div class="stop-info">
         <div class="stop-name-row">
-            <span class="stop-name">
+            <div class="stop-name">
                 {{ stop.stop_name }}
-            </span>
-            <span class="stop-feature-container">
+            </div>
+            <div class="stop-feature-container">
                 <svg
                     class="stop-feature"
-                    *ngIf="stop.wheelchair_boarding"
+                    *ngIf="stop.wheelchair_boarding === 1"
                     version="1.0" xmlns="http://www.w3.org/2000/svg"
                     width="768.000000pt" height="768.000000pt"
                     viewBox="0 0 768.000000 768.000000"
@@ -121,7 +121,7 @@
                         -10 149 -20 273 -22 277 -1 4 -42 -14 -92 -40z"/>
                     </g>
                 </svg>
-            </span>
+            </div>
         </div>
         <div class="stop-identifier">
             {{ stop.stop_code }}

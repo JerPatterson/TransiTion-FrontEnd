@@ -36,6 +36,7 @@ export interface StopLocationDto {
   stop_name: string;
   stop_lat: number;
   stop_lon: number;
+  wheelchair_boarding?: WheelchairBoardingType;
   stop_shelter: boolean;
 }
 

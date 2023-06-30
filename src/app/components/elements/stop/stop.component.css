@@ -1,5 +1,4 @@
 .stop-container {
-    max-width: 90vw;
     display: flex;
     flex-direction: row;
     border: 1px solid black;

@@ -25,7 +25,7 @@ export class StopListComponent implements OnInit {
         this.newStopId.emit(stopId);
     }
     
-    private async setStops() {
+    private async setStops() {;
         if (this.agencyId && this.routeId) {
             this.stops = await this.staticDataService.getStopsFromRoute(this.agencyId, this.routeId);
         } else if (this.agencyId && !this.routeId) {

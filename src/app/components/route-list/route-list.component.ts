@@ -16,7 +16,6 @@ export class RouteListComponent implements OnInit {
 
     constructor(private staticDataService: StaticDataService) {}
 
-    
     ngOnInit() {
         this.setRoutes();
     }
