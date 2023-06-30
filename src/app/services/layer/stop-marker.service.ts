@@ -11,7 +11,7 @@ export class StopMarkerService {
     constructor(private staticDataService: StaticDataService) {}
 
     async createCurrentStopLayer(agencyId: string, stopId: string): Promise<L.LayerGroup> {
-        const stop = await this.staticDataService.getStop(agencyId, stopId);
+        const stop = await this.staticDataService.getStopById(agencyId, stopId);
         return stop? L.layerGroup().addLayer(await this.buildStopMarker(stop)) : L.layerGroup();
     }
 

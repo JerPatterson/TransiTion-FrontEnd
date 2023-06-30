@@ -30,6 +30,15 @@ export interface StopDto {
   stop_display: boolean;
 }
 
+export interface StopLocationDto {
+  stop_id: string;
+  stop_code?: string;
+  stop_name: string;
+  stop_lat: number;
+  stop_lon: number;
+  stop_shelter: boolean;
+}
+
 export interface RouteDto {
   route_id: string;
   agency_id: string;

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AgencyDto, RouteDto, ShapeDto, StopDto, TimeDto, TripDto } from '@app/utils/dtos';
+import { AgencyDto, RouteDto, ShapeDto, StopDto, StopLocationDto, TimeDto, TripDto } from '@app/utils/dtos';
 import { SERVER_URL } from '@app/utils/env';
 
 @Injectable({
@@ -39,48 +39,56 @@ export class StaticDataService {
         return shape;
     }
 
-    async getStopsFromAgency(agencyId: string): Promise<StopDto[]> {
-        const res = await fetch(`${SERVER_URL}/stops/${agencyId}`);
-        return res.json();
-    }
-
-    async getStop(agencyId: string, stopId: string): Promise<StopDto> {
-        const res = await fetch(`${SERVER_URL}/stops/${agencyId}/${stopId}`);
-        return res.json();
-    }
-
-    async getStopsFromRoute(agencyId: string, routeId: string): Promise<StopDto[]> {
-        const res = await fetch(`${SERVER_URL}/stops/route/${agencyId}/${routeId}`);
-        return res.json();
-    }
-
-    async getStopsFromTrip(agencyId: string, tripId: string): Promise<StopDto[]> {
-        const res = await fetch(`${SERVER_URL}/stops/trip/${agencyId}/${tripId}`);
-        return res.json();
-    }
-
     async getTrip(agencyId: string, tripId: string): Promise<TripDto> {
-        const res = await fetch(`${SERVER_URL}/trips/${agencyId}/${tripId}`);
-        return res.json();
+        const ssTrip = sessionStorage.getItem(`trips/${agencyId}/${tripId}`);
+        if (ssTrip) return JSON.parse(ssTrip);
+        const response = await fetch(`${SERVER_URL}/trips/${agencyId}/${tripId}`);
+        const trip = await response.json();
+        sessionStorage.setItem(`trips/${agencyId}/${tripId}`, trip);
+        return trip;
     }
 
     async getTodayTripsFromStop(agencyId: string, stopId: string): Promise<TripDto[]> {
-        const res = await fetch(`${SERVER_URL}/trips/stop/today/${agencyId}/${stopId}`);
-        return res.json();
+        const response = await fetch(`${SERVER_URL}/trips/stop/today/${agencyId}/${stopId}`);
+        return response.json();
     }
 
     async getTodayTripsFromRoute(agencyId: string, routeId: string): Promise<TripDto[]> {
-        const res = await fetch(`${SERVER_URL}/trips/route/today/${agencyId}/${routeId}`);
-        return res.json();
+        const response = await fetch(`${SERVER_URL}/trips/route/today/${agencyId}/${routeId}`);
+        return response.json();
+    }
+
+    async getStopLocationsFromAgency(agencyId: string): Promise<StopLocationDto[]> {
+        const ssStopLocations = localStorage.getItem(`stops/${agencyId}`);
+        if (ssStopLocations) return JSON.parse(ssStopLocations);
+        const response = await fetch(`${SERVER_URL}/stops/${agencyId}`);
+        const stopLocations = await response.json();
+        localStorage.setItem(`stops/${agencyId}`, stopLocations);
+        return stopLocations;
+    }
+
+    async getStopById(agencyId: string, stopId: string): Promise<StopDto> {
+        const response = await fetch(`${SERVER_URL}/stops/${agencyId}/${stopId}`);
+        return response.json();
+    }
+
+    async getStopsFromRoute(agencyId: string, routeId: string): Promise<StopDto[]> {
+        const response = await fetch(`${SERVER_URL}/stops/route/${agencyId}/${routeId}`);
+        return response.json();
+    }
+
+    async getStopsFromTrip(agencyId: string, tripId: string): Promise<StopDto[]> {
+        const response = await fetch(`${SERVER_URL}/stops/trip/${agencyId}/${tripId}`);
+        return response.json();
     }
 
     async getTimesFromStop(agencyId: string, stopId: string): Promise<TimeDto[]> {
-        const res = await fetch(`${SERVER_URL}/times/stop/today/${agencyId}/${stopId}`);
-        return res.json();
+        const response = await fetch(`${SERVER_URL}/times/stop/today/${agencyId}/${stopId}`);
+        return response.json();
     }
 
     async getTimesFromStopOfRoute(agencyId: string, routeId: string, stopId: string): Promise<TimeDto[]> {
-        const res = await fetch(`${SERVER_URL}/times/route/stop/today/${agencyId}/${routeId}/${stopId}`);
-        return res.json();
+        const response = await fetch(`${SERVER_URL}/times/route/stop/today/${agencyId}/${routeId}/${stopId}`);
+        return response.json();
     }
 }
