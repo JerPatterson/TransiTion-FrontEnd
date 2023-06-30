@@ -6,7 +6,7 @@ import { AppRoutingModule } from '@app/app-routing.module';
 import { AgencyListComponent } from '@app/components/agency-list/agency-list.component';
 import { RouteListComponent } from '@app/components/route-list/route-list.component';
 import { StopListComponent } from '@app/components/stop-list/stop-list.component';
-import { SchedulePageComponent } from '@app/pages/schedule-page/schedule-page.component';
+import { SchedulePageComponent } from '@app/pages/schedule-page.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { TimeComparisonComponent } from './components/time-comparison/time-comparison.component';
 
@@ -18,7 +18,7 @@ import { TimeComparisonComponent } from './components/time-comparison/time-compa
     StopListComponent,
     SchedulePageComponent,
     MapComponent,
-    TimeComparisonComponent
+    TimeComparisonComponent,
   ],
   imports: [
     AppRoutingModule,
