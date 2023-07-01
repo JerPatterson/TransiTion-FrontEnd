@@ -1,37 +1,34 @@
-.stop-container {
+.agency-container {
     display: flex;
     flex-direction: row;
     border: 1px solid black;
+    min-height: 12vh;
+    align-items: center;
+    justify-content: space-between;
 }
 
-.stop-container:hover {
+.agency-container:hover {
     cursor: pointer;
 }
 
-
-.stop-info {
-    margin-top: 1.1em;
-    padding: 0%;
+.agency-info {
+    margin: 0px;
+    padding: 0px;
+    padding-left: 2%;
 }
 
-.stop-name-row {
+.agency-name-row {
     display: flex;
 }
 
-.stop-name {
-    font-size: 1.5em;
+.agency-name {
+    font-size: 1.7em;
     font-weight: 700;
     margin: 0px;
     padding: 0px;
 }
 
-.stop-feature {
-    max-width: 4vh;
-    max-height: 4vh;
-    margin-left: 4%;
-}
-
-.stop-identifier {
+.agency-identifier {
     font-size: 1.3em;
     font-weight: bolder;
     margin: 0px;
@@ -39,13 +36,13 @@
     line-height: 88%;
 }
 
-.stop-type {
+.agency-logo {
     margin: 0px;
     padding: 1.5vh;
     align-items: center;
 }
 
-.stop-type-icon {
+.agency-logo > img {
     max-width: 8.5vh;
     max-height: 8.5vh;
 }

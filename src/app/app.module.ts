@@ -12,6 +12,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { TimeComparisonComponent } from './components/time-comparison/time-comparison.component';
 import { RouteComponent } from './components/elements/route/route.component';
 import { StopComponent } from './components/elements/stop/stop.component';
+import { AgencyComponent } from './components/elements/agency/agency.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { StopComponent } from './components/elements/stop/stop.component';
     TimeComparisonComponent,
     RouteComponent,
     StopComponent,
+    AgencyComponent,
   ],
   imports: [
     AppRoutingModule,

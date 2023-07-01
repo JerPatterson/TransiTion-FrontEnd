@@ -4,6 +4,10 @@
     border: 1px solid black;
 }
 
+.route-container:hover {
+    cursor: pointer;
+}
+
 .route-info {
     padding: 2% 0%;
 }
