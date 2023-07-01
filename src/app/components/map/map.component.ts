@@ -23,6 +23,7 @@ export class MapComponent implements OnInit {
     @Input() set agencyId(value: string) {
         this.currentAgencyId = value;
         this.clearAllLayer();
+        this.addAllVehicleMarkers();
     };
 
     @Input() set routeId(value: string) {
@@ -101,11 +102,11 @@ export class MapComponent implements OnInit {
         }
     }
 
-    // private async addAllVehicleMarkers(): Promise<void> {
-    //     if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
-    //     this.vehicleLayer = await this.vehicleMarkerService.createAllVehiclesLayer(this.currentAgencyId);
-    //     this.map.addLayer(this.vehicleLayer);
-    // }
+    private async addAllVehicleMarkers(): Promise<void> {
+        if (this.vehicleLayer) this.map.removeLayer(this.vehicleLayer);
+        this.vehicleLayer = await this.vehicleMarkerService.createAllVehiclesLayer(this.currentAgencyId);
+        this.map.addLayer(this.vehicleLayer);
+    }
 
     private async addVehicleMarkers(routeId: string): Promise<void> {
         this.clearLayer(this.vehicleLayer);
