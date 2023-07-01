@@ -26,7 +26,12 @@ export class RouteListComponent implements OnInit {
 
     private async setRoutes() {
         if (this.agencyId) {
-            this.routes = await this.staticDataService.getRoutes(this.agencyId);
+            this.routes = (await this.staticDataService.getRoutes(this.agencyId))
+                .sort((a, b) => {
+                    const aNumber = a.route_id.match(/\d+/)?.[0];
+                    const bNumber = b.route_id.match(/\d+/)?.[0];
+                    return aNumber && bNumber ? parseInt(aNumber, 10) - parseInt(bNumber, 10) : 0;
+                });
         }
     }
 }
