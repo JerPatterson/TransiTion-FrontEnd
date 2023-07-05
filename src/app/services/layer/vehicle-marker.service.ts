@@ -1,19 +1,25 @@
 import { Injectable } from '@angular/core';
 import L from 'leaflet';
-import { RealtimeDataService } from '../realtime/realtime-data.service';
+import { RealtimeDataService } from 'src/app/services/realtime/realtime-data.service';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
+import { StaticDataService } from 'src/app/services/static/static-data.service';
+import { RouteType } from '@app/utils/enums';
+import { AGENCY_ID_TO_THEME_COLOR } from '@app/utils/agencies-style';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VehicleMarkerService {
 
-    constructor(private rtDataService: RealtimeDataService) {}
+    constructor(
+        private stDataService: StaticDataService,
+        private rtDataService: RealtimeDataService,
+    ) {}
 
     async createVehiclesLayer(agencyId: string, routeId: string): Promise<L.LayerGroup> {
         const vehicleMarkers = L.layerGroup();
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
-            const vehicleMarker = await this.buildVehicleMarker(vehicle);
+            const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
             if (vehicleMarker) vehicleMarkers.addLayer(vehicleMarker);
         });
 
@@ -23,18 +29,18 @@ export class VehicleMarkerService {
     async createAllVehiclesLayer(agencyId: string): Promise<L.LayerGroup> {
         const vehicleMarkers = L.layerGroup();
         (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
-            const vehicleMarker = await this.buildVehicleMarker(vehicle);
+            const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
             if (vehicleMarker) vehicleMarkers.addLayer(vehicleMarker);
         });
 
         return L.layerGroup().addLayer(vehicleMarkers);
     }
 
-    private async buildVehicleMarker(vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition)
+    private async buildVehicleMarker(agencyId: string, vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition)
         : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker([vehicle.position.latitude, vehicle.position.longitude], {
-            icon: await this.buildBusIcon(),
+            icon: await this.buildVehicleIcon(agencyId, vehicle.trip?.routeId),
             // L.divIcon({
             //     iconUrl: './assets/icons/bus.svg',
             //     iconSize: [40, 40],
@@ -48,7 +54,11 @@ export class VehicleMarkerService {
         return marker.bindPopup(`${vehicle.vehicle?.id }`);
     }
 
-    private async buildBusIcon(): Promise<L.DivIcon> {
+    private async buildVehicleIcon(agencyId: string, routeId?: string | null): Promise<L.DivIcon> {
+        const routeType = routeId ? (await this.stDataService.getRouteById(agencyId, routeId))?.route_type : undefined;
+        const iconLink =  routeType ? this.getIconLinkFromRouteType(routeType) : this.getIconLinkFromRouteType(RouteType.Bus);
+        const backgroundColor = AGENCY_ID_TO_THEME_COLOR.get(agencyId.toLowerCase());
+
         return L.divIcon({
             className: 'vehicle-icon',
             html: `
@@ -67,16 +77,28 @@ export class VehicleMarkerService {
                         </mask>
                     </defs>
                     <circle cx="25" cy="25" r="20" style="mask: url(#circle-mask); filter: url(#blur)"/>
-                    <circle cx="25" cy="25" r="20" fill="white"/>
+                    <circle cx="25" cy="25" r="20" fill="${backgroundColor ? backgroundColor : '#ffffff'}"/>
                     <use
                         height="32" y="7"
-                        xlink:href='./assets/icons/bus.svg#bus'
-                        href="./assets/icons/bus.svg#bus"></use>
+                        xlink:href="${iconLink}"
+                        href="${iconLink}"></use>
                 </svg>`,
             iconSize: [50, 50],
             iconAnchor: [25, 25],
             popupAnchor: [0, -25],
           });
           
+    }
+
+    private getIconLinkFromRouteType(type: RouteType): string {
+        switch(type) {
+            case RouteType.Subway:
+                return './assets/icons/subway.svg#subway';
+            case RouteType.Rail:
+                return './assets/icons/train.svg#train';
+            case RouteType.Bus:
+                return './assets/icons/bus.svg#bus';
+        }
+        return '';
     }
 }

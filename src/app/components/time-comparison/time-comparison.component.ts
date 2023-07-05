@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ACCEPTABLE_DELAY_IN_SEC, ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/constants/time';
+import { ACCEPTABLE_DELAY_IN_SEC, ONE_HOUR_IN_MIN, ONE_MINUTE_IN_SEC } from '@app/utils/constants';
 import { TripArrivalState } from '@app/enums/states';
 import { Time } from '@app/interfaces/time-concepts';
 
