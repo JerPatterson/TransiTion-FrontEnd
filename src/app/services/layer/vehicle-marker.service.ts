@@ -18,7 +18,7 @@ export class VehicleMarkerService {
         private rtDataService: RealtimeDataService,
     ) {}
 
-    async createVehiclesLayer(agencyIds: string[]): Promise<L.MarkerClusterGroup> {
+    async createVehicleLayer(agencyIds: string[]): Promise<L.MarkerClusterGroup> {
         let color: string | undefined;
         if (agencyIds.length === 1)
             color = AGENCY_ID_TO_THEME_COLOR.get(agencyIds[0].toLowerCase());

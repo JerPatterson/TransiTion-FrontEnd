@@ -21,6 +21,7 @@
 .option-container > button:hover {
     cursor: pointer;
     background-color: #dbe2e6;
+    border: 2px solid #e8eef2;
 }
 
 .option-container > button.selected {

@@ -9,6 +9,8 @@ export class MainPageComponent {
     tripId: string = '';
 
     agenciesSelected: string[] = [];
+    mergeAgenciesOption: boolean = false;
+
     routeId: string = '';
     stopId: string = '';
 
@@ -24,6 +26,10 @@ export class MainPageComponent {
     removeAgency(agencyId: string) {
         this.agenciesSelected = this.agenciesSelected
             .filter((value) => value !== agencyId)
+    }
+
+    changeMergeAgenciesOption() {
+        this.mergeAgenciesOption = !this.mergeAgenciesOption;
     }
 
     changeCurrentRouteId(value: string) {

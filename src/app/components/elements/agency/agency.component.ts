@@ -8,8 +8,7 @@ import { AgencyDto } from '@app/utils/dtos';
 })
 export class AgencyComponent {
     @Input() agency!: AgencyDto;
-
-    selected: boolean = false;
+    @Input() selected: boolean = false;
 
     onAgencyClick() {
         this.selected = !this.selected;

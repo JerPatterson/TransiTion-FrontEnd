@@ -1,4 +1,4 @@
-import { OnInit, Component, EventEmitter, Input, Output } from '@angular/core';
+import { OnInit, Component, EventEmitter, Output, Input } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { AgencyDto } from '@app/utils/dtos';
 
@@ -9,8 +9,10 @@ import { AgencyDto } from '@app/utils/dtos';
 })
 export class AgencyListComponent implements OnInit {
     agencies: AgencyDto[] = [];
+    selections = new Set<string>();
 
-    @Input() selections = new Set<string>();
+    @Input() currentSelections: string[] = [];
+
     @Output() addAgencySelected = new EventEmitter<string>();
     @Output() removeAgencySelected = new EventEmitter<string>();
 
@@ -18,6 +20,7 @@ export class AgencyListComponent implements OnInit {
 
     ngOnInit() {
         this.setAgencies();
+        this.currentSelections.forEach((value) => this.selections.add(value));
     }
 
     onAgencyClick(agencyId: string) {
