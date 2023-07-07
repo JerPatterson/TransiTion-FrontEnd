@@ -12,6 +12,7 @@ import { MapComponent } from '@app/components/map/map.component';
 import { RouteComponent } from './components/elements/route/route.component';
 import { StopComponent } from './components/elements/stop/stop.component';
 import { AgencyComponent } from './components/elements/agency/agency.component';
+import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { AgencyComponent } from './components/elements/agency/agency.component';
     RouteComponent,
     StopComponent,
     AgencyComponent,
+    ToolbarComponent,
   ],
   imports: [
     AppRoutingModule,

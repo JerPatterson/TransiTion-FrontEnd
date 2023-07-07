@@ -1,0 +1,38 @@
+<div class="toolbar">
+    <button 
+        class="tool"
+        [ngClass]="this.agencyListSelected ? 'selected' : ''"
+        (click)="this.handleAgencyListClick()">
+        <svg class="tool">
+            <use xlink:href='../assets/icons/agency.svg#agency' href="./assets/icons/agency.svg#agency"></use>
+        </svg>
+        <p class="tool">Agences</p>
+    </button>
+    <button 
+        class="tool"
+        [ngClass]="this.routeListSelected ? 'selected' : ''"
+        (click)="this.handleRouteListClick()">
+        <svg class="tool">
+            <use xlink:href='../assets/icons/route.svg#route' href="./assets/icons/route.svg#route"></use>
+        </svg>
+        <p class="tool">Routes</p>
+    </button>
+    <button 
+        class="tool"
+        [ngClass]="this.stopListSelected ? 'selected' : ''"
+        (click)="this.handleStopListClick()">
+        <svg class="tool">
+            <use xlink:href='../assets/icons/stop-sign.svg#stop-sign' href="./assets/icons/stop-sign.svg#stop-sign"></use>
+        </svg>
+        <p class="tool">Arrêts</p>
+    </button>
+    <button 
+        class="tool"
+        [ngClass]="this.vehicleListSelected ? 'selected' : ''"
+        (click)="this.handleVehicleListClick()">
+        <svg class="tool">
+            <use xlink:href='../assets/icons/bus.svg#bus' href="./assets/icons/bus.svg#bus"></use>
+        </svg>
+        <p class="tool">Véhicules</p>
+    </button>
+</div>

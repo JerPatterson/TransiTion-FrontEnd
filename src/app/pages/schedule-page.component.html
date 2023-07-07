@@ -1,23 +1,4 @@
-<div class="sidebar">
-    <button class="sidebar-icon" 
-        (click)="this.displayAgencyList()"
-        [ngClass]="this.agencyId ? 'selected' : ''">
-        <img class="sidebar-icon" src="./assets/icons/agency.svg">
-    </button>
-    <button class="sidebar-icon"
-        (click)="this.displayRouteList()"
-        [ngClass]="this.routeId ? 'selected' : ''">
-        <img class="sidebar-icon" src="./assets/icons/route.svg">
-    </button>
-    <button class="sidebar-icon"
-        (click)="this.displayStopList()"
-        [ngClass]="this.stopId ? 'selected' : ''">
-        <img class="sidebar-icon" src="./assets/icons/stop-sign.svg">
-    </button>
-    <button class="sidebar-icon" disabled>
-        <img class="sidebar-icon" src="./assets/icons/bus.svg">
-    </button>
-</div>
+<app-toolbar></app-toolbar>
 
 <div class="container">
     <app-agency-list

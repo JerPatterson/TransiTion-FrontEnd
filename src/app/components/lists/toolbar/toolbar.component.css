@@ -1,0 +1,39 @@
+.toolbar {
+    position: fixed;
+    z-index: 1;
+    min-width: 5vw;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: aliceblue;
+}
+
+button.tool {
+    padding: 0.5vh;
+    margin-top: 1vh;
+    margin-bottom: 1vh;
+    background-color: transparent;
+    border: 2px solid transparent;
+    border-radius: 5px;
+}
+
+button.tool.selected p,
+button.tool.selected svg {
+    color: #1a73e8;
+}
+
+button.tool:hover {
+    cursor: pointer;
+}
+
+svg.tool {
+    color: black;
+    max-width: 6vh;
+    max-height: 6vh;
+}
+
+p.tool {
+    color: black;
+    padding: 0px;
+    margin: 0px;
+}
