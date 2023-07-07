@@ -10,6 +10,7 @@ export class MainPageComponent {
 
     agenciesSelected: string[] = [];
     mergeAgenciesOption: boolean = false;
+    selectAllAgenciesOption: boolean = false;
 
     routeId: string = '';
     stopId: string = '';
@@ -30,6 +31,10 @@ export class MainPageComponent {
 
     changeMergeAgenciesOption() {
         this.mergeAgenciesOption = !this.mergeAgenciesOption;
+    }
+
+    changeSelectAllAgenciesOption() {
+        this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
     }
 
     changeCurrentRouteId(value: string) {

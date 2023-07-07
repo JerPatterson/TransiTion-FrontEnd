@@ -9,6 +9,7 @@
     <app-agency-list
         *ngIf="this.agencyListSelected"
         [currentSelections]="this.agenciesSelected"
+        [selectAll]="this.selectAllAgenciesOption"
         (addAgencySelected)="this.addAgency($event)"
         (removeAgencySelected)="this.removeAgency($event)">
     </app-agency-list>
@@ -24,11 +25,16 @@
     <div
         class="option-container"
         *ngIf="this.agencyListSelected">
-        <button *ngIf="this.agencyListSelected">
+        <button
+            *ngIf="this.agencyListSelected"
+            [ngClass]="this.selectAllAgenciesOption ? 'selected' : ''"
+            (click)="this.changeSelectAllAgenciesOption()">
             <svg class="option-icon">
                 <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
             </svg>
-            <span class="option-name">
+            <span
+                class="option-name"
+                *ngIf="!this.selectAllAgenciesOption">
                 Tout sélectionner
             </span>
         </button>
