@@ -2,12 +2,12 @@
     <button class="sidebar-icon" 
         (click)="this.displayAgencyList()"
         [ngClass]="this.agencyId ? 'selected' : ''">
-        <img class="sidebar-icon" src="./assets/icons/agency.png">
+        <img class="sidebar-icon" src="./assets/icons/agency.svg">
     </button>
     <button class="sidebar-icon"
         (click)="this.displayRouteList()"
         [ngClass]="this.routeId ? 'selected' : ''">
-        <img class="sidebar-icon" src="./assets/icons/route.png">
+        <img class="sidebar-icon" src="./assets/icons/route.svg">
     </button>
     <button class="sidebar-icon"
         (click)="this.displayStopList()"
@@ -20,13 +20,6 @@
 </div>
 
 <div class="container">
-    <app-time-comparison
-        *ngIf="this.times.length" 
-        [times]="this.times"
-        [selectedTripId]="this.tripId"
-        (newTripEvent)="this.changeCurrentTripId($event)">
-    </app-time-comparison>
-
     <app-agency-list
         *ngIf="this.agencySelected"
         [agencyId]="this.agencyId"

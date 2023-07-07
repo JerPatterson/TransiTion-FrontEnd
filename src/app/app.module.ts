@@ -9,7 +9,6 @@ import { RouteListComponent } from '@app/components/lists/route-list/route-list.
 import { StopListComponent } from '@app/components/lists/stop-list/stop-list.component';
 import { SchedulePageComponent } from '@app/pages/schedule-page.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { TimeComparisonComponent } from './components/time-comparison/time-comparison.component';
 import { RouteComponent } from './components/elements/route/route.component';
 import { StopComponent } from './components/elements/stop/stop.component';
 import { AgencyComponent } from './components/elements/agency/agency.component';
@@ -22,7 +21,6 @@ import { AgencyComponent } from './components/elements/agency/agency.component';
     StopListComponent,
     SchedulePageComponent,
     MapComponent,
-    TimeComparisonComponent,
     RouteComponent,
     StopComponent,
     AgencyComponent,
