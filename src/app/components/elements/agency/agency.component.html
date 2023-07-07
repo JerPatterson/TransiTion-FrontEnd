@@ -1,7 +1,4 @@
-<div
-    class="agency-container"
-    [ngStyle]="{'background-color': themeColor }">
-
+<div class="agency-container">
     <div class="agency-info">
         <div class="agency-name">
             {{ agency.agency_name }}
@@ -10,7 +7,6 @@
             {{ agency.agency_id.toUpperCase() }}
         </div>
     </div>
-
     <div class="agency-logo">
         <img [src]="'./assets/agencies/' + agency.agency_id.toLowerCase() + '.png'"/>
     </div>

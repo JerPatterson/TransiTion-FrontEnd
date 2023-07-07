@@ -1,7 +1,6 @@
 .agency-container {
     display: flex;
     flex-direction: row;
-    border: 1px solid black;
     min-height: 8vh;
     align-items: center;
     justify-content: space-between;
@@ -9,6 +8,7 @@
 
 .agency-container:hover {
     cursor: pointer;
+    background-color: #dbe2e6;
 }
 
 .agency-info {

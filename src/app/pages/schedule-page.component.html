@@ -1,21 +1,26 @@
-<app-toolbar></app-toolbar>
+<app-toolbar
+    (agencyListClick)="this.agencyListSelected = $event"
+    (routeListClick)="this.routeListSelected = $event"
+    (stopListClick)="this.stopListSelected = $event"
+    (vehicleListClick)="this.vehicleListSelected = $event">
+</app-toolbar>
 
 <div class="container">
     <app-agency-list
-        *ngIf="this.agencySelected"
+        *ngIf="this.agencyListSelected"
         [agencyId]="this.agencyId"
         (newAgencyId)="this.changeCurrentAgencyId($event)">
     </app-agency-list>
 
     <app-route-list
-        *ngIf="this.routeSelected"
+        *ngIf="this.routeListSelected"
         [agencyId]="this.agencyId"
         [routeId]="this.routeId"
         (newRouteId)="this.changeCurrentRouteId($event)">
     </app-route-list>
 
     <app-stop-list
-        *ngIf="this.stopSelected"
+        *ngIf="this.stopListSelected"
         [agencyId]="this.agencyId"
         [routeId]="this.routeId"
         [stopId]="this.stopId"

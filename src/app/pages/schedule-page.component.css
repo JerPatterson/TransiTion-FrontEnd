@@ -1,8 +1,11 @@
 .container {
     position: relative;
     z-index: 1;
-    padding-right: 0px;
-    margin-top: 0%;
-    margin-left: 5vw;
-    border: 2px solid transparent;
+    top: 0.8vh;
+    left: 5.5vw;
+    max-width: 32vw;
+    max-height: 50vh;
+    padding: 0px;
+    border-radius: 8px;
+    background-color: aliceblue;
 }
