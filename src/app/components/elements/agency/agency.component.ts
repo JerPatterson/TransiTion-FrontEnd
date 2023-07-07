@@ -13,7 +13,6 @@ export class AgencyComponent implements OnInit {
     themeColor: string = '#ffffff';
 
     ngOnInit() {
-        console.log(this.agency);
         const color = AGENCY_ID_TO_THEME_COLOR.get(this.agency.agency_id.toLowerCase());
         if (color) this.themeColor = color;
     }
