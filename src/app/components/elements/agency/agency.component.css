@@ -11,6 +11,11 @@
     background-color: #dbe2e6;
 }
 
+.agency-container.selected {
+    cursor: pointer;
+    background-color: #c1cacf;
+}
+
 .agency-info {
     margin: 0px;
     padding: 0px;

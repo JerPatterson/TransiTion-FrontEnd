@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 export class SchedulePageComponent {
     tripId: string = '';
 
-    agencyId: string = '';
+    agenciesSelected: string[] = [];
     routeId: string = '';
     stopId: string = '';
 
@@ -17,9 +17,13 @@ export class SchedulePageComponent {
     stopListSelected: boolean = false;
     vehicleListSelected: boolean = false;
 
-    changeCurrentAgencyId(value: string) {
-        this.agencyId = value;
-        this.agencyListSelected = false;
+    addAgency(agencyId: string) {
+        this.agenciesSelected = this.agenciesSelected.concat([agencyId]);
+    }
+
+    removeAgency(agencyId: string) {
+        this.agenciesSelected = this.agenciesSelected
+            .filter((value) => value !== agencyId)
     }
 
     changeCurrentRouteId(value: string) {

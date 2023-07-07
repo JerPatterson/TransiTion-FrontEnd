@@ -11,13 +11,30 @@ import { AGENCY_ID_TO_THEME_COLOR } from '@app/utils/agencies-style';
     providedIn: 'root'
 })
 export class VehicleMarkerService {
+    private readonly DEFAULT_COLOR = '#f0f8ff';
 
     constructor(
         private stDataService: StaticDataService,
         private rtDataService: RealtimeDataService,
     ) {}
 
-    async createVehiclesLayer(agencyId: string, routeId: string): Promise<L.MarkerClusterGroup> {
+    async createVehiclesLayer(agencyIds: string[]): Promise<L.MarkerClusterGroup> {
+        let color: string | undefined;
+        if (agencyIds.length === 1)
+            color = AGENCY_ID_TO_THEME_COLOR.get(agencyIds[0].toLowerCase());
+        const clusterGroup = await this.buildVehicleMarkerClusterGroup(color ? color : this.DEFAULT_COLOR);
+        
+        agencyIds.map(async (agencyId) => {
+            (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
+                const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
+                if (vehicleMarker) clusterGroup.addLayer(vehicleMarker);
+            });
+        });
+
+        return clusterGroup;
+    }
+
+    async createVehiclesLayerFromRoute(agencyId: string, routeId: string): Promise<L.MarkerClusterGroup> {
         const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId);
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
             const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
@@ -27,18 +44,7 @@ export class VehicleMarkerService {
         return vehicleMarkers;
     }
 
-    async createAllVehiclesLayer(agencyId: string): Promise<L.MarkerClusterGroup> {
-        const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId);
-        (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
-            const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
-            if (vehicleMarker) vehicleMarkers.addLayer(vehicleMarker);
-        });
-
-        return vehicleMarkers;
-    }
-
-    private async buildVehicleMarkerClusterGroup(agencyId: string): Promise<L.MarkerClusterGroup> {
-        const backgroundColor = AGENCY_ID_TO_THEME_COLOR.get(agencyId.toLowerCase());
+    private async buildVehicleMarkerClusterGroup(color: string): Promise<L.MarkerClusterGroup> {
         return L.markerClusterGroup({
             chunkedLoading: true,
             iconCreateFunction: (cluster) => {
@@ -54,10 +60,8 @@ export class VehicleMarkerService {
                 return new L.DivIcon({
                     html: `
                         <div style="
-                            background-color:${(backgroundColor ? 
-                                backgroundColor : '#ffffff') + (alpha).toString(16)};
-                            border: solid 2px ${(backgroundColor ? 
-                                backgroundColor : '#ffffff')};">
+                            border: solid 2px ${color};
+                            background-color:${color + (alpha).toString(16)};">
                             ${childCount}
                         </div>`, 
                     className: 'marker-cluster',

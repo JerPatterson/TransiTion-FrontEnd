@@ -3,6 +3,6 @@
         class="agency-element"
         *ngFor="let agency of this.agencies" 
         [agency]="agency"
-        (click)="onClick(agency.agency_id)">
+        (click)="onAgencyClick(agency.agency_id)">
     </app-agency>
 </div>

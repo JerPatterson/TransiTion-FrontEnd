@@ -8,29 +8,19 @@
 <div class="container">
     <app-agency-list
         *ngIf="this.agencyListSelected"
-        [agencyId]="this.agencyId"
-        (newAgencyId)="this.changeCurrentAgencyId($event)">
+        (addAgencySelected)="this.addAgency($event)"
+        (removeAgencySelected)="this.removeAgency($event)">
     </app-agency-list>
 
     <app-route-list
-        *ngIf="this.routeListSelected"
-        [agencyId]="this.agencyId"
-        [routeId]="this.routeId"
-        (newRouteId)="this.changeCurrentRouteId($event)">
+        *ngIf="this.routeListSelected">
     </app-route-list>
 
     <app-stop-list
-        *ngIf="this.stopListSelected"
-        [agencyId]="this.agencyId"
-        [routeId]="this.routeId"
-        [stopId]="this.stopId"
-        (newStopId)="this.changeCurrentStopId($event)">
+        *ngIf="this.stopListSelected">
     </app-stop-list>
 </div>
 
 <app-map 
-    [agencyId]="agencyId"
-    [stopId]="stopId"
-    [routeId]="routeId"
-    [tripId]="tripId">
+    [agencies]="agenciesSelected">
 </app-map>

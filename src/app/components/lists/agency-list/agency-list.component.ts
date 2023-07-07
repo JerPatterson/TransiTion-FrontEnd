@@ -10,8 +10,9 @@ import { AgencyDto } from '@app/utils/dtos';
 export class AgencyListComponent implements OnInit {
     agencies: AgencyDto[] = [];
 
-    @Input() agencyId: string = '';
-    @Output() newAgencyId = new EventEmitter<string>();
+    @Input() selections = new Set<string>();
+    @Output() addAgencySelected = new EventEmitter<string>();
+    @Output() removeAgencySelected = new EventEmitter<string>();
 
     constructor(private staticDataService: StaticDataService) {}
 
@@ -19,8 +20,14 @@ export class AgencyListComponent implements OnInit {
         this.setAgencies();
     }
 
-    onClick(agencyId: string) {
-        this.newAgencyId.emit(agencyId);
+    onAgencyClick(agencyId: string) {
+        if (this.selections.has(agencyId)) {
+            this.selections.delete(agencyId);
+            this.removeAgencySelected.emit(agencyId);
+        } else {
+            this.selections.add(agencyId);
+            this.addAgencySelected.emit(agencyId);
+        }
     }
  
     private async setAgencies() {
