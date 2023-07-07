@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: row;
     border: 1px solid black;
-    min-height: 12vh;
+    min-height: 8vh;
     align-items: center;
     justify-content: space-between;
 }
@@ -22,14 +22,14 @@
 }
 
 .agency-name {
-    font-size: 1.7em;
+    font-size: 1.4em;
     font-weight: 700;
     margin: 0px;
     padding: 0px;
 }
 
 .agency-identifier {
-    font-size: 1.3em;
+    font-size: 1em;
     font-weight: bolder;
     margin: 0px;
     padding: 0px;
@@ -43,6 +43,6 @@
 }
 
 .agency-logo > img {
-    max-width: 8.5vh;
-    max-height: 8.5vh;
+    max-width: 7vh;
+    max-height: 7vh;
 }

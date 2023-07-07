@@ -13,7 +13,7 @@
 }
 
 .route-identifier {
-    font-size: 3em;
+    font-size: 2em;
     font-weight: bolder;
     margin: 0px;
     padding: 0px;
@@ -21,7 +21,7 @@
 }
 
 .route-name {
-    font-size: 1.2em;
+    font-size: 0.9em;
     font-weight: 700;
     margin: 0px;
     padding: 0px;
@@ -34,6 +34,6 @@
 }
 
 .route-type-icon {
-    max-width: 8.5vh;
-    max-height: 8.5vh;
+    max-width: 6vh;
+    max-height: 6vh;
 }

@@ -8,7 +8,6 @@
     cursor: pointer;
 }
 
-
 .stop-info {
     margin-top: 1.1em;
     padding: 0%;
@@ -19,20 +18,20 @@
 }
 
 .stop-name {
-    font-size: 1.5em;
+    font-size: 1.2em;
     font-weight: 700;
     margin: 0px;
     padding: 0px;
 }
 
 .stop-feature {
-    max-width: 4vh;
-    max-height: 4vh;
+    max-width: 3vh;
+    max-height: 3vh;
     margin-left: 4%;
 }
 
 .stop-identifier {
-    font-size: 1.3em;
+    font-size: 1em;
     font-weight: bolder;
     margin: 0px;
     padding: 0px;
@@ -46,6 +45,6 @@
 }
 
 .stop-type-icon {
-    max-width: 8.5vh;
-    max-height: 8.5vh;
+    max-width: 7vh;
+    max-height: 7vh;
 }
