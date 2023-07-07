@@ -5,7 +5,7 @@
     (vehicleListClick)="this.vehicleListSelected = $event">
 </app-toolbar>
 
-<div class="container">
+<div class="list-container">
     <app-agency-list
         *ngIf="this.agencyListSelected"
         (addAgencySelected)="this.addAgency($event)"
@@ -19,6 +19,27 @@
     <app-stop-list
         *ngIf="this.stopListSelected">
     </app-stop-list>
+
+    <div
+        class="option-container"
+        *ngIf="this.agencyListSelected">
+        <button *ngIf="this.agencyListSelected">
+            <svg class="option-icon">
+                <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
+            </svg>
+            <span class="option-name">
+                Tout sélectionner
+            </span>
+        </button>
+        <button *ngIf="this.agenciesSelected.length">
+            <svg class="option-icon">
+                <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
+            </svg>
+            <span class="option-name">
+                Fusionner les repères
+            </span>
+        </button>
+    </div>
 </div>
 
 <app-map 

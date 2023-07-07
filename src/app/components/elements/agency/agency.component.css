@@ -12,7 +12,6 @@
 }
 
 .agency-container.selected {
-    cursor: pointer;
     background-color: #c1cacf;
 }
 
