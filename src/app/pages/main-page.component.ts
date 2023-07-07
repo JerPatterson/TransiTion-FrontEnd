@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 
 @Component({
-    selector: 'app-schedule-page',
-    templateUrl: './schedule-page.component.html',
-    styleUrls: ['./schedule-page.component.css']
+    selector: 'app-main-page',
+    templateUrl: './main-page.component.html',
+    styleUrls: ['./main-page.component.css']
 })
-export class SchedulePageComponent {
+export class MainPageComponent {
     tripId: string = '';
 
     agenciesSelected: string[] = [];

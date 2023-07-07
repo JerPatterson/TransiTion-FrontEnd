@@ -7,7 +7,7 @@ import { AppRoutingModule } from '@app/app-routing.module';
 import { AgencyListComponent } from '@app/components/lists/agency-list/agency-list.component';
 import { RouteListComponent } from '@app/components/lists/route-list/route-list.component';
 import { StopListComponent } from '@app/components/lists/stop-list/stop-list.component';
-import { SchedulePageComponent } from '@app/pages/schedule-page.component';
+import { MainPageComponent } from '@app/pages/main-page.component';
 import { MapComponent } from '@app/components/map/map.component';
 import { RouteComponent } from './components/elements/route/route.component';
 import { StopComponent } from './components/elements/stop/stop.component';
@@ -20,7 +20,7 @@ import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
     AgencyListComponent,
     RouteListComponent,
     StopListComponent,
-    SchedulePageComponent,
+    MainPageComponent,
     MapComponent,
     RouteComponent,
     StopComponent,
