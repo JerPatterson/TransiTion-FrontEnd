@@ -21,7 +21,7 @@ export class ToolbarComponent {
         this.stopListSelected = false;
         this.vehicleListSelected = false;
         this.agencyListSelected = !this.agencyListSelected;
-        this.agencyListClick.emit(this.agencyListSelected);
+        this.emitNewSelection();
     }
 
     handleRouteListClick() {
@@ -29,7 +29,7 @@ export class ToolbarComponent {
         this.stopListSelected = false;
         this.vehicleListSelected = false;
         this.routeListSelected = !this.routeListSelected;
-        this.routeListClick.emit(this.routeListSelected);
+        this.emitNewSelection();
     }
 
     handleStopListClick() {
@@ -37,7 +37,7 @@ export class ToolbarComponent {
         this.routeListSelected= false;
         this.vehicleListSelected = false;
         this.stopListSelected = !this.stopListSelected;
-        this.stopListClick.emit(this.stopListSelected);
+        this.emitNewSelection();
     }
 
     handleVehicleListClick() {
@@ -45,6 +45,13 @@ export class ToolbarComponent {
         this.routeListSelected= false;
         this.stopListSelected = false;
         this.vehicleListSelected = !this.vehicleListSelected;
+        this.emitNewSelection();
+    }
+
+    private emitNewSelection() {
+        this.agencyListClick.emit(this.agencyListSelected);
+        this.routeListClick.emit(this.routeListSelected);
+        this.stopListClick.emit(this.stopListSelected);
         this.vehicleListClick.emit(this.vehicleListSelected);
     }
 }
