@@ -10,8 +10,8 @@
         *ngIf="this.agencyListSelected"
         [selections]="this.agencyIdsSelected"
         [selectAll]="this.selectAllAgenciesOption"
-        (addAgencyId)="this.addAgencyId($event)"
-        (removeAgencyId)="this.removeAgencyId($event)">
+        (addAgencyIds)="this.addAgencyIds($event)"
+        (removeAgencyIds)="this.removeAgencyIds($event)">
     </app-agency-list>
 
     <app-route-list

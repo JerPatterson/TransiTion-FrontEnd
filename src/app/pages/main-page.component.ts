@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.css']
 })
-export class MainPageComponent {
+export class MainPageComponent implements AfterContentChecked {
     tripId: string = '';
 
     agencyIdsSelected: string[] = [];
@@ -20,13 +20,19 @@ export class MainPageComponent {
     stopListSelected: boolean = false;
     vehicleListSelected: boolean = false;
 
-    addAgencyId(agencyId: string) {
-        this.agencyIdsSelected = this.agencyIdsSelected.concat([agencyId]);
+    constructor(private cdref: ChangeDetectorRef) {}
+
+    ngAfterContentChecked() {
+        this.cdref.detectChanges();
     }
 
-    removeAgencyId(agencyId: string) {
+    addAgencyIds(agencyIds: string[]) {
+        this.agencyIdsSelected = this.agencyIdsSelected.concat(agencyIds);
+    }
+
+    removeAgencyIds(agencyIds: string[]) {
         this.agencyIdsSelected = this.agencyIdsSelected
-            .filter((value) => value !== agencyId)
+            .filter((value) => !agencyIds.includes(value));
     }
 
     changeMergeAgencies() {

@@ -13,23 +13,26 @@ export class AgencyListComponent implements OnInit {
 
     @Input() selections: string[] = [];
     @Input() set selectAll(option: boolean) {
+        const agencyIdsToEmit: string[] = [];
         if (option) {
             this.agencies.forEach((agency) => {
                 if (!this.agencyIds.has(agency.agency_id)) {
                     this.agencyIds.add(agency.agency_id);
-                    this.addAgencyId.emit(agency.agency_id);
+                    agencyIdsToEmit.push(agency.agency_id);
                 }
             });
+            this.addAgencyIds.emit(agencyIdsToEmit);
         } else {
             this.agencies.forEach((agency) => {
                 this.agencyIds.delete(agency.agency_id);
-                this.removeAgencyId.emit(agency.agency_id);
-            })
+                agencyIdsToEmit.push(agency.agency_id);
+            });
+            this.removeAgencyIds.emit(agencyIdsToEmit);
         }
     }
 
-    @Output() addAgencyId = new EventEmitter<string>();
-    @Output() removeAgencyId = new EventEmitter<string>();
+    @Output() addAgencyIds = new EventEmitter<string[]>();
+    @Output() removeAgencyIds = new EventEmitter<string[]>();
 
     constructor(private staticDataService: StaticDataService) {}
 
@@ -41,10 +44,10 @@ export class AgencyListComponent implements OnInit {
     onAgencyClick(agencyId: string) {
         if (this.agencyIds.has(agencyId)) {
             this.agencyIds.delete(agencyId);
-            this.removeAgencyId.emit(agencyId);
+            this.removeAgencyIds.emit([agencyId]);
         } else {
             this.agencyIds.add(agencyId);
-            this.addAgencyId.emit(agencyId);
+            this.addAgencyIds.emit([agencyId]);
         }
     }
  
