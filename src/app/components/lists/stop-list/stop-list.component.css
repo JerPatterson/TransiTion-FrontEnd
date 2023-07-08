@@ -1,0 +1,13 @@
+.stop-list {
+    position: relative;
+    z-index: 1;
+    max-width: 32vw;
+    max-height: 50vh;
+    overflow-y: scroll;
+    margin: 0px;
+    padding: 0px;
+}
+
+.stop-list::-webkit-scrollbar {
+    width: 0px;
+}

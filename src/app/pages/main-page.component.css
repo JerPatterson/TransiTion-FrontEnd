@@ -1,0 +1,39 @@
+.list-container {
+    position: relative;
+    z-index: 1;
+    top: 0.8vh;
+    left: 5.5vw;
+    max-width: 32vw;
+    max-height: 50vh;
+    padding: 0px;
+    border-radius: 8px;
+    background-color: #f0f8ff;
+}
+
+.option-container > button {
+    margin-right: 1vh;
+    margin-top: 0.5vh;
+    background-color: #f0f8ff;
+    border: 2px solid #e2e8ee;
+    border-radius: 10px;
+}
+
+.option-container > button:hover {
+    cursor: pointer;
+    background-color: #dbe2e6;
+}
+
+.option-container > button.selected {
+    background-color: #c1cacf;
+}
+
+.option-icon {
+    max-width: 3.5vh;
+    max-height: 3.5vh;
+}
+
+.option-name {
+    position: relative;
+    top: -1vh;
+    font-weight: 600;
+}

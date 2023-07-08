@@ -1,0 +1,8 @@
+<div class="route-list">
+    <app-route 
+        class="route-element"
+        *ngFor="let route of this.routes" 
+        [route]="route"
+        (click)="onClick(route.route_id)">
+    </app-route>
+</div>

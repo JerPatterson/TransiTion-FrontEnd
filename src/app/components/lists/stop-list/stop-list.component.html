@@ -1,0 +1,8 @@
+<div class="stop-list">
+    <app-stop 
+        class="stop-element"
+        *ngFor="let stop of this.stops" 
+        [stop]="stop"
+        (click)="onClick(stop.stop_id)">
+    </app-stop>
+</div>

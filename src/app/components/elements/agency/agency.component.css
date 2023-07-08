@@ -1,0 +1,52 @@
+.agency-container {
+    display: flex;
+    flex-direction: row;
+    min-height: 8vh;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.agency-container:hover {
+    cursor: pointer;
+    background-color: #dbe2e6;
+}
+
+.agency-container.selected {
+    background-color: #c1cacf;
+}
+
+.agency-info {
+    margin: 0px;
+    padding: 0px;
+    padding-left: 2%;
+}
+
+.agency-name-row {
+    display: flex;
+}
+
+.agency-name {
+    font-size: 1.4em;
+    font-weight: 700;
+    margin: 0px;
+    padding: 0px;
+}
+
+.agency-identifier {
+    font-size: 1em;
+    font-weight: bolder;
+    margin: 0px;
+    padding: 0px;
+    line-height: 88%;
+}
+
+.agency-logo {
+    margin: 0px;
+    padding: 1.5vh;
+    align-items: center;
+}
+
+.agency-logo > img {
+    max-width: 7vh;
+    max-height: 7vh;
+}

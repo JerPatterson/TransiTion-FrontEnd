@@ -1,0 +1,8 @@
+<div class="agency-list">
+    <app-agency 
+        class="agency-element"
+        *ngFor="let agency of this.agencies" 
+        [agency]="agency"
+        (click)="onAgencyClick(agency.agency_id)">
+    </app-agency>
+</div>

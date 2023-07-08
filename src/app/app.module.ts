@@ -1,26 +1,37 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { RouteListComponent } from './components/route-list/route-list.component';
-import { StopListComponent } from './components/stop-list/stop-list.component';
-import { ScheduleComponent } from './components/schedule/schedule.component';
-import { RouteInfographyComponent } from './components/route-infography/route-infography.component';
-import { AppRoutingModule } from './modules/app-routing.module';
-import { SchedulePageComponent } from './pages/schedule-page/schedule-page.component';
+
+import { AppComponent } from '@app/components/app/app.component';
+import { AppRoutingModule } from '@app/app-routing.module';
+import { AgencyListComponent } from '@app/components/lists/agency-list/agency-list.component';
+import { RouteListComponent } from '@app/components/lists/route-list/route-list.component';
+import { StopListComponent } from '@app/components/lists/stop-list/stop-list.component';
+import { MainPageComponent } from '@app/pages/main-page.component';
+import { MapComponent } from '@app/components/map/map.component';
+import { RouteComponent } from './components/elements/route/route.component';
+import { StopComponent } from './components/elements/stop/stop.component';
+import { AgencyComponent } from './components/elements/agency/agency.component';
+import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
 
 @NgModule({
-    declarations: [
-        RouteListComponent,
-        StopListComponent,
-        ScheduleComponent,
-        RouteInfographyComponent,
-        SchedulePageComponent,
-    ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-    ],
-    providers: [],
-    bootstrap: [SchedulePageComponent]
+  declarations: [
+    AppComponent,
+    AgencyListComponent,
+    RouteListComponent,
+    StopListComponent,
+    MainPageComponent,
+    MapComponent,
+    RouteComponent,
+    StopComponent,
+    AgencyComponent,
+    ToolbarComponent,
+  ],
+  imports: [
+    AppRoutingModule,
+    BrowserModule,
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

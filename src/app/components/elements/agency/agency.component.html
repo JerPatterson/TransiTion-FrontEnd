@@ -1,0 +1,16 @@
+<div
+    class="agency-container"
+    [ngClass]="this.selected ? 'selected' : ''"
+    (click)="this.onAgencyClick()">
+    <div class="agency-info">
+        <div class="agency-name">
+            {{ agency.agency_name }}
+        </div>
+        <div class="agency-identifier">
+            {{ agency.agency_id.toUpperCase() }}
+        </div>
+    </div>
+    <div class="agency-logo">
+        <img [src]="'./assets/agencies/' + agency.agency_id.toLowerCase() + '.png'"/>
+    </div>
+</div>
