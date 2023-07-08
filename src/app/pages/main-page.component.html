@@ -8,6 +8,7 @@
 <div class="list-container">
     <app-agency-list
         *ngIf="this.agencyListSelected"
+        [selections]="this.agenciesSelected"
         [selectAll]="this.selectAllAgenciesOption"
         (addAgencySelected)="this.addAgency($event)"
         (removeAgencySelected)="this.removeAgency($event)">

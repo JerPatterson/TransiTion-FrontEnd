@@ -9,19 +9,20 @@ import { AgencyDto } from '@app/utils/dtos';
 })
 export class AgencyListComponent implements OnInit {
     agencies: AgencyDto[] = [];
+    agenciesSelected = new Set<string>();
 
-    @Input() selections = new Set<string>();
+    @Input() selections: string[] = [];
     @Input() set selectAll(option: boolean) {
         if (option) {
             this.agencies.forEach((agency) => {
-                if (!this.selections.has(agency.agency_id)) {
-                    this.selections.add(agency.agency_id);
+                if (!this.agenciesSelected.has(agency.agency_id)) {
+                    this.agenciesSelected.add(agency.agency_id);
                     this.addAgencySelected.emit(agency.agency_id);
                 }
             });
         } else {
             this.agencies.forEach((agency) => {
-                this.selections.delete(agency.agency_id);
+                this.agenciesSelected.delete(agency.agency_id);
                 this.removeAgencySelected.emit(agency.agency_id);
             })
         }
@@ -34,14 +35,15 @@ export class AgencyListComponent implements OnInit {
 
     ngOnInit() {
         this.setAgencies();
+        this.selections.forEach((agencyId) => this.agenciesSelected.add(agencyId))
     }
 
     onAgencyClick(agencyId: string) {
-        if (this.selections.has(agencyId)) {
-            this.selections.delete(agencyId);
+        if (this.agenciesSelected.has(agencyId)) {
+            this.agenciesSelected.delete(agencyId);
             this.removeAgencySelected.emit(agencyId);
         } else {
-            this.selections.add(agencyId);
+            this.agenciesSelected.add(agencyId);
             this.addAgencySelected.emit(agencyId);
         }
     }
