@@ -5,15 +5,13 @@ import { RealtimeDataService } from 'src/app/services/realtime/realtime-data.ser
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { StaticDataService } from 'src/app/services/static/static-data.service';
 import { RouteType } from '@app/utils/enums';
-import { AGENCY_ID_TO_THEME_COLOR } from '@app/utils/agencies-style';
-import { BASE_NUMBER_HEXADECIMAL, DISABLE_CLUSTER_ZOOM, FIRST_CLUSTER_ALPHA, FIRST_CLUSTER_MAX_CHILD_COUT, FOURTH_CLUSTER_ALPHA, MAX_ZOOM, SECOND_CLUSTER_ALPHA, SECOND_CLUSTER_MAX_CHILD_COUT, THIRD_CLUSTER_ALPHA, THIRD_CLUSTER_MAX_CHILD_COUT } from '@app/utils/constants';
+import { AGENCY_TO_STYLE } from '@app/utils/styles';
+import { BASE_NUMBER_HEXADECIMAL, DEFAULT_COLOR, DISABLE_CLUSTER_ZOOM, FIRST_CLUSTER_ALPHA, FIRST_CLUSTER_MAX_CHILD_COUT, FOURTH_CLUSTER_ALPHA, MAX_ZOOM, SECOND_CLUSTER_ALPHA, SECOND_CLUSTER_MAX_CHILD_COUT, THIRD_CLUSTER_ALPHA, THIRD_CLUSTER_MAX_CHILD_COUT } from '@app/utils/constants';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VehicleMarkerService {
-    private readonly DEFAULT_COLOR = '#f0f8ff';
-
     constructor(
         private stDataService: StaticDataService,
         private rtDataService: RealtimeDataService,
@@ -22,11 +20,9 @@ export class VehicleMarkerService {
     async createVehiclesLayer(agencyIds: string[], clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
         let color: string | undefined;
         if (agencyIds.length === 1)
-            color = AGENCY_ID_TO_THEME_COLOR.get(agencyIds[0].toLowerCase());
+            color = AGENCY_TO_STYLE.get(agencyIds[0].toLowerCase())?.backgroundColor;
         const clusterGroup = await this.buildVehicleMarkerClusterGroup(
-            color ? color : this.DEFAULT_COLOR,
-            clusteringMaxZoom
-        );
+            color ? color : DEFAULT_COLOR, clusteringMaxZoom);
         
         agencyIds.map(async (agencyId) => {
             (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
@@ -88,7 +84,8 @@ export class VehicleMarkerService {
     private async buildVehicleIcon(agencyId: string, routeId?: string | null): Promise<L.DivIcon> {
         const route = routeId ? await this.stDataService.getRouteById(agencyId, routeId) : undefined;
         const iconLink = this.getIconLinkFromRouteType(route?.route_type);
-        const backgroundColor = AGENCY_ID_TO_THEME_COLOR.get(agencyId.toLowerCase());
+        const backgroundColor = AGENCY_TO_STYLE.get(agencyId.toLowerCase())?.backgroundColor;
+        const vehicleIconColor = AGENCY_TO_STYLE.get(agencyId.toLowerCase())?.vehicleIconColor;
 
         return L.divIcon({
             className: 'vehicle-icon',
@@ -96,7 +93,8 @@ export class VehicleMarkerService {
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
-                    viewBox="0 0 50 50">
+                    viewBox="0 0 50 50"
+                    style="color: ${vehicleIconColor}">
                     <defs>
                         <filter id="blur">
                             <feDropShadow dx="0" dy="0" stdDeviation="3.0"

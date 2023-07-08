@@ -5,6 +5,8 @@ export const SECONDS_IN_DAY = 86400;
 
 export const ACCEPTABLE_DELAY_IN_SEC = 20;
 
+export const DEFAULT_COLOR = '#f0f8ff';
+
 export const BASE_NUMBER_HEXADECIMAL = 16
 
 export const MIN_ZOOM = 8;
