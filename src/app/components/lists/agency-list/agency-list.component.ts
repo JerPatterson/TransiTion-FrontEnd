@@ -11,6 +11,22 @@ export class AgencyListComponent implements OnInit {
     agencies: AgencyDto[] = [];
 
     @Input() selections = new Set<string>();
+    @Input() set selectAll(option: boolean) {
+        if (option) {
+            this.agencies.forEach((agency) => {
+                if (!this.selections.has(agency.agency_id)) {
+                    this.selections.add(agency.agency_id);
+                    this.addAgencySelected.emit(agency.agency_id);
+                }
+            });
+        } else {
+            this.agencies.forEach((agency) => {
+                this.selections.delete(agency.agency_id);
+                this.removeAgencySelected.emit(agency.agency_id);
+            })
+        }
+    }
+
     @Output() addAgencySelected = new EventEmitter<string>();
     @Output() removeAgencySelected = new EventEmitter<string>();
 
