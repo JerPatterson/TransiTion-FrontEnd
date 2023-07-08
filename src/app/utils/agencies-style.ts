@@ -1,6 +1,7 @@
 export const AGENCY_ID_TO_THEME_COLOR: Map<string, string> = new Map();
 
 AGENCY_ID_TO_THEME_COLOR.set('stm', '#00a9e8');
+AGENCY_ID_TO_THEME_COLOR.set('stl', '#0b1263');
 AGENCY_ID_TO_THEME_COLOR.set('trains', '#b90068');
 AGENCY_ID_TO_THEME_COLOR.set('citla', '#5199a5');
 AGENCY_ID_TO_THEME_COLOR.set('mrclasso', '#4aa292');

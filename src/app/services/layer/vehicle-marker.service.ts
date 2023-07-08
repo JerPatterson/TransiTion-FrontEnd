@@ -6,6 +6,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { StaticDataService } from 'src/app/services/static/static-data.service';
 import { RouteType } from '@app/utils/enums';
 import { AGENCY_ID_TO_THEME_COLOR } from '@app/utils/agencies-style';
+import { BASE_NUMBER_HEXADECIMAL, DISABLE_CLUSTER_ZOOM, FIRST_CLUSTER_ALPHA, FIRST_CLUSTER_MAX_CHILD_COUT, FOURTH_CLUSTER_ALPHA, MAX_ZOOM, SECOND_CLUSTER_ALPHA, SECOND_CLUSTER_MAX_CHILD_COUT, THIRD_CLUSTER_ALPHA, THIRD_CLUSTER_MAX_CHILD_COUT } from '@app/utils/constants';
 
 @Injectable({
     providedIn: 'root'
@@ -18,11 +19,14 @@ export class VehicleMarkerService {
         private rtDataService: RealtimeDataService,
     ) {}
 
-    async createVehiclesLayer(agencyIds: string[]): Promise<L.MarkerClusterGroup> {
+    async createVehiclesLayer(agencyIds: string[], clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
         let color: string | undefined;
         if (agencyIds.length === 1)
             color = AGENCY_ID_TO_THEME_COLOR.get(agencyIds[0].toLowerCase());
-        const clusterGroup = await this.buildVehicleMarkerClusterGroup(color ? color : this.DEFAULT_COLOR);
+        const clusterGroup = await this.buildVehicleMarkerClusterGroup(
+            color ? color : this.DEFAULT_COLOR,
+            clusteringMaxZoom
+        );
         
         agencyIds.map(async (agencyId) => {
             (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
@@ -34,8 +38,8 @@ export class VehicleMarkerService {
         return clusterGroup;
     }
 
-    async createVehiclesLayerFromRoute(agencyId: string, routeId: string): Promise<L.MarkerClusterGroup> {
-        const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId);
+    async createVehiclesLayerFromRoute(agencyId: string, routeId: string, clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
+        const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId, clusteringMaxZoom);
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
             const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
             if (vehicleMarker) vehicleMarkers.addLayer(vehicleMarker);
@@ -44,24 +48,25 @@ export class VehicleMarkerService {
         return vehicleMarkers;
     }
 
-    private async buildVehicleMarkerClusterGroup(color: string): Promise<L.MarkerClusterGroup> {
+    private async buildVehicleMarkerClusterGroup(color: string, clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
         return L.markerClusterGroup({
             chunkedLoading: true,
+            disableClusteringAtZoom: clusteringMaxZoom ? DISABLE_CLUSTER_ZOOM : MAX_ZOOM,
             iconCreateFunction: (cluster) => {
-                let alpha = 255;
+                let alpha = FOURTH_CLUSTER_ALPHA;
                 const childCount = cluster.getChildCount();
-                if (childCount < 10)
-                    alpha = 51;
-                else if (childCount < 25)
-                    alpha = 153;
-                else if (childCount < 50)
-                    alpha = 204;
+                if (childCount <= FIRST_CLUSTER_MAX_CHILD_COUT)
+                    alpha = FIRST_CLUSTER_ALPHA;
+                else if (childCount <= SECOND_CLUSTER_MAX_CHILD_COUT)
+                    alpha = SECOND_CLUSTER_ALPHA;
+                else if (childCount < THIRD_CLUSTER_MAX_CHILD_COUT)
+                    alpha = THIRD_CLUSTER_ALPHA;
             
                 return new L.DivIcon({
                     html: `
                         <div style="
                             border: solid 2px ${color};
-                            background-color:${color + (alpha).toString(16)};">
+                            background-color:${color + (alpha).toString(BASE_NUMBER_HEXADECIMAL)};">
                             ${childCount}
                         </div>`, 
                     className: 'marker-cluster',

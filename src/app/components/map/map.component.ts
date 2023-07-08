@@ -3,6 +3,7 @@ import L from 'leaflet';
 // import { TripShapeService } from '@app/services/layer/trip-shape.service';
 // import { StopMarkerService } from '@app/services/layer/stop-marker.service';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
+import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
 
 @Component({
     selector: 'app-map',
@@ -74,25 +75,25 @@ export class MapComponent implements OnInit {
     
     private initMap(): void {
         this.map = L.map('map', {
-            minZoom: 8,
-            maxZoom: 18,
+            minZoom: MIN_ZOOM,
+            maxZoom: MAX_ZOOM,
             zoomControl: false,
             preferCanvas: true,
         }).setView([this.lat, this.lon], this.zoom);
         
-        // L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        // }).addTo(this.map);
+        L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(this.map);
 
         // L.tileLayer('https://navigoservprod.stl.laval.qc.ca/FCT/mbtiles-1.php?id=routier_stl_couleur/{z}/{x}/{y}.png', {
         //     attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',
         // }).addTo(this.map);
 
-        L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
-            maxZoom: 22,
-            attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
-            subdomains: 'abcd',
-        }).addTo(this.map);
+        // L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
+        //     maxZoom: 22,
+        //     attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
+        //     subdomains: 'abcd',
+        // }).addTo(this.map);
     }
 
     private async clearLayer(layer: L.LayerGroup) {
@@ -110,12 +111,12 @@ export class MapComponent implements OnInit {
         this.vehicleLayers = [];
 
         if (this.mergeAgenciesOption) {
-            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(this.currentAgencies);
+            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(this.currentAgencies, !this.mergeAgenciesOption);
             this.vehicleLayers.push(vehiclesLayer);
             this.map.addLayer(vehiclesLayer);
         } else {
             this.currentAgencies.forEach(async (agencyId) => {
-                const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer([agencyId]);
+                const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer([agencyId], !this.mergeAgenciesOption);
                 this.vehicleLayers.push(vehiclesLayer);
                 this.map.addLayer(vehiclesLayer);
             })
