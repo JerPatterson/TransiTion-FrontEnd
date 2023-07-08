@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
 export class MainPageComponent {
     tripId: string = '';
 
-    agenciesSelected: string[] = [];
+    agencyIdsSelected: string[] = [];
     mergeAgenciesOption: boolean = false;
     selectAllAgenciesOption: boolean = false;
 
@@ -20,20 +20,20 @@ export class MainPageComponent {
     stopListSelected: boolean = false;
     vehicleListSelected: boolean = false;
 
-    addAgency(agencyId: string) {
-        this.agenciesSelected = this.agenciesSelected.concat([agencyId]);
+    addAgencyId(agencyId: string) {
+        this.agencyIdsSelected = this.agencyIdsSelected.concat([agencyId]);
     }
 
-    removeAgency(agencyId: string) {
-        this.agenciesSelected = this.agenciesSelected
+    removeAgencyId(agencyId: string) {
+        this.agencyIdsSelected = this.agencyIdsSelected
             .filter((value) => value !== agencyId)
     }
 
-    changeMergeAgenciesOption() {
+    changeMergeAgencies() {
         this.mergeAgenciesOption = !this.mergeAgenciesOption;
     }
 
-    changeSelectAllAgenciesOption() {
+    changeSelectAllAgencies() {
         this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
     }
 
