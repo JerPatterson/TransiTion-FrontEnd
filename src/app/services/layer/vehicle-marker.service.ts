@@ -17,7 +17,8 @@ export class VehicleMarkerService {
         private rtDataService: RealtimeDataService,
     ) {}
 
-    async createVehiclesLayer(agencyIds: string[], clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
+    async createVehiclesLayer(agencyIds: string[], clusteringMaxZoom: boolean)
+        : Promise<L.MarkerClusterGroup> {
         let color: string | undefined;
         if (agencyIds.length === 1)
             color = AGENCY_TO_STYLE.get(agencyIds[0].toLowerCase())?.backgroundColor;
@@ -34,7 +35,8 @@ export class VehicleMarkerService {
         return clusterGroup;
     }
 
-    async createVehiclesLayerFromRoute(agencyId: string, routeId: string, clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
+    async createVehiclesLayerFromRoute(agencyId: string, routeId: string, clusteringMaxZoom: boolean)
+        : Promise<L.MarkerClusterGroup> {
         const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId, clusteringMaxZoom);
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
             const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
@@ -44,7 +46,8 @@ export class VehicleMarkerService {
         return vehicleMarkers;
     }
 
-    private async buildVehicleMarkerClusterGroup(color: string, clusteringMaxZoom: boolean): Promise<L.MarkerClusterGroup> {
+    private async buildVehicleMarkerClusterGroup(color: string, clusteringMaxZoom: boolean)
+        : Promise<L.MarkerClusterGroup> {
         return L.markerClusterGroup({
             chunkedLoading: true,
             disableClusteringAtZoom: clusteringMaxZoom ? DISABLE_CLUSTER_ZOOM : MAX_ZOOM,

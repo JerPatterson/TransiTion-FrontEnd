@@ -1,0 +1,41 @@
+.vehicle-container {
+    position: relative;
+    z-index: 1;
+    max-width: 32vw;
+    max-height: 48vh;
+    overflow-y: scroll;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    margin-left: 5vh;
+    margin-top: 1vh;
+}
+
+.vehicle-container::-webkit-scrollbar {
+    width: 0px;
+}
+
+.vehicle-header {
+    display: flex;
+    flex-direction: row;
+    margin-left: 0.3vw;
+}
+
+.vehicle-header > svg {
+    max-width: 10vh;
+    max-height: 10vh;
+    margin-right: 0.8vw;
+}
+
+.vehicle-identifier {
+    position: relative;
+    margin-top: 1vh;
+    margin-bottom: 0.2vh;
+    font-size: 4.5vh;
+    font-weight: bold;
+}
+
+.vehicle-last-update {
+    margin: 0px;
+}
