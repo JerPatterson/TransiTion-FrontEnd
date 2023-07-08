@@ -13,6 +13,8 @@ export class MapComponent implements OnInit {
     // private readonly zoomLevelThatHideStops = 16;
 
     private currentAgencies: string[] = [];
+    private mergeAgenciesOption: boolean = false;
+
     // private currentStopId: string = '';
     // private currentRouteId: string = '';
 
@@ -22,6 +24,11 @@ export class MapComponent implements OnInit {
 
     @Input() set agencies(value: string[]) {
         this.currentAgencies = value;
+        this.addAllVehicleMarkers();
+    };
+
+    @Input() set mergeAgencies(value: boolean) {
+        this.mergeAgenciesOption = value;
         this.addAllVehicleMarkers();
     };
 
@@ -48,7 +55,7 @@ export class MapComponent implements OnInit {
     // };
 
     private map!: L.Map;
-    private vehicleLayer!: L.LayerGroup;
+    private vehicleLayers: L.LayerGroup[] = [];
 
     // private stopLayer!: L.LayerGroup;
     // private currentStopLayer!: L.LayerGroup;
@@ -94,10 +101,25 @@ export class MapComponent implements OnInit {
         }
     }
 
+    private async clearLayers(layers: L.LayerGroup[]) {
+        layers.forEach(async (layer) => await this.clearLayer(layer));
+    }
+
     private async addAllVehicleMarkers(): Promise<void> {
-        this.clearLayer(this.vehicleLayer);
-        this.vehicleLayer = await this.vehicleMarkerService.createVehiclesLayer(this.currentAgencies);
-        this.map.addLayer(this.vehicleLayer);
+        await this.clearLayers(this.vehicleLayers);
+        this.vehicleLayers = [];
+
+        if (this.mergeAgenciesOption) {
+            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(this.currentAgencies);
+            this.vehicleLayers.push(vehiclesLayer);
+            this.map.addLayer(vehiclesLayer);
+        } else {
+            this.currentAgencies.forEach(async (agencyId) => {
+                const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer([agencyId]);
+                this.vehicleLayers.push(vehiclesLayer);
+                this.map.addLayer(vehiclesLayer);
+            })
+        }
     }
 
     // private async addVehicleMarkers(routeId: string): Promise<void> {
