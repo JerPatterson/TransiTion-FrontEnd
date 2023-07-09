@@ -16,11 +16,14 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
     route: RouteDto | undefined;
     style: AgencyStyle | undefined;
-    iconLink: string | undefined;
-    
+
+    iconLink: string = '';
     lastSeenString: string = '';
     speedKmHrString: string = '';
     occupancyString: string = '';
+    stopStatusString: string = '';
+    congestionLevelString: string = '';
+    scheduleRelationshipString: string = '';
 
     @Input() agencyId!: string;
     @Input() vehicle!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition;
@@ -42,7 +45,7 @@ export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
     }
 
     private async setVehicle() {
-        this.vehicle = await this.rtDataService.getVehicleFromAgencyById('stm', '42048');
+        this.vehicle = await this.rtDataService.getVehicleFromAgencyById('stm', '41035');
         this.route = await this.stDataService.getRouteById('stm', '777');
         this.style = AGENCY_TO_STYLE.get('stm');
         this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
@@ -51,7 +54,10 @@ export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
             this.setLastSeenValue();
             this.setSpeedValue();
             this.setOccupancyStatusValue();
-        });
+            this.setVehicleStopStatusValue();
+            this.setCongestionLevelValue();
+            this.setScheduleRelationshipValue();
+        }, 100);
     }
 
     private setLastSeenValue(): void {
@@ -90,13 +96,13 @@ export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
     }
 
     private setOccupancyStatusValue(): void {
-        console.log(this.vehicle.occupancyStatus);
         if (!this.vehicle.occupancyStatus) {
             this.occupancyString = ''
         } else {
             const occupancyStatusType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.OccupancyStatus;
             switch (this.vehicle.occupancyStatus as any) {
                 case 'EMPTY':
+                case occupancyStatusType.EMPTY:
                     this.occupancyString = 'Vide';
                     break;
                 case 'MANY_SEATS_AVAILABLE':
@@ -115,8 +121,98 @@ export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
                 case occupancyStatusType.CRUSHED_STANDING_ROOM_ONLY:
                     this.occupancyString = 'Pratiquement plein';
                     break;
+                case 'FULL':
+                case occupancyStatusType.FULL:
+                    this.occupancyString = 'Plein';
+                    break;
+                case 'NOT_BOARDABLE':
+                case 'NOT_ACCEPTING_PASSENGER':
+                case occupancyStatusType.NOT_BOARDABLE:
+                case occupancyStatusType.NOT_ACCEPTING_PASSENGERS:
+                    this.occupancyString = "N'accepte pas de passagers";
+                    break;
                 default:
                     this.occupancyString = 'Inconnue';
+            }
+        }
+    }
+
+    private setVehicleStopStatusValue(): void {
+        if (!this.vehicle.currentStatus) {
+            this.stopStatusString = ''
+        } else {
+            const vehicleStopStatusType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.VehicleStopStatus;
+            switch (this.vehicle.currentStatus as any) {
+                case 'INCOMING_AT':
+                case vehicleStopStatusType.INCOMING_AT:
+                    this.stopStatusString = "Tout près de l'arrêt";
+                    break;
+                case 'STOPPED_AT':
+                case vehicleStopStatusType.STOPPED_AT:
+                    this.stopStatusString = "À l'arrêt";
+                    break;
+                case 'IN_TRANSIT_TO':
+                case vehicleStopStatusType.IN_TRANSIT_TO:
+                    this.stopStatusString = 'En déplacement';
+                    break;
+                default:
+                    this.stopStatusString = 'Inconnue';
+            }
+        }
+    }
+
+    private setScheduleRelationshipValue(): void {
+        const scheduleRelationshipType = GtfsRealtimeBindings.transit_realtime.TripDescriptor.ScheduleRelationship;
+        switch (this.vehicle.currentStatus as any) {
+            case 'ADDED':
+            case scheduleRelationshipType.ADDED:
+                this.scheduleRelationshipString = 'Ajouté';
+                break;
+            case 'CANCELED':
+            case scheduleRelationshipType.CANCELED:
+                this.scheduleRelationshipString = 'Annulé';
+                break;
+            case 'DUPLICATED':
+            case scheduleRelationshipType.DUPLICATED:
+                this.scheduleRelationshipString = 'Dupliqué';
+                break;
+            case 'REPLACEMENT':
+            case scheduleRelationshipType.REPLACEMENT:
+                this.scheduleRelationshipString = 'Remplacement';
+                break;
+            case 'UNSCHEDULE':
+                case scheduleRelationshipType.UNSCHEDULED:
+                    this.scheduleRelationshipString = 'Non-prévu';
+                    break;
+            default:
+                this.scheduleRelationshipString = 'Prévu';
+        }
+    }
+
+    private setCongestionLevelValue(): void {
+        if (!this.vehicle.congestionLevel) {
+            this.congestionLevelString = ''
+        } else {
+            const congestionLevelType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.CongestionLevel;
+            switch (this.vehicle.currentStatus as any) {
+                case 'RUNNING_SMOOTHLY':
+                case congestionLevelType.RUNNING_SMOOTHLY:
+                    this.congestionLevelString = 'Fluide';
+                    break;
+                case 'STOP_AND_GO':
+                case congestionLevelType.STOP_AND_GO:
+                    this.congestionLevelString = 'Au ralenti';
+                    break;
+                case 'CONGESTION':
+                case congestionLevelType.CONGESTION:
+                    this.congestionLevelString = 'Congestion';
+                    break;
+                case 'SEVERE_CONGESTION':
+                case congestionLevelType.SEVERE_CONGESTION:
+                    this.congestionLevelString = 'Congestion sévère';
+                    break;
+                default:
+                    this.congestionLevelString = 'Inconnue';
             }
         }
     }
