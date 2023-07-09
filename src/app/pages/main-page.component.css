@@ -4,10 +4,23 @@
     top: 0.8vh;
     left: 5.5vw;
     max-width: 32vw;
-    max-height: 50vh;
+    max-height: fit-content;
     padding: 0px;
     border-radius: 8px;
     background-color: #f0f8ff;
+}
+
+.option-container {
+    position: relative;
+    z-index: 1;
+    top: 0.8vh;
+    left: 5.5vw;
+    max-width: 32vw;
+    overflow-x: scroll;
+}
+
+.option-container::-webkit-scrollbar {
+    width: 0px;
 }
 
 .option-container > button {

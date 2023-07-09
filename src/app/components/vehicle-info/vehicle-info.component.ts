@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy } from '@angular/core';
-import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
+import { OnChanges, Component, Input, OnDestroy } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { METERS_IN_KM, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS, SECONDS_IN_HOUR } from '@app/utils/constants';
 import { RouteDto } from '@app/utils/dtos';
@@ -13,7 +12,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
     templateUrl: './vehicle-info.component.html',
     styleUrls: ['./vehicle-info.component.css']
 })
-export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
+export class VehicleInfoComponent implements OnChanges, OnDestroy {
     route: RouteDto | undefined;
     style: AgencyStyle | undefined;
 
@@ -31,33 +30,30 @@ export class VehicleInfoComponent implements AfterViewInit, OnDestroy {
     private timeSinceUpdate = 0;
     private timeSinceUpdateInterval!: NodeJS.Timer;
 
-    constructor(
-        private rtDataService: RealtimeDataService,
-        private stDataService: StaticDataService
-    ) {
-        this.setVehicle();
-    }
+    constructor(private stDataService: StaticDataService) {}
 
-    ngAfterViewInit(): void {}
+    ngOnChanges(): void {
+        console.log(this.agencyId, this.vehicle.vehicle?.id);
+        this.setVehicleInfoValues();
+    }
 
     ngOnDestroy(): void {
         clearInterval(this.timeSinceUpdateInterval);
     }
 
-    private async setVehicle() {
-        this.vehicle = await this.rtDataService.getVehicleFromAgencyById('stm', '41035');
-        this.route = await this.stDataService.getRouteById('stm', '777');
-        this.style = AGENCY_TO_STYLE.get('stm');
+    private async setVehicleInfoValues() {
+        this.agencyId = this.agencyId.toLowerCase();
+        if (this.vehicle.trip?.routeId)
+            this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip?.routeId);
+        this.style = AGENCY_TO_STYLE.get(this.agencyId);
         this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
 
-        setTimeout(() => {
-            this.setLastSeenValue();
-            this.setSpeedValue();
-            this.setOccupancyStatusValue();
-            this.setVehicleStopStatusValue();
-            this.setCongestionLevelValue();
-            this.setScheduleRelationshipValue();
-        }, 100);
+        this.setLastSeenValue();
+        this.setSpeedValue();
+        this.setOccupancyStatusValue();
+        this.setVehicleStopStatusValue();
+        this.setCongestionLevelValue();
+        this.setScheduleRelationshipValue();
     }
 
     private setLastSeenValue(): void {

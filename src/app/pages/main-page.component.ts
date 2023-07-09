@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core';
+import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 
 @Component({
     selector: 'app-main-page',
@@ -6,14 +7,12 @@ import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core
     styleUrls: ['./main-page.component.css']
 })
 export class MainPageComponent implements AfterContentChecked {
-    tripId: string = '';
-
     agencyIdsSelected: string[] = [];
     mergeAgenciesOption: boolean = false;
     selectAllAgenciesOption: boolean = false;
 
-    routeId: string = '';
-    stopId: string = '';
+    vehicleSelected!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined;
+    vehicleSelectedAgencyId: string = ''; 
 
     agencyListSelected: boolean = false;
     routeListSelected: boolean = false;
@@ -24,6 +23,11 @@ export class MainPageComponent implements AfterContentChecked {
 
     ngAfterContentChecked() {
         this.cdref.detectChanges();
+    }
+
+    selectAgencyList(value: boolean) {
+        this.agencyListSelected = value;
+        if (value) this.vehicleSelected = undefined;
     }
 
     addAgencyIds(agencyIds: string[]) {
@@ -51,13 +55,11 @@ export class MainPageComponent implements AfterContentChecked {
         this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
     }
 
-    changeCurrentRouteId(value: string) {
-        this.routeId = value;
-        this.routeListSelected = false;
+    addVehicleSlected(vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) {
+        this.vehicleSelected = vehicle;
     }
 
-    changeCurrentStopId(value: string) {
-        this.stopId = value;
-        this.stopListSelected = false;
+    addVehicleSlectedAgencyId(agencyId: string) {
+        this.vehicleSelectedAgencyId = agencyId;
     }
 }

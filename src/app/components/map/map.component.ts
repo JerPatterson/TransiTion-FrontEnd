@@ -1,9 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
-// import { TripShapeService } from '@app/services/layer/trip-shape.service';
-// import { StopMarkerService } from '@app/services/layer/stop-marker.service';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
 import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
+import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 
 @Component({
     selector: 'app-map',
@@ -11,13 +10,9 @@ import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-    // private readonly zoomLevelThatHideStops = 16;
 
     private currentAgencies: string[] = [];
     private mergeAgenciesOption: boolean = false;
-
-    // private currentStopId: string = '';
-    // private currentRouteId: string = '';
 
     @Input() lat: number = 45.6;
     @Input() lon: number = -73.75;
@@ -33,39 +28,13 @@ export class MapComponent implements OnInit {
         this.addAllVehicleMarkers();
     };
 
-    // @Input() set routeId(value: string) {
-    //     this.currentRouteId = value;
-    //     if (value) {
-    //         this.addVehicleMarkers(value);
-    //     }
-    // };
-
-    // @Input() set stopId(value: string) {
-    //     this.currentStopId = value;
-    //     this.addCurrentStopMarker();
-    //     if (value && !this.currentRouteId) {
-    //         this.addSecondaryTripsShape(value);
-    //     }
-    // }
-
-    // @Input() set tripId(value: string) {
-    //     if (value) {
-    //         this.addTripShape(value);
-    //         this.addStopMarkers(value);
-    //     }
-    // };
+    @Output() newVehicleSelected = new EventEmitter<GtfsRealtimeBindings.transit_realtime.IVehiclePosition>();
+    @Output() newVehicleSelectedAgencyId = new EventEmitter<string>();
 
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
 
-    // private stopLayer!: L.LayerGroup;
-    // private currentStopLayer!: L.LayerGroup;
-    // private tripLayer!: L.LayerGroup;
-    // private secondaryTripLayer!: L.LayerGroup;
-
     constructor(
-        // private tripShapeService: TripShapeService,
-        // private stopMarkerService: StopMarkerService,
         private vehicleMarkerService: VehicleMarkerService,
     ) {}
 
@@ -110,60 +79,33 @@ export class MapComponent implements OnInit {
         await this.clearLayers(this.vehicleLayers);
         this.vehicleLayers = [];
 
+        const emitVehicleSelected = (
+            agencyId: string, 
+            vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition
+        ) => {
+            this.newVehicleSelected.emit(vehicle);
+            this.newVehicleSelectedAgencyId.emit(agencyId);
+        };
+
         if (this.mergeAgenciesOption) {
-            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(this.currentAgencies, !this.mergeAgenciesOption);
+            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
+                this.currentAgencies,
+                !this.mergeAgenciesOption,
+                emitVehicleSelected,
+            );
             this.vehicleLayers.push(vehiclesLayer);
             this.map.addLayer(vehiclesLayer);
         } else {
             this.currentAgencies.forEach(async (agencyId) => {
-                const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer([agencyId], !this.mergeAgenciesOption);
+                const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
+                    [agencyId],
+                    !this.mergeAgenciesOption,
+                    emitVehicleSelected,
+                );
                 this.vehicleLayers.push(vehiclesLayer);
                 this.map.addLayer(vehiclesLayer);
             })
         }
     }
-
-    // private async addVehicleMarkers(routeId: string): Promise<void> {
-    //     this.clearLayer(this.vehicleLayer);
-    //     this.vehicleLayer = await this.vehicleMarkerService.createVehiclesLayer(this.currentAgencies, routeId);
-    //     this.map.addLayer(this.vehicleLayer);
-    // }
-
-    // private async addTripShape(tripId: string): Promise<void> {
-    //     this.clearLayer(this.tripLayer);
-    //     this.tripLayer = await this.tripShapeService.createTripShapeLayer(this.currentAgencies, tripId, '#0a2196');
-    //     this.map.addLayer(this.tripLayer);
-    // }
-
-    // private async addSecondaryTripsShape(stopId: string): Promise<void> {
-    //     this.clearLayer(this.secondaryTripLayer);
-    //     this.secondaryTripLayer = await this.tripShapeService.createSecondaryTripShapeLayer(this.currentAgencies, stopId, '#0a2196');
-    //     if (this.secondaryTripLayer) this.map.addLayer(this.secondaryTripLayer);
-    //     this.map.createPane('semitransparent').style.opacity = '0.5';
-    // }
-
-    // private async addCurrentStopMarker(): Promise<void> {
-    //     this.clearLayer(this.currentStopLayer);
-    //     this.currentStopLayer = await this.stopMarkerService.createCurrentStopLayer(this.currentAgencies, this.currentStopId);
-    //     this.map.addLayer(this.currentStopLayer);
-    // }
-
-    // private async addStopMarkers(tripId: string): Promise<void> {
-    //     this.clearLayer(this.stopLayer);
-    //     if (this.stopLayer && this.map.hasLayer(this.stopLayer)) {
-    //         this.map.removeLayer(this.stopLayer);
-    //     }
-
-    //     this.stopLayer = await this.stopMarkerService.createOtherStopsLayer(this.currentAgencies, tripId, this.currentStopId);
-    //     if (this.map.getZoom() > this.zoomLevelThatHideStops) this.map.addLayer(this.stopLayer);
-
-    //     this.map.addEventListener('zoomend', () => {
-    //         if (this.map.getZoom() <= this.zoomLevelThatHideStops) {
-    //             this.map.removeLayer(this.stopLayer);
-    //         } else if (!this.map.hasLayer(this.stopLayer)) {
-    //             this.map.addLayer(this.stopLayer);
-    //         }
-    //     });
-    // }
 }
     

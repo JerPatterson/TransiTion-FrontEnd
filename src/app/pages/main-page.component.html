@@ -1,13 +1,19 @@
 <app-toolbar
-    (agencyListClick)="this.agencyListSelected = $event"
+    (agencyListClick)="this.selectAgencyList($event)"
     (routeListClick)="this.routeListSelected = $event"
     (stopListClick)="this.stopListSelected = $event"
     (vehicleListClick)="this.vehicleListSelected = $event">
 </app-toolbar>
 
 <div class="list-container">
+    <app-vehicle-info
+        *ngIf="this.vehicleSelected"
+        [vehicle]="this.vehicleSelected"
+        [agencyId]="this.vehicleSelectedAgencyId">
+    </app-vehicle-info>
+
     <app-agency-list
-        *ngIf="this.agencyListSelected"
+        *ngIf="this.agencyListSelected && !this.vehicleSelected"
         [selections]="this.agencyIdsSelected"
         [selectAll]="this.selectAllAgenciesOption"
         (addAgencyIds)="this.addAgencyIds($event)"
@@ -15,46 +21,48 @@
     </app-agency-list>
 
     <app-route-list
-        *ngIf="this.routeListSelected">
+        *ngIf="this.routeListSelected && !this.vehicleSelected">
     </app-route-list>
 
     <app-stop-list
-        *ngIf="this.stopListSelected">
+        *ngIf="this.stopListSelected && !this.vehicleSelected">
     </app-stop-list>
+</div>
 
-    <div
-        class="option-container"
-        *ngIf="this.agencyListSelected">
-        <button
-            *ngIf="this.agencyListSelected"
-            [ngClass]="this.selectAllAgenciesOption ? 'selected' : ''"
-            (click)="this.changeSelectAllAgencies()">
-            <svg class="option-icon">
-                <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
-            </svg>
-            <span
-                class="option-name"
-                *ngIf="!this.selectAllAgenciesOption">
-                Tout sélectionner
-            </span>
-        </button>
-        <button
-            *ngIf="this.agencyIdsSelected.length"
-            [ngClass]="this.mergeAgenciesOption ? 'selected' : ''"
-            (click)="this.changeMergeAgencies()">
-            <svg class="option-icon">
-                <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
-            </svg>
-            <span 
-                class="option-name"
-                *ngIf="!this.mergeAgenciesOption">
-                Fusionner les repères
-            </span>
-        </button>
-    </div>
+<div
+    class="option-container"
+    *ngIf="this.agencyListSelected">
+    <button
+        *ngIf="this.agencyListSelected && !this.vehicleSelected"
+        [ngClass]="this.selectAllAgenciesOption ? 'selected' : ''"
+        (click)="this.changeSelectAllAgencies()">
+        <svg class="option-icon">
+            <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
+        </svg>
+        <span
+            class="option-name"
+            *ngIf="!this.selectAllAgenciesOption">
+            Tout sélectionner
+        </span>
+    </button>
+    <button
+        *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
+        [ngClass]="this.mergeAgenciesOption ? 'selected' : ''"
+        (click)="this.changeMergeAgencies()">
+        <svg class="option-icon">
+            <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
+        </svg>
+        <span 
+            class="option-name"
+            *ngIf="!this.mergeAgenciesOption">
+            Fusionner les repères
+        </span>
+    </button>
 </div>
 
 <app-map 
     [agencies]="this.agencyIdsSelected"
-    [mergeAgencies]="this.mergeAgenciesOption">
+    [mergeAgencies]="this.mergeAgenciesOption"
+    (newVehicleSelected)="this.addVehicleSlected($event)"
+    (newVehicleSelectedAgencyId)="this.addVehicleSlectedAgencyId($event)">
 </app-map>

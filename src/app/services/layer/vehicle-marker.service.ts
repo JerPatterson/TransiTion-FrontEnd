@@ -6,28 +6,44 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { StaticDataService } from 'src/app/services/static/static-data.service';
 import { RouteType } from '@app/utils/enums';
 import { AGENCY_TO_STYLE } from '@app/utils/styles';
-import { BASE_NUMBER_HEXADECIMAL, DEFAULT_COLOR, DISABLE_CLUSTER_ZOOM, FIRST_CLUSTER_ALPHA, FIRST_CLUSTER_MAX_CHILD_COUT, FOURTH_CLUSTER_ALPHA, MAX_ZOOM, SECOND_CLUSTER_ALPHA, SECOND_CLUSTER_MAX_CHILD_COUT, THIRD_CLUSTER_ALPHA, THIRD_CLUSTER_MAX_CHILD_COUT } from '@app/utils/constants';
+import { 
+    BASE_NUMBER_HEXADECIMAL,
+    DEFAULT_COLOR,
+    DISABLE_CLUSTER_ZOOM,
+    FIRST_CLUSTER_ALPHA,
+    FIRST_CLUSTER_MAX_CHILD_COUT,
+    FOURTH_CLUSTER_ALPHA,
+    MAX_ZOOM,
+    SECOND_CLUSTER_ALPHA,
+    SECOND_CLUSTER_MAX_CHILD_COUT,
+    THIRD_CLUSTER_ALPHA,
+    THIRD_CLUSTER_MAX_CHILD_COUT
+} from '@app/utils/constants';
 
 @Injectable({
     providedIn: 'root'
 })
 export class VehicleMarkerService {
     constructor(
-        private stDataService: StaticDataService,
         private rtDataService: RealtimeDataService,
+        private stDataService: StaticDataService,
     ) {}
 
-    async createVehiclesLayer(agencyIds: string[], clusteringMaxZoom: boolean)
-        : Promise<L.MarkerClusterGroup> {
+    async createVehiclesLayer(
+        agencyIds: string[],
+        clusteringMaxZoom: boolean,
+        emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
+    ) : Promise<L.MarkerClusterGroup> {
         let color: string | undefined;
         if (agencyIds.length === 1)
             color = AGENCY_TO_STYLE.get(agencyIds[0].toLowerCase())?.backgroundColor;
         const clusterGroup = await this.buildVehicleMarkerClusterGroup(
-            color ? color : DEFAULT_COLOR, clusteringMaxZoom);
+            color ? color : DEFAULT_COLOR, clusteringMaxZoom
+        );
         
         agencyIds.map(async (agencyId) => {
             (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
-                const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
+                const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle, emitVehicleSelected);
                 if (vehicleMarker) clusterGroup.addLayer(vehicleMarker);
             });
         });
@@ -35,11 +51,15 @@ export class VehicleMarkerService {
         return clusterGroup;
     }
 
-    async createVehiclesLayerFromRoute(agencyId: string, routeId: string, clusteringMaxZoom: boolean)
-        : Promise<L.MarkerClusterGroup> {
+    async createVehiclesLayerFromRoute(
+        agencyId: string,
+        routeId: string, 
+        clusteringMaxZoom: boolean,
+        emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
+    ) : Promise<L.MarkerClusterGroup> {
         const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId, clusteringMaxZoom);
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
-            const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle);
+            const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle, emitVehicleSelected);
             if (vehicleMarker) vehicleMarkers.addLayer(vehicleMarker);
         });
 
@@ -75,13 +95,16 @@ export class VehicleMarkerService {
         });
     }
 
-    private async buildVehicleMarker(agencyId: string, vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition)
-        : Promise<L.Marker | undefined> {
+    private async buildVehicleMarker(
+            agencyId: string,
+            vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
+            emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
+        ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker([vehicle.position.latitude, vehicle.position.longitude], {
             icon: await this.buildVehicleIcon(agencyId, vehicle.trip?.routeId),
         });
-        return marker.bindPopup(`${vehicle.vehicle?.id }`);
+        return marker.addEventListener('click', () => emitVehicleSelected(agencyId, vehicle));
     }
 
     private async buildVehicleIcon(agencyId: string, routeId?: string | null): Promise<L.DivIcon> {
