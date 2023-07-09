@@ -37,45 +37,45 @@
     <hr>
 
     <div class="vehicle-info-container">
-        <p class="info-title">         
-           Heure du départ:
+        <p class="vehicle-info-title">         
+            Vitesse
         </p>
-        <p class="info-value">         
-           {{ vehicle.trip?.startTime }}
-        </p>
-
-        <p class="info-title">         
-           Achalandage:
-        </p>
-        <p class="info-value">
-            {{ vehicle.occupancyStatus }}
-        </p>
-
-        <p class="info-title">         
-           Vitesse:
-        </p>
-        <p class="info-value">
+        <p class="vehicle-info-value">
             {{ vehicle.position?.speed }}
         </p>
-        
-        <p class="info-title">         
-           Statut:
+
+        <p class="vehicle-info-title">         
+           Achalandage
         </p>
-        <p class="info-value">
+        <p class="vehicle-info-value">
+            {{ vehicle.occupancyStatus }}
+        </p>
+        
+        <p class="vehicle-info-title">         
+           Heure du départ
+        </p>
+        <p class="vehicle-info-value">         
+           {{ vehicle.trip?.startTime }}
+        </p>
+        
+        <p class="vehicle-info-title">         
+           Statut du trajet
+        </p>
+        <p class="vehicle-info-value">
             {{ vehicle.currentStatus }}
         </p>
 
-        <p class="info-title">         
-           Niveau de congestion:
+        <p class="vehicle-info-title">         
+           Niveau de congestion
         </p>
-        <p class="info-value">
+        <p class="vehicle-info-value">
             {{ vehicle.congestionLevel }}
         </p>
 
-        <p class="info-title">         
-           Relation avec l'horaire:
+        <p class="vehicle-info-title">         
+           Relation avec l'horaire
         </p>
-        <p class="info-value">
+        <p class="vehicle-info-value">
             {{ vehicle.trip?.scheduleRelationship }}
         </p>
     </div>

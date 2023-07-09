@@ -10,6 +10,7 @@
     padding-bottom: 1vh;
     margin-left: 5vh;
     margin-top: 1vh;
+    background-color: aliceblue;
 }
 
 .vehicle-container::-webkit-scrollbar {
@@ -38,4 +39,17 @@
 
 .vehicle-last-update {
     margin: 0px;
+}
+
+.vehicle-info-title {
+    margin: 0px;
+    font-size: 2vh;
+    font-weight: 500;
+    color: #849096;
+}
+
+.vehicle-info-value {
+    margin-top: 0px;
+    margin-bottom: 1vh;
+    font-size: 2.5vh;
 }
