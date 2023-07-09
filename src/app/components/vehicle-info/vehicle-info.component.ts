@@ -33,18 +33,25 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
     constructor(private stDataService: StaticDataService) {}
 
     ngOnChanges(): void {
-        console.log(this.agencyId, this.vehicle.vehicle?.id);
+        this.clearTimer();
         this.setVehicleInfoValues();
     }
 
     ngOnDestroy(): void {
+        this.clearTimer()
+    }
+
+    private clearTimer(): void {
         clearInterval(this.timeSinceUpdateInterval);
     }
 
     private async setVehicleInfoValues() {
         this.agencyId = this.agencyId.toLowerCase();
-        if (this.vehicle.trip?.routeId)
+        if (this.vehicle.trip?.routeId) {
             this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip?.routeId);
+        } else {
+            this.route = undefined;
+        }
         this.style = AGENCY_TO_STYLE.get(this.agencyId);
         this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
 
