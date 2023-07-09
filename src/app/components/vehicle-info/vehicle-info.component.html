@@ -37,46 +37,88 @@
     <hr>
 
     <div class="vehicle-info-container">
-        <p class="vehicle-info-title">         
-            Vitesse
-        </p>
-        <p class="vehicle-info-value">
-            {{ vehicle.position?.speed }}
-        </p>
+        <div class="vehicle-info">
+            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+                <use xlink:href='./assets/icons/speed.svg#speed' href="./assets/icons/speed.svg#speed"></use>
+            </svg>
+            <div>
+                <p class="vehicle-info-title">         
+                    Vitesse
+                </p>
+                <p class="vehicle-info-value">
+                    {{ vehicle.position?.speed }}
+                </p>
+            </div>
+        </div>
 
-        <p class="vehicle-info-title">         
-           Achalandage
-        </p>
-        <p class="vehicle-info-value">
-            {{ vehicle.occupancyStatus }}
-        </p>
-        
-        <p class="vehicle-info-title">         
-           Heure du départ
-        </p>
-        <p class="vehicle-info-value">         
-           {{ vehicle.trip?.startTime }}
-        </p>
-        
-        <p class="vehicle-info-title">         
-           Statut du trajet
-        </p>
-        <p class="vehicle-info-value">
-            {{ vehicle.currentStatus }}
-        </p>
+        <div class="vehicle-info">
+            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+                <use xlink:href='./assets/icons/clock.svg#clock' href="./assets/icons/clock.svg#clock"></use>
+            </svg>
+            <div>
+                <p class="vehicle-info-title">         
+                    Heure du départ
+                </p>
+                <p class="vehicle-info-value">         
+                    {{ vehicle.trip?.startTime }}
+                </p>
+            </div>
+        </div>
 
-        <p class="vehicle-info-title">         
-           Niveau de congestion
-        </p>
-        <p class="vehicle-info-value">
-            {{ vehicle.congestionLevel }}
-        </p>
+        <div class="vehicle-info">
+            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+                <use xlink:href='./assets/icons/occupancy.svg#occupancy' href="./assets/icons/occupancy.svg#occupancy"></use>
+            </svg>
+            <div>
+                <p class="vehicle-info-title">         
+                    Achalandage
+                </p>
+                <p class="vehicle-info-value">
+                    {{ vehicle.occupancyStatus }}
+                </p>
+            </div>
+        </div>
 
-        <p class="vehicle-info-title">         
-           Relation avec l'horaire
-        </p>
-        <p class="vehicle-info-value">
-            {{ vehicle.trip?.scheduleRelationship }}
-        </p>
+        <div class="vehicle-info">
+            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+                <use xlink:href='./assets/icons/stop.svg#stop' href="./assets/icons/stop.svg#stop"></use>
+            </svg>
+            <div>
+                <p class="vehicle-info-title">         
+                    Statut du trajet
+                </p>
+                <p class="vehicle-info-value">
+                    {{ vehicle.currentStatus }}
+                </p>
+            </div>
+        </div>
+
+        <div class="vehicle-info">
+            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+                <use xlink:href='./assets/icons/schedule.svg#schedule' href="./assets/icons/schedule.svg#schedule"></use>
+            </svg>
+            <div>
+                <p class="vehicle-info-title">         
+                    Relation avec l'horaire
+                </p>
+                <p class="vehicle-info-value">
+                    {{ vehicle.trip?.scheduleRelationship }}
+                </p>
+            </div>
+        </div>
+
+        <div class="vehicle-info">
+            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+                <use xlink:href='./assets/icons/traffic.svg#traffic' href="./assets/icons/traffic.svg#traffic"></use>
+            </svg>
+            <div>
+                <p class="vehicle-info-title">         
+                    Niveau de congestion
+                </p>
+                <p class="vehicle-info-value">
+                    {{ vehicle.congestionLevel }}
+                </p>
+            </div>
+        </div>
     </div>
 </div>

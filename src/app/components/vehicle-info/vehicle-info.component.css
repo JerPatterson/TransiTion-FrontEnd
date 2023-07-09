@@ -26,7 +26,7 @@
 .vehicle-header > svg {
     max-width: 10vh;
     max-height: 10vh;
-    margin-right: 0.8vw;
+    margin-right: 2vh;
 }
 
 .vehicle-identifier {
@@ -41,6 +41,19 @@
     margin: 0px;
 }
 
+.vehicle-info {
+    display: flex;
+    flex-direction: row;
+    margin: 1.5vh;
+    min-height: 6vh;
+}
+
+.vehicle-info > svg {
+    margin-right: 3vh;
+    max-width: 5vh;
+    max-height: 5vh;
+}
+
 .vehicle-info-title {
     margin: 0px;
     font-size: 2vh;
@@ -49,7 +62,6 @@
 }
 
 .vehicle-info-value {
-    margin-top: 0px;
-    margin-bottom: 1vh;
+    margin: 0px;
     font-size: 2.5vh;
 }
