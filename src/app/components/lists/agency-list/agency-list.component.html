@@ -3,7 +3,7 @@
         class="agency-element"
         *ngFor="let agency of this.agencies" 
         [agency]="agency"
-        [selected]="this.selections.has(agency.agency_id)"
+        [selected]="this.agencyIds.has(agency.agency_id)"
         (click)="onAgencyClick(agency.agency_id)">
     </app-agency>
 </div>

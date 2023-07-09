@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.css']
 })
-export class MainPageComponent {
+export class MainPageComponent implements AfterContentChecked {
     tripId: string = '';
 
-    agenciesSelected: string[] = [];
+    agencyIdsSelected: string[] = [];
     mergeAgenciesOption: boolean = false;
     selectAllAgenciesOption: boolean = false;
 
@@ -20,13 +20,27 @@ export class MainPageComponent {
     stopListSelected: boolean = false;
     vehicleListSelected: boolean = false;
 
-    addAgency(agencyId: string) {
-        this.agenciesSelected = this.agenciesSelected.concat([agencyId]);
+    constructor(private cdref: ChangeDetectorRef) {}
+
+    ngAfterContentChecked() {
+        this.cdref.detectChanges();
     }
 
-    removeAgency(agencyId: string) {
-        this.agenciesSelected = this.agenciesSelected
-            .filter((value) => value !== agencyId)
+    addAgencyIds(agencyIds: string[]) {
+        this.agencyIdsSelected = this.agencyIdsSelected.concat(agencyIds);
+    }
+
+    removeAgencyIds(agencyIds: string[]) {
+        this.agencyIdsSelected = this.agencyIdsSelected
+            .filter((value) => !agencyIds.includes(value));
+    }
+
+    changeMergeAgencies() {
+        this.mergeAgenciesOption = !this.mergeAgenciesOption;
+    }
+
+    changeSelectAllAgencies() {
+        this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
     }
 
     changeMergeAgenciesOption() {

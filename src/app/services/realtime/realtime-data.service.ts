@@ -12,6 +12,12 @@ export class RealtimeDataService {
         return response.json();
     }
 
+    async getVehicleFromAgencyById(agencyId: string, vehicleId: string):
+        Promise<GtfsRealtimeBindings.transit_realtime.IVehiclePosition> {
+        const response = await fetch(`${SERVER_URL}/vehicles/${agencyId.toLowerCase()}/${vehicleId}`);
+        return response.json();
+    }
+
     async getVehiclesFromRoute(agencyId: string, routeId: string): 
         Promise<GtfsRealtimeBindings.transit_realtime.IVehiclePosition[]> {
         const response = await fetch(`${SERVER_URL}/vehicles/route/${agencyId.toLowerCase()}/${routeId}`);

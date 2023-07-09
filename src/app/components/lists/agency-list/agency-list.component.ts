@@ -9,41 +9,45 @@ import { AgencyDto } from '@app/utils/dtos';
 })
 export class AgencyListComponent implements OnInit {
     agencies: AgencyDto[] = [];
-    selections = new Set<string>();
+    agencyIds = new Set<string>();
 
-    @Input() currentSelections: string[] = [];
-    @Input() set selectAll(value: boolean) {
-        if (value)
+    @Input() selections: string[] = [];
+    @Input() set selectAll(option: boolean) {
+        const agencyIdsToEmit: string[] = [];
+        if (option) {
             this.agencies.forEach((agency) => {
-                if (this.selections.has(agency.agency_id)) return;
-                this.selections.add(agency.agency_id);
-                this.addAgencySelected.emit(agency.agency_id);
+                if (!this.agencyIds.has(agency.agency_id)) {
+                    this.agencyIds.add(agency.agency_id);
+                    agencyIdsToEmit.push(agency.agency_id);
+                }
             });
-        else
+            this.addAgencyIds.emit(agencyIdsToEmit);
+        } else {
             this.agencies.forEach((agency) => {
-                this.selections.delete(agency.agency_id);
-                this.removeAgencySelected.emit(agency.agency_id);
+                this.agencyIds.delete(agency.agency_id);
+                agencyIdsToEmit.push(agency.agency_id);
             });
-            
-    };
+            this.removeAgencyIds.emit(agencyIdsToEmit);
+        }
+    }
 
-    @Output() addAgencySelected = new EventEmitter<string>();
-    @Output() removeAgencySelected = new EventEmitter<string>();
+    @Output() addAgencyIds = new EventEmitter<string[]>();
+    @Output() removeAgencyIds = new EventEmitter<string[]>();
 
     constructor(private staticDataService: StaticDataService) {}
 
     ngOnInit() {
         this.setAgencies();
-        this.currentSelections.forEach((value) => this.selections.add(value));
+        this.selections.forEach((agencyId) => this.agencyIds.add(agencyId))
     }
 
     onAgencyClick(agencyId: string) {
-        if (this.selections.has(agencyId)) {
-            this.selections.delete(agencyId);
-            this.removeAgencySelected.emit(agencyId);
+        if (this.agencyIds.has(agencyId)) {
+            this.agencyIds.delete(agencyId);
+            this.removeAgencyIds.emit([agencyId]);
         } else {
-            this.selections.add(agencyId);
-            this.addAgencySelected.emit(agencyId);
+            this.agencyIds.add(agencyId);
+            this.addAgencyIds.emit([agencyId]);
         }
     }
  

@@ -13,6 +13,7 @@ import { RouteComponent } from './components/elements/route/route.component';
 import { StopComponent } from './components/elements/stop/stop.component';
 import { AgencyComponent } from './components/elements/agency/agency.component';
 import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
+import { VehicleInfoComponent } from './components/vehicle-info/vehicle-info.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
     StopComponent,
     AgencyComponent,
     ToolbarComponent,
+    VehicleInfoComponent,
   ],
   imports: [
     AppRoutingModule,
