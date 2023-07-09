@@ -28,8 +28,7 @@
             
             </p>
             <p class="vehicle-last-update">
-                Il y a {{ this.lastSeen }} sec.
-            
+                Il y a {{ this.lastSeenString }}
             </p>
         </div>
     </div>
@@ -37,7 +36,9 @@
     <hr>
 
     <div class="vehicle-info-container">
-        <div class="vehicle-info">
+        <div
+            class="vehicle-info"
+            *ngIf="this.speedKmHrString">
             <svg [ngStyle]="{color: this.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/speed.svg#speed' href="./assets/icons/speed.svg#speed"></use>
             </svg>
@@ -46,7 +47,7 @@
                     Vitesse
                 </p>
                 <p class="vehicle-info-value">
-                    {{ vehicle.position?.speed }}
+                    {{ this.speedKmHrString }}
                 </p>
             </div>
         </div>
@@ -65,7 +66,9 @@
             </div>
         </div>
 
-        <div class="vehicle-info">
+        <div
+            class="vehicle-info"
+            *ngIf="this.occupancyString">
             <svg [ngStyle]="{color: this.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/occupancy.svg#occupancy' href="./assets/icons/occupancy.svg#occupancy"></use>
             </svg>
@@ -74,7 +77,7 @@
                     Achalandage
                 </p>
                 <p class="vehicle-info-value">
-                    {{ vehicle.occupancyStatus }}
+                    {{ this.occupancyString }}
                 </p>
             </div>
         </div>
