@@ -1,7 +1,7 @@
 import { OnChanges, Component, Input, OnDestroy } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { METERS_IN_KM, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS, SECONDS_IN_HOUR } from '@app/utils/constants';
-import { RouteDto } from '@app/utils/dtos';
+import { RouteDto, TripDto } from '@app/utils/dtos';
 import { RouteType } from '@app/utils/enums';
 import { AGENCY_TO_STYLE, AgencyStyle } from '@app/utils/styles';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
@@ -14,6 +14,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 })
 export class VehicleInfoComponent implements OnChanges, OnDestroy {
     route: RouteDto | undefined;
+    trip: TripDto | undefined;
     style: AgencyStyle | undefined;
 
     iconLink: string = '';
@@ -47,10 +48,15 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
 
     private async setVehicleInfoValues() {
         this.agencyId = this.agencyId.toLowerCase();
-        if (this.vehicle.trip?.routeId) {
-            this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip?.routeId);
+        if (this.vehicle.trip?.routeId && this.vehicle.trip?.tripId) {
+            this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip.routeId);
+            this.trip = await this.stDataService.getTrip( // TODO Stl...
+                this.agencyId, this.agencyId === 'stl' ? 
+                'JUIN23' + this.vehicle.trip.tripId : 
+                this.vehicle.trip.tripId);
         } else {
             this.route = undefined;
+            this.trip = undefined;
         }
         this.style = AGENCY_TO_STYLE.get(this.agencyId);
         this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);

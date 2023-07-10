@@ -29,11 +29,27 @@
         <div 
             class="route-identifier"
             [ngStyle]="{'color': '#' + route.route_text_color }">
-            {{ route.route_short_name }} · {{ route.agency_id }}
+            {{ route.route_short_name }} · {{ route.agency_id.toUpperCase() }}
         </div>
-        <div 
+        <div
+            *ngIf="this.trip"
             class="route-name"
             [ngStyle]="{'color': '#' + route.route_text_color }">
-            {{ route.route_long_name }}
+            <svg
+                class="direction-icon"
+                [ngStyle]="{'color': '#' + route.route_text_color}">
+                <use xlink:href='./assets/icons/arrow.svg#arrow' href="./assets/icons/arrow.svg#arrow"></use>
+            </svg>
+            <span class="direction-name">
+                {{ trip.trip_headsign }}
+            </span>
+        </div>
+
+        <div
+            *ngIf="!this.trip"
+            [ngStyle]="{'color': '#' + route.route_text_color }">
+            <span class="route-name">
+                {{ route.route_long_name }}
+            </span>
         </div>
 </div>

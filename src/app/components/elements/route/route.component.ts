@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { RouteDto } from '@app/utils/dtos';
+import { RouteDto, TripDto } from '@app/utils/dtos';
 
 @Component({
     selector: 'app-route',
@@ -8,4 +8,5 @@ import { RouteDto } from '@app/utils/dtos';
 })
 export class RouteComponent {
     @Input() route!: RouteDto;
+    @Input() trip!: TripDto | undefined;
 }

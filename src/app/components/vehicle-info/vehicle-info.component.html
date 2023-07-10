@@ -34,6 +34,12 @@
     </div>
 
     <hr>
+    <app-route 
+        *ngIf="this.route"
+        [route]="this.route"
+        [trip]="this.trip">
+    </app-route>
+    <hr *ngIf="this.route">
 
     <div class="vehicle-info-container">
         <div
