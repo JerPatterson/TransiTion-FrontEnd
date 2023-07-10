@@ -14,6 +14,8 @@ import {
     FIRST_CLUSTER_MAX_CHILD_COUT,
     FOURTH_CLUSTER_ALPHA,
     MAX_ZOOM,
+    ONE_MINUTE_IN_SEC,
+    ONE_SEC_IN_MS,
     SECOND_CLUSTER_ALPHA,
     SECOND_CLUSTER_MAX_CHILD_COUT,
     THIRD_CLUSTER_ALPHA,
@@ -102,13 +104,14 @@ export class VehicleMarkerService {
         ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker([vehicle.position.latitude, vehicle.position.longitude], {
-            icon: await this.buildVehicleIcon(agencyId, vehicle.trip?.routeId),
+            icon: await this.buildVehicleIcon(agencyId, vehicle.trip?.routeId, vehicle.timestamp as number),
         });
         return marker.addEventListener('click', () => emitVehicleSelected(agencyId, vehicle));
     }
 
-    private async buildVehicleIcon(agencyId: string, routeId?: string | null): Promise<L.DivIcon> {
+    private async buildVehicleIcon(agencyId: string, routeId?: string | null, timestamp?: number | null): Promise<L.DivIcon> {
         const route = routeId ? await this.stDataService.getRouteById(agencyId, routeId) : undefined;
+        const wasSeenLongAgo = this.wasSeenLongAgo(timestamp);
         const iconLink = this.getIconLinkFromRouteType(route?.route_type);
         const backgroundColor = AGENCY_TO_STYLE.get(agencyId.toLowerCase())?.backgroundColor;
         const vehicleIconColor = AGENCY_TO_STYLE.get(agencyId.toLowerCase())?.vehicleIconColor;
@@ -120,7 +123,8 @@ export class VehicleMarkerService {
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
                     viewBox="0 0 50 50"
-                    style="color: ${vehicleIconColor}">
+                    style="color: ${
+                        wasSeenLongAgo ? '#c1cacf' : vehicleIconColor};">
                     <defs>
                         <filter id="blur">
                             <feDropShadow dx="0" dy="0" stdDeviation="3.0"
@@ -132,7 +136,8 @@ export class VehicleMarkerService {
                         </mask>
                     </defs>
                     <circle cx="25" cy="25" r="20" style="mask: url(#circle-mask); filter: url(#blur)"/>
-                    <circle cx="25" cy="25" r="20" fill="${backgroundColor ? backgroundColor : '#ffffff'}"/>
+                    <circle cx="25" cy="25" r="20" fill="${backgroundColor ? 
+                        (wasSeenLongAgo ? '#939b9f' : backgroundColor) : '#ffffff'}"/>
                     <use
                         height="32" y="7"
                         xlink:href="${iconLink}"
@@ -142,6 +147,11 @@ export class VehicleMarkerService {
             iconAnchor: [25, 25],
             popupAnchor: [0, -25],
           });     
+    }
+
+    private wasSeenLongAgo(timestamp?: number | null) {
+        if (!timestamp) return true;
+        return (Date.now() / ONE_SEC_IN_MS - timestamp) > 3 * ONE_MINUTE_IN_SEC;
     }
 
     private getIconLinkFromRouteType(type?: RouteType | null): string {
