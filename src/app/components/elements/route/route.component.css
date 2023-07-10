@@ -5,13 +5,31 @@
 
 .route-container:hover {
     cursor: pointer;
+    background-color: #dbe2e6 !important;
+}
+
+.route-container.selected {
+    background-color: #c1cacf !important;
 }
 
 .route-info {
-    padding: 2% 0%;
+    padding: 1.2vh 0%;
+}
+
+.route-info-with-trip {
+    padding: 2vh 0%;
 }
 
 .route-identifier {
+    font-size: 4vh;
+    font-weight: bolder;
+    margin: 0px;
+    padding: 0.5vh 1.5vh;
+    line-height: 80%;
+    border-radius: 4px;
+}
+
+.route-with-trip-identifier {
     font-size: 4vh;
     font-weight: bolder;
     margin: 0px;
@@ -20,20 +38,23 @@
 }
 
 .route-name {
-    font-size: 2vh;
-    font-weight: 700;
+    font-size: 2.2vh;
     margin: 0px;
+    margin-top: 1.8vh;
+    margin-left: 1vh;
     padding: 0px;
 }
 
 .direction-name {
     position: relative;
     top: -0.8vh;
+    font-size: 2vh;
 }
 
 .route-type {
     margin: 0px;
-    padding: 1.5vh;
+    padding-left: 1.5vh;
+    padding-right: 1.5vh;
     align-items: center;
 }
 

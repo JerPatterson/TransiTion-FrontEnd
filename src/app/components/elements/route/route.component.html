@@ -1,39 +1,52 @@
 <div 
     class="route-container"
-    [ngStyle]="{'background-color': '#' + route.route_color }">
+    [ngStyle]="{'background-color': this.trip ? '#' + route.route_color : 'transparent'}">
 
-    <div class="route-type">
+    <div
+        class="route-type"
+        [ngStyle]="{'padding': this.trip ? '2vh' : '0.5vh'}">
         <svg
             class="route-type-icon"
             *ngIf="route.route_type === 1"
-            [ngStyle]="{'color': '#' + route.route_text_color}">
+            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
             <use xlink:href='./assets/icons/subway.svg#subway' href="./assets/icons/subway.svg#subway"></use>
         </svg>
 
         <svg
             class="route-type-icon"
             *ngIf="route.route_type === 2"
-            [ngStyle]="{'color': '#' + route.route_text_color}">
+            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
             <use xlink:href='./assets/icons/train.svg#train' href="./assets/icons/train.svg#train"></use>
         </svg>
 
         <svg
             class="route-type-icon"
             *ngIf="route.route_type === 3"
-            [ngStyle]="{'color': '#' + route.route_text_color}">
+            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
             <use xlink:href='./assets/icons/bus.svg#bus' href="./assets/icons/bus.svg#bus"></use>
         </svg>
     </div>
 
-    <div class="route-info">
+    <div [ngClass]="this.trip ? 'route-info-with-trip' : 'route-info'">
         <div 
             class="route-identifier"
+            *ngIf="!this.trip"
+            [ngStyle]="{
+                'color': '#' + route.route_text_color,
+                'background-color': '#' + route.route_color,
+            }">
+            {{ route.route_short_name }}
+        </div>
+
+        <div 
+            class="route-with-trip-identifier"
+            *ngIf="this.trip"
             [ngStyle]="{'color': '#' + route.route_text_color }">
             {{ route.route_short_name }} · {{ route.agency_id.toUpperCase() }}
         </div>
+
         <div
             *ngIf="this.trip"
-            class="route-name"
             [ngStyle]="{'color': '#' + route.route_text_color }">
             <svg
                 class="direction-icon"
@@ -44,12 +57,13 @@
                 {{ trip.trip_headsign }}
             </span>
         </div>
+    </div>
 
-        <div
-            *ngIf="!this.trip"
-            [ngStyle]="{'color': '#' + route.route_text_color }">
-            <span class="route-name">
-                {{ route.route_long_name }}
-            </span>
-        </div>
+    <div
+        class="route-name"
+        *ngIf="!this.trip">
+        <span>
+            {{ route.route_long_name }}
+        </span>
+    </div>
 </div>

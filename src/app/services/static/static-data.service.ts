@@ -17,6 +17,10 @@ export class StaticDataService {
         return agencies;
     }
 
+    async getAgencyById(agencyId: string): Promise<AgencyDto | undefined> {
+        return (await this.getAgencies()).find((agency) => agency.agency_id === agencyId);
+    }
+
     async getRoutes(agencyId: string): Promise<RouteDto[]> {
         const ssRoutes = sessionStorage.getItem(`routes/${agencyId}`);
         if (ssRoutes) return JSON.parse(ssRoutes);

@@ -2,12 +2,31 @@
     position: relative;
     z-index: 1;
     max-width: 32vw;
-    max-height: 50vh;
+    max-height: 48vh;
     overflow-y: scroll;
     margin: 0px;
     padding: 0px;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 }
 
 .route-list::-webkit-scrollbar {
     width: 0px;
+}
+
+.agency-name {
+    margin-left: 1vh;
+    margin-bottom: 1vh;
+}
+
+.information-icon {
+    max-width: 5vh;
+    max-height: 5vh;
+    margin: 0px 1.5vh;
+}
+
+.information-text {
+    position: relative;
+    top: -1vh;
+    font-size: 3vh;
 }

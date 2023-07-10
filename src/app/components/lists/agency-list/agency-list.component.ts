@@ -38,7 +38,7 @@ export class AgencyListComponent implements OnInit {
 
     ngOnInit() {
         this.setAgencies();
-        this.selections.forEach((agencyId) => this.agencyIds.add(agencyId))
+        this.selections.forEach((agencyId) => this.agencyIds.add(agencyId));
     }
 
     onAgencyClick(agencyId: string) {

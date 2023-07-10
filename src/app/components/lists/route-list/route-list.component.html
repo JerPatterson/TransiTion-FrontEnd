@@ -1,8 +1,24 @@
 <div class="route-list">
-    <app-route 
-        class="route-element"
-        *ngFor="let route of this.routes" 
-        [route]="route"
-        (click)="onClick(route.route_id)">
-    </app-route>
+    <div *ngIf="!this.elements.length">
+        <svg class="information-icon">
+            <use xlink:href='./assets/icons/information.svg#information' href="./assets/icons/information.svg#information"></use>
+        </svg>
+        <span class="information-text">Il faut d'abord sélectionner une agence...</span>
+    </div>
+
+    <div
+        class="agency-route-list"
+        *ngFor="let element of this.elements">
+        <h3 class="agency-name">
+            {{ element.agency ? 
+                element.agency.agency_name : element.routes[0].agency_id.toUpperCase() }}
+        </h3>
+        <hr>
+        <app-route 
+            class="route-element"
+            *ngFor="let route of element.routes" 
+            [route]="route"
+            (click)="this.onRouteClick(route.agency_id, route.route_id)">
+        </app-route>
+    </div>
 </div>

@@ -11,6 +11,8 @@ export class MainPageComponent implements AfterContentChecked {
     mergeAgenciesOption: boolean = false;
     selectAllAgenciesOption: boolean = false;
 
+    routeIdsSelected: string[] = [];
+
     vehicleSelected!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined;
     vehicleSelectedAgencyId: string = ''; 
 
@@ -27,7 +29,7 @@ export class MainPageComponent implements AfterContentChecked {
 
     selectAgencyList(value: boolean) {
         this.agencyListSelected = value;
-        if (value) this.vehicleSelected = undefined;
+        this.vehicleSelected = undefined;
     }
 
     addAgencyIds(agencyIds: string[]) {
@@ -53,6 +55,20 @@ export class MainPageComponent implements AfterContentChecked {
 
     changeSelectAllAgenciesOption() {
         this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
+    }
+
+    selectRouteList(value: boolean) {
+        this.routeListSelected = value;
+        this.vehicleSelected = undefined;
+    }
+
+    addRouteId(routeId: string) {
+        this.routeIdsSelected.push(routeId);
+    }
+
+    removeRouteId(routeId: string) {
+        this.routeIdsSelected = this.routeIdsSelected
+            .filter((value) => value === routeId);
     }
 
     addVehicleSlected(vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) {

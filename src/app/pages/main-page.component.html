@@ -21,7 +21,11 @@
     </app-agency-list>
 
     <app-route-list
-        *ngIf="this.routeListSelected && !this.vehicleSelected">
+        *ngIf="this.routeListSelected && !this.vehicleSelected"
+        [agencyIds]="this.agencyIdsSelected"
+        [selections]="this.routeIdsSelected"
+        (addRouteId)="this.addRouteId($event)"
+        (removeRouteId)="this.removeRouteId($event)">
     </app-route-list>
 
     <app-stop-list
