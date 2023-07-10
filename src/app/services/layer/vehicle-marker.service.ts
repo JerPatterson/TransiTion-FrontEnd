@@ -70,7 +70,7 @@ export class VehicleMarkerService {
         : Promise<L.MarkerClusterGroup> {
         return L.markerClusterGroup({
             chunkedLoading: true,
-            disableClusteringAtZoom: clusteringMaxZoom ? DISABLE_CLUSTER_ZOOM : MAX_ZOOM,
+            disableClusteringAtZoom: clusteringMaxZoom ? DISABLE_CLUSTER_ZOOM : MAX_ZOOM + 1,
             iconCreateFunction: (cluster) => {
                 let alpha = FOURTH_CLUSTER_ALPHA;
                 const childCount = cluster.getChildCount();
