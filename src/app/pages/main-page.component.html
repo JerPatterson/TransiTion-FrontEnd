@@ -35,7 +35,7 @@
 
 <div
     class="option-container"
-    *ngIf="this.agencyListSelected">
+    *ngIf="this.agencyListSelected || this.routeListSelected">
     <button
         *ngIf="this.agencyListSelected && !this.vehicleSelected"
         [ngClass]="this.selectAllAgenciesOption ? 'selected' : ''"
@@ -62,11 +62,25 @@
             Fusionner les repères
         </span>
     </button>
+    <button
+        *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
+        [ngClass]="this.oldVehiclesOption ? 'selected' : ''"
+        (click)="this.changeOldVehiclesOption()">
+        <svg class="option-icon">
+            <use xlink:href='./assets/icons/clock.svg#clock' href="./assets/icons/clock.svg#clock"></use>
+        </svg>
+        <span 
+            class="option-name"
+            *ngIf="!this.oldVehiclesOption">
+            Afficher les véhicules inactifs
+        </span>
+    </button>
 </div>
 
 <app-map 
     [agencies]="this.agencyIdsSelected"
     [mergeAgencies]="this.mergeAgenciesOption"
+    [showOldVehicles]="this.oldVehiclesOption"
     (newVehicleSelected)="this.addVehicleSlected($event)"
     (newVehicleSelectedAgencyId)="this.addVehicleSlectedAgencyId($event)">
 </app-map>

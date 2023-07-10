@@ -33,18 +33,20 @@ export class VehicleMarkerService {
 
     async createVehiclesLayer(
         agencyIds: string[],
-        clusteringMaxZoom: boolean,
+        clusteringAtMaxZoom: boolean,
+        showOldVehicles: boolean,
         emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
     ) : Promise<L.MarkerClusterGroup> {
         let color: string | undefined;
         if (agencyIds.length === 1)
             color = AGENCY_TO_STYLE.get(agencyIds[0].toLowerCase())?.backgroundColor;
         const clusterGroup = await this.buildVehicleMarkerClusterGroup(
-            color ? color : DEFAULT_COLOR, clusteringMaxZoom
+            color ? color : DEFAULT_COLOR, clusteringAtMaxZoom
         );
         
         agencyIds.map(async (agencyId) => {
             (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
+                if (!showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
                 const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle, emitVehicleSelected);
                 if (vehicleMarker) clusterGroup.addLayer(vehicleMarker);
             });
@@ -56,11 +58,13 @@ export class VehicleMarkerService {
     async createVehiclesLayerFromRoute(
         agencyId: string,
         routeId: string, 
-        clusteringMaxZoom: boolean,
+        clusteringAtMaxZoom: boolean,
+        showOldVehicles: boolean,
         emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
     ) : Promise<L.MarkerClusterGroup> {
-        const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId, clusteringMaxZoom);
+        const vehicleMarkers = await this.buildVehicleMarkerClusterGroup(agencyId, clusteringAtMaxZoom);
         (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
+            if (!showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
             const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle, emitVehicleSelected);
             if (vehicleMarker) vehicleMarkers.addLayer(vehicleMarker);
         });
@@ -68,11 +72,11 @@ export class VehicleMarkerService {
         return vehicleMarkers;
     }
 
-    private async buildVehicleMarkerClusterGroup(color: string, clusteringMaxZoom: boolean)
+    private async buildVehicleMarkerClusterGroup(color: string, clusteringAtMaxZoom: boolean)
         : Promise<L.MarkerClusterGroup> {
         return L.markerClusterGroup({
             chunkedLoading: true,
-            disableClusteringAtZoom: clusteringMaxZoom ? DISABLE_CLUSTER_ZOOM : MAX_ZOOM + 1,
+            disableClusteringAtZoom: clusteringAtMaxZoom ? MAX_ZOOM + 1 : DISABLE_CLUSTER_ZOOM,
             iconCreateFunction: (cluster) => {
                 let alpha = FOURTH_CLUSTER_ALPHA;
                 const childCount = cluster.getChildCount();

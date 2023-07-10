@@ -15,6 +15,7 @@ export class MainPageComponent implements AfterContentChecked {
 
     vehicleSelected!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined;
     vehicleSelectedAgencyId: string = ''; 
+    oldVehiclesOption: boolean = false;
 
     agencyListSelected: boolean = false;
     routeListSelected: boolean = false;
@@ -77,5 +78,9 @@ export class MainPageComponent implements AfterContentChecked {
 
     addVehicleSlectedAgencyId(agencyId: string) {
         this.vehicleSelectedAgencyId = agencyId;
+    }
+
+    changeOldVehiclesOption() {
+        this.oldVehiclesOption = !this.oldVehiclesOption;
     }
 }

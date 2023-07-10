@@ -13,6 +13,7 @@ export class MapComponent implements OnInit {
 
     private currentAgencies: string[] = [];
     private mergeAgenciesOption: boolean = false;
+    private oldVehiclesOption: boolean = false;
 
     @Input() lat: number = 45.6;
     @Input() lon: number = -73.75;
@@ -22,6 +23,11 @@ export class MapComponent implements OnInit {
         this.mergeAgenciesOption = value;
         this.addAllVehicleMarkers();
     };
+
+    @Input() set showOldVehicles(value: boolean) {
+        this.oldVehiclesOption = value;
+        this.addAllVehicleMarkers();
+    }
 
     @Input() set agencies(value: string[]) {
         this.currentAgencies = value;
@@ -90,7 +96,8 @@ export class MapComponent implements OnInit {
         if (this.mergeAgenciesOption) {
             const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
                 this.currentAgencies,
-                !this.mergeAgenciesOption,
+                this.mergeAgenciesOption,
+                this.oldVehiclesOption,
                 emitVehicleSelected,
             );
             this.vehicleLayers.push(vehiclesLayer);
@@ -99,7 +106,8 @@ export class MapComponent implements OnInit {
             this.currentAgencies.forEach(async (agencyId) => {
                 const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
                     [agencyId],
-                    !this.mergeAgenciesOption,
+                    this.mergeAgenciesOption,
+                    this.oldVehiclesOption,
                     emitVehicleSelected,
                 );
                 this.vehicleLayers.push(vehiclesLayer);
