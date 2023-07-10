@@ -1,5 +1,6 @@
 <div 
     class="route-container"
+    [ngClass]="!this.trip ? 'clickable' : ''"
     [ngStyle]="{'background-color': this.trip ? '#' + route.route_color : 'transparent'}">
 
     <div

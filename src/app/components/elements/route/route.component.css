@@ -3,12 +3,12 @@
     flex-direction: row;
 }
 
-.route-container:hover {
+.route-container.clickable:hover {
     cursor: pointer;
     background-color: #dbe2e6 !important;
 }
 
-.route-container.selected {
+.route-container.clickable.selected {
     background-color: #c1cacf !important;
 }
 
