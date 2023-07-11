@@ -67,7 +67,7 @@ export class MainPageComponent implements AfterContentChecked {
     }
 
     addRouteId(routeId: string) {
-        this.routeIdsSelected.push(routeId);
+        this.routeIdsSelected = this.routeIdsSelected.concat([routeId]);
     }
 
     removeRouteId(routeId: string) {

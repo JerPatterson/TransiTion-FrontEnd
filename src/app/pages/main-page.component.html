@@ -79,6 +79,7 @@
 
 <app-map 
     [agencies]="this.agencyIdsSelected"
+    [routes]="this.routeIdsSelected"
     [mergeAgencies]="this.mergeAgenciesOption"
     [showOldVehicles]="this.oldVehiclesOption"
     (newVehicleSelected)="this.addVehicleSlected($event)"
