@@ -2,7 +2,11 @@
     (agencyListClick)="this.selectAgencyList($event)"
     (routeListClick)="this.routeListSelected = $event"
     (stopListClick)="this.stopListSelected = $event"
-    (vehicleListClick)="this.vehicleListSelected = $event">
+    (vehicleListClick)="this.vehicleListSelected = $event"
+    [agencyListSelected]="this.agencyListSelected"
+    [routeListSelected]="this.routeListSelected"
+    [stopListSelected]="this.stopListSelected"
+    [vehicleListSelected]="this.vehicleListSelected">
 </app-toolbar>
 
 <div class="list-container">

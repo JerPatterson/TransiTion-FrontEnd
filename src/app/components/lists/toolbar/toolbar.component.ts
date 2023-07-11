@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
     selector: 'app-toolbar',
@@ -6,15 +6,15 @@ import { Component, EventEmitter, Output } from '@angular/core';
     styleUrls: ['./toolbar.component.css']
 })
 export class ToolbarComponent {
+    @Input() agencyListSelected: boolean = false;
+    @Input() routeListSelected: boolean = false;
+    @Input() stopListSelected: boolean = false;
+    @Input() vehicleListSelected: boolean = false;
+
     @Output() agencyListClick = new EventEmitter<boolean>();
     @Output() routeListClick = new EventEmitter<boolean>();
     @Output() stopListClick = new EventEmitter<boolean>();
     @Output() vehicleListClick = new EventEmitter<boolean>();
-
-    agencyListSelected: boolean = false;
-    routeListSelected: boolean = false;
-    stopListSelected: boolean = false;
-    vehicleListSelected: boolean = false;
 
     handleAgencyListClick() {
         this.routeListSelected = false;

@@ -76,6 +76,10 @@ export class MainPageComponent implements AfterContentChecked {
     }
 
     addVehicleSlected(vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) {
+        this.agencyListSelected = false;
+        this.routeListSelected = false;
+        this.stopListSelected = false;
+        this.vehicleListSelected= false;
         this.vehicleSelected = vehicle;
     }
 
