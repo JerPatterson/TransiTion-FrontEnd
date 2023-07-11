@@ -14,7 +14,7 @@
             (click)="this.onAgencyClick(element.agency ? element.agency.agency_id : '')">
             <h3 class="agency-name">
                 {{ element.agency ? 
-                    element.agency.agency_name : element.routes[0].agency_id.toUpperCase() }}
+                    element.agency.agency_name : element.routes[0][0].agency_id.toUpperCase() }}
             </h3>
             <svg 
                 class="list-icon"
@@ -32,10 +32,10 @@
             <app-route 
                 class="route-element"
                 *ngFor="let route of element.routes" 
-                [route]="route"
+                [route]="route[0]"
                 [selected]="this.routeIds.has((element.agency ? 
-                    element.agency.agency_id.toLowerCase() : '') + '/' + route.route_id)"
-                (click)="this.onRouteClick(route.agency_id, route.route_id)">
+                    element.agency.agency_id.toLowerCase() : '') + '/' + route[0].route_id)"
+                (click)="this.onRouteClick(route[0].agency_id, route)">
             </app-route>
         </div>
     </div>
