@@ -3,6 +3,7 @@ import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
 import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
+import { TripShapeService } from '@app/services/layer/trip-shape.service';
 
 @Component({
     selector: 'app-map',
@@ -43,6 +44,7 @@ export class MapComponent implements OnInit {
 
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
+    private tripShapeLayers: L.LayerGroup[] = [];
 
     private currentAgencies: string[] = [];
     private currentRoutes: string[] = [];
@@ -55,10 +57,12 @@ export class MapComponent implements OnInit {
     ) => {
         this.newVehicleSelected.emit(vehicle);
         this.newVehicleSelectedAgencyId.emit(agencyId);
+        this.addTripShape(agencyId, vehicle.trip);
     };
 
     constructor(
         private vehicleMarkerService: VehicleMarkerService,
+        private tripShapeService: TripShapeService,
     ) {}
 
     ngOnInit(): void {
@@ -166,6 +170,24 @@ export class MapComponent implements OnInit {
                     routeIds.push(routeId);
                 }
             }
+        }
+    }
+
+    private async addTripShape(
+        agencyId: string, 
+        tripDescriptor?: GtfsRealtimeBindings.transit_realtime.ITripDescriptor | null
+    ): Promise<void> {
+        this.clearLayers(this.tripShapeLayers);
+        this.tripShapeLayers = [];
+
+        if (tripDescriptor?.tripId && tripDescriptor.routeId) {
+            const tripShape = await this.tripShapeService.createTripShapeLayer(
+                agencyId,
+                tripDescriptor.tripId,
+                tripDescriptor.routeId,
+            );
+            this.tripShapeLayers.push(tripShape);
+            this.map.addLayer(tripShape);
         }
     }
 }

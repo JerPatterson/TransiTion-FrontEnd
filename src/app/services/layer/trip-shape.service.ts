@@ -10,11 +10,12 @@ export class TripShapeService {
 
     constructor(private staticDataService: StaticDataService) {}
     
-    async createTripShapeLayer(agencyId: string, tripId: string, shapeColor: string): Promise<L.LayerGroup> {
+    async createTripShapeLayer(agencyId: string, tripId: string, routeId: string): Promise<L.LayerGroup> {
         const shapeLayer = L.layerGroup();
-        const shapeId = (await this.staticDataService.getTrip(agencyId, tripId)).shape_id;
+        const shapeId = (await this.staticDataService.getTrip(agencyId, agencyId.toLowerCase() === 'stl' ? 'JUIN23' + tripId : tripId)).shape_id;
+        const shapeColor = (await this.staticDataService.getRouteById(agencyId, routeId))?.route_color;
         const shapePts = await this.staticDataService.getShapeById(agencyId, shapeId);
-        return shapeLayer.addLayer(await this.buildTripShape(shapePts, shapeColor));
+        return shapeLayer.addLayer(await this.buildTripShape(shapePts, shapeColor ? '#' + shapeColor : 'black'));
     }
     
     async createSecondaryTripShapeLayer(agencyId: string, stopId: string, shapeColor: string): Promise<L.LayerGroup> {
