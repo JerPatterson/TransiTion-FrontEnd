@@ -9,18 +9,34 @@
     <div
         class="agency-route-list"
         *ngFor="let element of this.elements">
-        <h3 class="agency-name">
-            {{ element.agency ? 
-                element.agency.agency_name : element.routes[0].agency_id.toUpperCase() }}
-        </h3>
+        <div
+            class="agency-element"
+            (click)="this.onAgencyClick(element.agency ? element.agency.agency_id : '')">
+            <h3 class="agency-name">
+                {{ element.agency ? 
+                    element.agency.agency_name : element.routes[0].agency_id.toUpperCase() }}
+            </h3>
+            <svg 
+                class="list-icon"
+                *ngIf="element.agency && this.hideAgencies.has(element.agency.agency_id)">
+                <use xlink:href='./assets/icons/show.svg#show' href="./assets/icons/show.svg#show"></use>
+            </svg>
+            <svg
+                class="list-icon"
+                *ngIf="element.agency && !this.hideAgencies.has(element.agency.agency_id)">
+                <use xlink:href='./assets/icons/hide.svg#hide' href="./assets/icons/hide.svg#hide"></use>
+            </svg>
+        </div>
         <hr>
-        <app-route 
-            class="route-element"
-            *ngFor="let route of element.routes" 
-            [route]="route"
-            [selected]="this.routeIds.has((element.agency ? 
-                element.agency.agency_id.toLowerCase() : '') + '/' + route.route_id)"
-            (click)="this.onRouteClick(route.agency_id, route.route_id)">
-        </app-route>
+        <div *ngIf="element.agency && !this.hideAgencies.has(element.agency.agency_id)">
+            <app-route 
+                class="route-element"
+                *ngFor="let route of element.routes" 
+                [route]="route"
+                [selected]="this.routeIds.has((element.agency ? 
+                    element.agency.agency_id.toLowerCase() : '') + '/' + route.route_id)"
+                (click)="this.onRouteClick(route.agency_id, route.route_id)">
+            </app-route>
+        </div>
     </div>
 </div>

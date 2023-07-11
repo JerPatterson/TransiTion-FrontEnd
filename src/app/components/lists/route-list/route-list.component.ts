@@ -10,6 +10,7 @@ import { RouteListType } from '@app/utils/component-interface';
 export class RouteListComponent implements OnInit {    
     elements: RouteListType[] = [];
     routeIds = new Set<string>();
+    hideAgencies = new Set<string>();
 
     @Input() agencyIds: string[] = [];
     @Input() selections: string[] = [];
@@ -22,6 +23,14 @@ export class RouteListComponent implements OnInit {
     ngOnInit() {
         this.setRoutes();
         this.selections.forEach((routeId) => this.routeIds.add(routeId));
+    }
+
+    onAgencyClick(agencyId: string) {
+        if (this.hideAgencies.has(agencyId)) {
+            this.hideAgencies.delete(agencyId);
+        } else {
+            this.hideAgencies.add(agencyId);
+        }
     }
 
     onRouteClick(agencyId: string, routeId: string) {

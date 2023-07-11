@@ -34,7 +34,8 @@ export class MapComponent implements OnInit {
 
     @Input() set routes(value: string[]) {
         this.currentRoutes = value;
-        this.addAllVehicleMarkersFromRoutes();
+        if (!this.currentRoutes.length) this.addAllVehicleMarkers();
+        else this.addAllVehicleMarkersFromRoutes();
     };
 
     @Output() newVehicleSelected = new EventEmitter<GtfsRealtimeBindings.transit_realtime.IVehiclePosition>();
