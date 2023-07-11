@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
-import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
+import { MAX_ZOOM, MIN_ZOOM, PARAM_SEPARATOR } from '@app/utils/constants';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 
@@ -17,26 +17,26 @@ export class MapComponent implements OnInit {
 
     @Input() set mergeAgencies(value: boolean) {
         this.mergeAgenciesOption = value;
-        if (!this.currentRoutes.length) this.addAllVehicleMarkers();
-        else this.addAllVehicleMarkersFromRoutes();
+        if (!this.currentRoutes.length) this.addAllVehicles();
+        else this.addAllVehiclesFromRoutes();
     };
 
     @Input() set showOldVehicles(value: boolean) {
         this.oldVehiclesOption = value;
-        if (!this.currentRoutes.length) this.addAllVehicleMarkers();
-        else this.addAllVehicleMarkersFromRoutes();
+        if (!this.currentRoutes.length) this.addAllVehicles();
+        else this.addAllVehiclesFromRoutes();
     }
 
     @Input() set agencies(value: string[]) {
         this.currentAgencies = value;
-        if (!this.currentRoutes.length) this.addAllVehicleMarkers();
-        else this.addAllVehicleMarkersFromRoutes();
+        if (!this.currentRoutes.length) this.addAllVehicles();
+        else this.addAllVehiclesFromRoutes();
     };
 
     @Input() set routes(value: string[]) {
         this.currentRoutes = value;
-        if (!this.currentRoutes.length) this.addAllVehicleMarkers();
-        else this.addAllVehicleMarkersFromRoutes();
+        if (!this.currentRoutes.length) this.addAllVehicles();
+        else this.addAllVehiclesFromRoutes();
     };
 
     @Output() newVehicleSelected = new EventEmitter<GtfsRealtimeBindings.transit_realtime.IVehiclePosition>();
@@ -92,85 +92,79 @@ export class MapComponent implements OnInit {
         }).addTo(this.map);
     }
 
-    private async clearLayers(layers: L.LayerGroup[]) {
+    private async clearVehicles(): Promise<void> {
+        await this.clearLayers(this.vehicleLayers);
+        this.vehicleLayers = [];
+    }
+
+    private async clearLayers(layers: L.LayerGroup[]): Promise<void> {
         layers.forEach((layer) => this.clearLayer(layer));
     }
 
-    private async clearLayer(layer: L.LayerGroup) {
+    private async clearLayer(layer: L.LayerGroup): Promise<void> {
         if (layer && this.map.hasLayer(layer)) {
             this.map.removeLayer(layer);
         }
     }
 
-    private async addAllVehicleMarkers(): Promise<void> {
-        await this.clearLayers(this.vehicleLayers);
-        this.vehicleLayers = [];
+    private async addAllVehicles(): Promise<void> {
+        await this.clearVehicles();
 
         if (this.mergeAgenciesOption) {
-            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
-                this.currentAgencies,
-                this.mergeAgenciesOption,
-                this.oldVehiclesOption,
-                this.emitVehicleSelected,
-            );
-            this.vehicleLayers.push(vehiclesLayer);
-            this.map.addLayer(vehiclesLayer);
+            await this.addAllVehiclesLayer(this.currentAgencies)
         } else {
             this.currentAgencies.forEach(async (agencyId) => {
-                const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
-                    [agencyId],
-                    this.mergeAgenciesOption,
-                    this.oldVehiclesOption,
-                    this.emitVehicleSelected,
-                );
-                this.vehicleLayers.push(vehiclesLayer);
-                this.map.addLayer(vehiclesLayer);
+                await this.addAllVehiclesLayer([agencyId]);
             });
         }
     }
 
-    private async addAllVehicleMarkersFromRoutes(): Promise<void> {
-        await this.clearLayers(this.vehicleLayers);
-        this.vehicleLayers = [];
+    private async addAllVehiclesLayer(agencyIds: string[]): Promise<void> {
+        const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
+            agencyIds,
+            this.mergeAgenciesOption,
+            this.oldVehiclesOption,
+            this.emitVehicleSelected,
+        );
+        this.vehicleLayers.push(vehiclesLayer);
+        this.map.addLayer(vehiclesLayer);
+    }
+
+    private async addAllVehiclesFromRoutes(): Promise<void> {
+        await this.clearVehicles();
+
+        if (!this.currentRoutes.length) return;
+        this.currentRoutes = this.currentRoutes
+            .sort((a, b) => a.localeCompare(b));
 
         if (this.mergeAgenciesOption) {
-            const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayerFromRoutes(
-                this.currentRoutes,
+            await this.addAllVehiclesFromRoutesLayer(this.currentRoutes);
+        } else {
+            let routes: string[] = [];
+            let currentAgencyId = this.currentRoutes[0].split(PARAM_SEPARATOR)[0];
+
+            for (let route of this.currentRoutes.concat([PARAM_SEPARATOR])) {
+                const agencyId = route.split(PARAM_SEPARATOR)[0];
+                if (agencyId !== currentAgencyId) {
+                    await this.addAllVehiclesFromRoutesLayer(routes);
+                    routes = [];
+                    currentAgencyId = agencyId;
+                }
+                routes.push(route);
+            }
+        }
+    }
+
+    private async addAllVehiclesFromRoutesLayer(routes: string[]): Promise<void> {
+        const vehiclesLayer = await this.vehicleMarkerService
+            .createVehiclesLayerFromRoutes(
+                routes,
                 this.mergeAgenciesOption,
                 this.oldVehiclesOption,
                 this.emitVehicleSelected,
             );
-            this.vehicleLayers.push(vehiclesLayer);
-            this.map.addLayer(vehiclesLayer);
-        } else {
-            this.currentRoutes = this.currentRoutes.sort((a, b) => a.localeCompare(b));
-
-            let routeIds: string[] = [];
-            let currentAgencyId = this.currentRoutes.length ? 
-                this.currentRoutes[0].split('/')[0] : '';
-
-            for (let value of this.currentRoutes.concat(['/'])) {
-                const agencyId = value.split('/')[0];
-                const routeId = value.split('/')[1];
-                if (agencyId !== currentAgencyId) {
-                    const vehiclesLayer = await this.vehicleMarkerService
-                        .createVehiclesLayerFromRouteOfUniqueAgency(
-                            currentAgencyId.toLowerCase(),
-                            routeIds,
-                            this.mergeAgenciesOption,
-                            this.oldVehiclesOption,
-                            this.emitVehicleSelected,
-                        );
-                    this.vehicleLayers.push(vehiclesLayer);
-                    this.map.addLayer(vehiclesLayer);
-                    routeIds = [];
-                    routeIds.push(routeId);
-                    currentAgencyId = agencyId;
-                } else {
-                    routeIds.push(routeId);
-                }
-            }
-        }
+        this.vehicleLayers.push(vehiclesLayer);
+        this.map.addLayer(vehiclesLayer);
     }
 
     private async addTripShape(
