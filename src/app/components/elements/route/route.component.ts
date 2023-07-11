@@ -9,4 +9,5 @@ import { RouteDto, TripDto } from '@app/utils/dtos';
 export class RouteComponent {
     @Input() route!: RouteDto;
     @Input() trip!: TripDto | undefined;
+    @Input() selected: boolean = false;
 }

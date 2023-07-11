@@ -18,6 +18,8 @@
             class="route-element"
             *ngFor="let route of element.routes" 
             [route]="route"
+            [selected]="this.routeIds.has((element.agency ? 
+                element.agency.agency_id.toLowerCase() : '') + '/' + route.route_id)"
             (click)="this.onRouteClick(route.agency_id, route.route_id)">
         </app-route>
     </div>

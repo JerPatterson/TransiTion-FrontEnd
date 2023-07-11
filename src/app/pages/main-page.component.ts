@@ -40,6 +40,9 @@ export class MainPageComponent implements AfterContentChecked {
     removeAgencyIds(agencyIds: string[]) {
         this.agencyIdsSelected = this.agencyIdsSelected
             .filter((value) => !agencyIds.includes(value));
+
+        this.routeIdsSelected = this.routeIdsSelected
+            .filter((value) => agencyIds.includes(value.split('/')[0]))
     }
 
     changeMergeAgencies() {
@@ -69,7 +72,7 @@ export class MainPageComponent implements AfterContentChecked {
 
     removeRouteId(routeId: string) {
         this.routeIdsSelected = this.routeIdsSelected
-            .filter((value) => value === routeId);
+            .filter((value) => value !== routeId);
     }
 
     addVehicleSlected(vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) {
