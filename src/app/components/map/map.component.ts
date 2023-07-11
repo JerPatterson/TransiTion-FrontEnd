@@ -28,7 +28,8 @@ export class MapComponent implements OnInit {
 
     @Input() set agencies(value: string[]) {
         this.currentAgencies = value;
-        this.addAllVehicleMarkers();
+        if (!this.currentRoutes.length) this.addAllVehicleMarkers();
+        else this.addAllVehicleMarkersFromRoutes();
     };
 
     @Input() set routes(value: string[]) {

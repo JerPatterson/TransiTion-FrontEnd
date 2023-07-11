@@ -42,7 +42,7 @@ export class MainPageComponent implements AfterContentChecked {
             .filter((value) => !agencyIds.includes(value));
 
         this.routeIdsSelected = this.routeIdsSelected
-            .filter((value) => agencyIds.includes(value.split('/')[0]))
+            .filter((value) => !agencyIds.includes(value.split('/')[0].toUpperCase()))
     }
 
     changeMergeAgencies() {

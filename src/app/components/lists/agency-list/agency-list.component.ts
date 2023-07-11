@@ -23,6 +23,7 @@ export class AgencyListComponent implements OnInit {
             });
             this.addAgencyIds.emit(agencyIdsToEmit);
         } else {
+            if (!this.agencies.length) return;
             this.agencies.forEach((agency) => {
                 this.agencyIds.delete(agency.agency_id);
                 agencyIdsToEmit.push(agency.agency_id);
