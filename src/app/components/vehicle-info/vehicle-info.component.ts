@@ -47,7 +47,6 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
     }
 
     private async setVehicleInfoValues() {
-        this.agencyId = this.agencyId.toLowerCase();
         if (this.vehicle.trip?.routeId && this.vehicle.trip?.tripId) {
             this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip.routeId);
             this.trip = await this.stDataService.getTrip( // TODO Stl...

@@ -25,7 +25,7 @@ export class TripShapeService {
 
         for (let route of routes) {
             const [agencyId, routeId] = route.split(PARAM_SEPARATOR);
-            const trips = await this.staticDataService.getTodayTripsFromRoute(agencyId.toLowerCase(), routeId);
+            const trips = await this.staticDataService.getTodayTripsFromRoute(agencyId, routeId);
 
             for (let trip of trips) {
                 if (!shapeIds.has(trip.shape_id)) {

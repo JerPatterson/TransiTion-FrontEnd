@@ -22,6 +22,7 @@ export class StaticDataService {
     }
 
     async getRoutes(agencyId: string): Promise<RouteDto[]> {
+        agencyId = agencyId.toLowerCase();
         const ssRoutes = sessionStorage.getItem(`routes/${agencyId}`);
         if (ssRoutes) return JSON.parse(ssRoutes);
         const response = await fetch(`${SERVER_URL}/routes/${agencyId}`);
@@ -35,11 +36,12 @@ export class StaticDataService {
     }
 
     async getShapeById(agencyId: string, shapeId: string): Promise<ShapeDto[]> {
-        const ssShape = sessionStorage.getItem(`shapes/${agencyId}/${shapeId}`);
+        agencyId = agencyId.toLowerCase();
+        const ssShape = localStorage.getItem(`shapes/${agencyId}/${shapeId}`);
         if (ssShape) return JSON.parse(ssShape);
         const response = await fetch(`${SERVER_URL}/shapes/${agencyId}/${shapeId}`);
         const shape = await response.json();
-        sessionStorage.setItem(`shapes/${agencyId}/${shapeId}`, JSON.stringify(shape));
+        localStorage.setItem(`shapes/${agencyId}/${shapeId}`, JSON.stringify(shape));
         return shape;
     }
 
@@ -59,6 +61,7 @@ export class StaticDataService {
     }
 
     async getStopLocationsFromAgency(agencyId: string): Promise<StopLocationDto[]> {
+        agencyId = agencyId.toLowerCase();
         const ssStopLocations = localStorage.getItem(`stops/${agencyId}`);
         if (ssStopLocations) return JSON.parse(ssStopLocations);
         const response = await fetch(`${SERVER_URL}/stops/${agencyId}`);

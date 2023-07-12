@@ -17,31 +17,34 @@ export class MapComponent implements OnInit {
 
     @Input() set mergeAgencies(value: boolean) {
         this.mergeAgenciesOption = value;
-        if (!this.currentRoutes.length) this.addAllVehicles();
+        if (!this.currentRoutes.size) this.addAllVehicles();
         else this.addAllVehiclesFromRoutes();
     };
 
     @Input() set showOldVehicles(value: boolean) {
         this.oldVehiclesOption = value;
-        if (!this.currentRoutes.length) this.addAllVehicles();
+        if (!this.currentRoutes.size) this.addAllVehicles();
         else this.addAllVehiclesFromRoutes();
     }
 
-    @Input() set agencies(value: string[]) {
-        this.currentAgencies = value;
-        if (!this.currentRoutes.length) this.addAllVehicles();
+    @Input() set agencies(values: string[]) {
+        this.currentAgencies = values;
+        if (!this.currentRoutes.size) this.addAllVehicles();
         else this.addAllVehiclesFromRoutes();
     };
 
-    @Input() set routes(value: string[]) {
-        this.currentRoutes = value;
-        if (!this.currentRoutes.length) {
+    @Input() set routes(values: string[]) {
+        if (!values.length) {
             this.addAllVehicles();
-            this.clearAllTripShapes();
+            this.clearAllRouteShapes();
+            this.currentRoutes = new Set();
         }
-        else {
-            this.addSecondaryTripShapes();
+        else if (values.length > this.currentRoutes.size) {
             this.addAllVehiclesFromRoutes();
+            this.addSecondaryRouteShapes(values);
+        } else if (values.length < this.currentRoutes.size) {
+            this.addAllVehiclesFromRoutes();
+            this.removeSecondaryRouteShapes(values);
         }
     };
 
@@ -50,11 +53,11 @@ export class MapComponent implements OnInit {
 
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
-    private tripShapeLayers: L.LayerGroup[] = [];
-    private secondaryTripShapeLayers: L.LayerGroup[] = [];
+    private routeShapeLayers: L.LayerGroup[] = [];
+    private routeToSecondaryShapeLayers = new Map<string, L.LayerGroup>();
 
     private currentAgencies: string[] = [];
-    private currentRoutes: string[] = [];
+    private currentRoutes = new Set<string>();
     private mergeAgenciesOption: boolean = false;
     private oldVehiclesOption: boolean = false;
 
@@ -64,7 +67,7 @@ export class MapComponent implements OnInit {
     ) => {
         this.newVehicleSelected.emit(vehicle);
         this.newVehicleSelectedAgencyId.emit(agencyId);
-        this.addTripShape(agencyId, vehicle.trip);
+        this.addRouteShape(agencyId, vehicle.trip);
     };
 
     constructor(
@@ -106,16 +109,18 @@ export class MapComponent implements OnInit {
         this.vehicleLayers = [];
     }
 
-    private async clearTripShapes(): Promise<void> {
-        await this.clearLayers(this.tripShapeLayers);
-        this.tripShapeLayers = [];
+    private async clearRouteShapes(): Promise<void> {
+        await this.clearLayers(this.routeShapeLayers);
+        this.routeShapeLayers = [];
     }
 
-    private async clearAllTripShapes(): Promise<void> {
-        await this.clearLayers(this.tripShapeLayers);
-        await this.clearLayers(this.secondaryTripShapeLayers);
-        this.tripShapeLayers = [];
-        this.secondaryTripShapeLayers = [];
+    private async clearAllRouteShapes(): Promise<void> {
+        await this.clearLayers(this.routeShapeLayers);
+        this.routeToSecondaryShapeLayers.forEach(async (layer) => {
+            this.clearLayer(layer);
+        });
+        this.routeShapeLayers = [];
+        this.routeToSecondaryShapeLayers = new Map<string, L.LayerGroup>();
     }
 
     private async clearLayers(layers: L.LayerGroup[]): Promise<void> {
@@ -154,17 +159,17 @@ export class MapComponent implements OnInit {
     private async addAllVehiclesFromRoutes(): Promise<void> {
         await this.clearVehicles();
 
-        if (!this.currentRoutes.length) return;
-        this.currentRoutes = this.currentRoutes
+        if (!this.currentRoutes.size) return;
+        const currentRoutesSorted = [...this.currentRoutes]
             .sort((a, b) => a.localeCompare(b));
 
         if (this.mergeAgenciesOption) {
-            await this.addAllVehiclesFromRoutesLayer(this.currentRoutes);
+            await this.addAllVehiclesFromRoutesLayer(currentRoutesSorted);
         } else {
             let routes: string[] = [];
-            let currentAgencyId = this.currentRoutes[0].split(PARAM_SEPARATOR)[0];
+            let currentAgencyId = currentRoutesSorted[0].split(PARAM_SEPARATOR)[0];
 
-            for (let route of this.currentRoutes.concat([PARAM_SEPARATOR])) {
+            for (let route of currentRoutesSorted.concat([PARAM_SEPARATOR])) {
                 const agencyId = route.split(PARAM_SEPARATOR)[0];
                 if (agencyId !== currentAgencyId) {
                     await this.addAllVehiclesFromRoutesLayer(routes);
@@ -188,27 +193,46 @@ export class MapComponent implements OnInit {
         this.map.addLayer(vehiclesLayer);
     }
 
-    private async addTripShape(
+    private async addRouteShape(
         agencyId: string, 
         tripDescriptor?: GtfsRealtimeBindings.transit_realtime.ITripDescriptor | null
     ): Promise<void> {
-        await this.clearTripShapes();
+        await this.clearRouteShapes();
         if (tripDescriptor && tripDescriptor.tripId) {
             const tripShape = await this.tripShapeService.createTripShapeLayer(
                 agencyId,
                 tripDescriptor.tripId,
                 tripDescriptor.routeId,
             );
-            this.tripShapeLayers.push(tripShape);
+            this.routeShapeLayers.push(tripShape);
             this.map.addLayer(tripShape);
         }
     }
 
-    private async addSecondaryTripShapes(): Promise<void> {
-        await this.clearAllTripShapes();
-        const tripShapes = await this.tripShapeService.createSecondaryTripShapesLayer(this.currentRoutes);
-        this.secondaryTripShapeLayers.push(tripShapes);
+    private async addSecondaryRouteShapes(routes: string[]): Promise<void> {
+        const addedRoutes = routes.filter((route) => !this.currentRoutes.has(route));
+        addedRoutes.forEach((addedRoute) =>  this.addSecondaryRouteShape(addedRoute));
+        this.currentRoutes = new Set(routes);
+    }
+
+    private async addSecondaryRouteShape(route: string): Promise<void> {
+        const tripShapes = await this.tripShapeService.createSecondaryTripShapesLayer([route]);
+        this.routeToSecondaryShapeLayers.set(route, tripShapes);
         this.map.addLayer(tripShapes);
+    }
+
+    private async removeSecondaryRouteShapes(routes: string[]): Promise<void> {
+        const routesSet = new Set(routes);
+        const removedRoutes = [...this.currentRoutes].filter((route) => !routesSet.has(route));
+        removedRoutes.forEach((removedRoute) => this.removeSecondaryRouteShape(removedRoute));
+        this.currentRoutes = new Set(routes);
+    }
+
+    private async removeSecondaryRouteShape(route: string): Promise<void> {
+        const tripShapesLayer = this.routeToSecondaryShapeLayers.get(route);
+        if (!tripShapesLayer) return;
+        await this.clearLayer(tripShapesLayer);
+        this.routeToSecondaryShapeLayers.delete(route);
     }
 }
     
