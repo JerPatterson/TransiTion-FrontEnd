@@ -44,12 +44,8 @@ export class StaticDataService {
     }
 
     async getTrip(agencyId: string, tripId: string): Promise<TripDto> {
-        const ssTrip = sessionStorage.getItem(`trips/${agencyId}/${tripId}`);
-        if (ssTrip) return JSON.parse(ssTrip);
         const response = await fetch(`${SERVER_URL}/trips/${agencyId}/${tripId}`);
-        const trip = await response.json();
-        sessionStorage.setItem(`trips/${agencyId}/${tripId}`, JSON.stringify(trip));
-        return trip;
+        return response.json();
     }
 
     async getTodayTripsFromStop(agencyId: string, stopId: string): Promise<TripDto[]> {
