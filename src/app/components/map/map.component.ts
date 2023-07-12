@@ -35,8 +35,14 @@ export class MapComponent implements OnInit {
 
     @Input() set routes(value: string[]) {
         this.currentRoutes = value;
-        if (!this.currentRoutes.length) this.addAllVehicles();
-        else this.addAllVehiclesFromRoutes();
+        if (!this.currentRoutes.length) {
+            this.addAllVehicles();
+            this.clearAllTripShapes();
+        }
+        else {
+            this.addSecondaryTripShapes();
+            this.addAllVehiclesFromRoutes();
+        }
     };
 
     @Output() newVehicleSelected = new EventEmitter<GtfsRealtimeBindings.transit_realtime.IVehiclePosition>();
@@ -45,6 +51,7 @@ export class MapComponent implements OnInit {
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
     private tripShapeLayers: L.LayerGroup[] = [];
+    private secondaryTripShapeLayers: L.LayerGroup[] = [];
 
     private currentAgencies: string[] = [];
     private currentRoutes: string[] = [];
@@ -90,11 +97,25 @@ export class MapComponent implements OnInit {
             attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
             subdomains: 'abcd',
         }).addTo(this.map);
+
+        this.map.createPane('semitransparent').style.opacity = '0.5';
     }
 
     private async clearVehicles(): Promise<void> {
         await this.clearLayers(this.vehicleLayers);
         this.vehicleLayers = [];
+    }
+
+    private async clearTripShapes(): Promise<void> {
+        await this.clearLayers(this.tripShapeLayers);
+        this.tripShapeLayers = [];
+    }
+
+    private async clearAllTripShapes(): Promise<void> {
+        await this.clearLayers(this.tripShapeLayers);
+        await this.clearLayers(this.secondaryTripShapeLayers);
+        this.tripShapeLayers = [];
+        this.secondaryTripShapeLayers = [];
     }
 
     private async clearLayers(layers: L.LayerGroup[]): Promise<void> {
@@ -171,10 +192,8 @@ export class MapComponent implements OnInit {
         agencyId: string, 
         tripDescriptor?: GtfsRealtimeBindings.transit_realtime.ITripDescriptor | null
     ): Promise<void> {
-        this.clearLayers(this.tripShapeLayers);
-        this.tripShapeLayers = [];
-
-        if (tripDescriptor?.tripId && tripDescriptor.routeId) {
+        await this.clearTripShapes();
+        if (tripDescriptor && tripDescriptor.tripId) {
             const tripShape = await this.tripShapeService.createTripShapeLayer(
                 agencyId,
                 tripDescriptor.tripId,
@@ -183,6 +202,13 @@ export class MapComponent implements OnInit {
             this.tripShapeLayers.push(tripShape);
             this.map.addLayer(tripShape);
         }
+    }
+
+    private async addSecondaryTripShapes(): Promise<void> {
+        await this.clearAllTripShapes();
+        const tripShapes = await this.tripShapeService.createSecondaryTripShapesLayer(this.currentRoutes);
+        this.secondaryTripShapeLayers.push(tripShapes);
+        this.map.addLayer(tripShapes);
     }
 }
     

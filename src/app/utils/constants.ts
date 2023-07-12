@@ -8,6 +8,7 @@ export const ACCEPTABLE_DELAY_IN_SEC = 20;
 
 export const PARAM_SEPARATOR = '/';
 export const DEFAULT_ICON_COLOR = '#000000';
+export const DEFAULT_SHAPE_COLOR = '#000000';
 export const DEFAULT_BACKGROUND_COLOR = '#f0f8ff';
 export const OLD_VEHICLE_COLOR = '#c1cacf';
 export const OLD_VEHICLE_BACKGROUND_COLOR = '#939b9f';
