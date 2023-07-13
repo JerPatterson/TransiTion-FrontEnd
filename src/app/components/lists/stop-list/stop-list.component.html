@@ -1,42 +1,53 @@
 <div class="stop-list">
     <div *ngIf="!this.agencyIds.length">
         <svg class="information-icon">
-            <use xlink:href='./assets/icons/information.svg#information' href="./assets/icons/information.svg#information"></use>
+            <use
+                xlink:href='./assets/icons/information.svg#information'
+                href="./assets/icons/information.svg#information">
+            </use>
         </svg>
         <span class="information-text">Il faut d'abord sélectionner une agence...</span>
     </div>
 
     <div
         class="agency-stop-list"
-        *ngFor="let element of this.elements">
+        *ngFor="let agencyId of this.agencyIds">
         <div
-            class="agency-element"
-            (click)="this.onAgencyClick(element.agency ? element.agency.agency_id : '')">
-            <h3 class="agency-name">
-                {{ element.agency ? 
-                    element.agency.agency_name : '' }}
-            </h3>
-            <svg 
-                class="list-icon"
-                *ngIf="element.agency && !this.showAgencies.has(element.agency.agency_id)">
-                <use xlink:href='./assets/icons/show.svg#show' href="./assets/icons/show.svg#show"></use>
-            </svg>
-            <svg
-                class="list-icon"
-                *ngIf="element.agency && this.showAgencies.has(element.agency.agency_id)">
-                <use xlink:href='./assets/icons/hide.svg#hide' href="./assets/icons/hide.svg#hide"></use>
-            </svg>
-        </div>
-        <hr>
-        <div
-            *ngIf="element.agency"
-            [ngClass]="!this.showAgencies.has(element.agency.agency_id) ? 'hidden' : ''">
-            <app-stop 
-                class="stop-element"
-                *ngFor="let stop of element.stops" 
-                [stop]="stop"
-                (click)="this.onStopClick(element.agency ? element.agency.agency_id : '', stop.stop_id)">
-            </app-stop>
+            *ngIf="this.elements.get(agencyId) as content">
+            <div
+                class="agency-element"
+                (click)="this.onAgencyClick(agencyId)">
+                <h3 class="agency-name">
+                    {{ content?.agency?.agency_name }}
+                </h3>
+                <svg 
+                    class="list-icon"
+                    *ngIf="!this.showAgencies.has(agencyId)">
+                    <use 
+                        xlink:href='./assets/icons/show.svg#show'
+                        href="./assets/icons/show.svg#show">
+                    </use>
+                </svg>
+                <svg
+                    class="list-icon"
+                    *ngIf="this.showAgencies.has(agencyId)">
+                    <use
+                        xlink:href='./assets/icons/hide.svg#hide'
+                        href="./assets/icons/hide.svg#hide">
+                    </use>
+                </svg>
+            </div>
+            <hr>
+            <div
+                *ngIf="this.elements.get(agencyId)"
+                [ngClass]="!this.showAgencies.has(agencyId) ? 'hidden' : ''">
+                <app-stop 
+                    class="stop-element"
+                    *ngFor="let stop of content?.stops" 
+                    [stop]="stop"
+                    (click)="this.onStopClick(agencyId, stop.stop_id)">
+                </app-stop>
+            </div>
         </div>
     </div>
 </div>

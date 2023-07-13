@@ -17,7 +17,7 @@
     </app-vehicle-info>
 
     <app-agency-list
-        *ngIf="this.agencyListSelected && !this.vehicleSelected"
+        [ngClass]="this.agencyListSelected && !this.vehicleSelected ? '' : 'hidden'"
         [selections]="this.agencyIdsSelected"
         [selectAll]="this.selectAllAgenciesOption"
         (addAgencyIds)="this.addAgencyIds($event)"
@@ -25,7 +25,7 @@
     </app-agency-list>
 
     <app-route-list
-        *ngIf="this.routeListSelected && !this.vehicleSelected"
+        [ngClass]="this.routeListSelected && !this.vehicleSelected ? '' : 'hidden'"
         [agencyIds]="this.agencyIdsSelected"
         [selections]="this.routeIdsSelected"
         (addRouteId)="this.addRouteId($event)"
@@ -33,7 +33,7 @@
     </app-route-list>
 
     <app-stop-list
-        *ngIf="this.stopListSelected && !this.vehicleSelected"
+        [ngClass]="this.stopListSelected && !this.vehicleSelected ? '' : 'hidden'"
         [agencyIds]="this.agencyIdsSelected"
         [routeIds]="this.routeIdsSelected"
     >

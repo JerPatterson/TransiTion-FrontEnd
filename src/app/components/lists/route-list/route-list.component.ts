@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteListType } from '@app/utils/component-interface';
 import { RouteDto } from '@app/utils/dtos';
@@ -8,7 +8,7 @@ import { RouteDto } from '@app/utils/dtos';
     templateUrl: './route-list.component.html',
     styleUrls: ['./route-list.component.css']
 })
-export class RouteListComponent implements OnInit {    
+export class RouteListComponent implements OnChanges {    
     elements: RouteListType[] = [];
     routeIds = new Set<string>();
     showAgencies = new Set<string>();
@@ -21,7 +21,7 @@ export class RouteListComponent implements OnInit {
 
     constructor(private staticDataService: StaticDataService) {}
 
-    ngOnInit() {
+    ngOnChanges() {
         this.setRoutes();
         this.selections.forEach((routeId) => this.routeIds.add(routeId));
     }
