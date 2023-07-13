@@ -3,24 +3,35 @@
         <svg
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 0 50 50"
+            viewBox="0 0 70 70"
             [ngStyle]="{color: this.style?.vehicleIconColor}">
-            <defs>
-                <filter id="blur">
-                    <feDropShadow dx="0" dy="0" stdDeviation="3.0"
-                        flood-color="black"/>
-                </filter>
-                <mask id="circle-mask" x="-0.2" y="-0.2" width="1.4" height="1.4">
-                    <circle cx="25" cy="25" r="25" fill="white"/>  
-                    <circle cx="25" cy="25" r="20" fill="black"/>  
-                </mask>
-            </defs>
-            <circle cx="25" cy="25" r="20" style="mask: url(#circle-mask); filter: url(#blur)"/>
-            <circle cx="25" cy="25" r="20" [attr.fill]="this.style?.backgroundColor"/>
-            <use
-                height="32" y="7"
-                [attr.xlink:href]="this.iconLink"
-                [attr.href]="this.iconLink"></use>
+            <g
+                [attr.fill]="this.style?.backgroundColor"
+                [attr.transform]="'rotate(' + (this.bearing - 180) + ' 35 35)'">
+                <defs>
+                    <filter id="blur">
+                        <feDropShadow
+                            dx="0" dy="0"
+                            stdDeviation="3.0"
+                            flood-color="black"/>
+                    </filter>
+                    <mask id="circle-mask" x="-0.2" y="-0.2" width="1.4" height="1.4">
+                        <circle cx="35" cy="35" r="25" fill="white"/>  
+                        <circle cx="35" cy="35" r="20" fill="black"/>  
+                    </mask>
+                </defs>
+                <circle 
+                    cx="35" cy="35" r="20"
+                    style="mask: url(#circle-mask); filter: url(#blur)"
+                />
+                <circle cx="35" cy="35" r="20"/>
+                <polygon points="35,70 20,53 35,60 50,53"/>
+            </g>
+                <use 
+                    height="32" x="0" y="17" 
+                    [attr.xlink:href]="this.iconLink" 
+                    [attr.href]="this.iconLink">
+                </use>
         </svg>
         <div>
             <p class="vehicle-identifier">

@@ -18,6 +18,7 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
     trip: TripDto | undefined;
     style: AgencyStyle | undefined;
 
+    bearing: number = 0;
     iconLink: string = '';
     lastSeenString: string = '';
     speedKmHrString: string = '';
@@ -40,6 +41,9 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
 
     ngOnChanges(): void {
         this.clearTimers();
+        this.style = AGENCY_TO_STYLE.get(this.agencyId.toLowerCase());
+        this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
+
         this.setVehicleInfoValues();
         this.refreshVehicleDataInterval = setInterval(async () => {
             if (!this.vehicle.vehicle?.id) return;
@@ -82,8 +86,7 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
             this.trip = undefined;
         }
 
-        this.style = AGENCY_TO_STYLE.get(this.agencyId.toLowerCase());
-        this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
+        this.bearing = this.vehicle.position?.bearing ? this.vehicle.position.bearing : 0;
 
         this.setLastSeenValue();
         this.setSpeedValue();
