@@ -18,20 +18,22 @@
             </h3>
             <svg 
                 class="list-icon"
-                *ngIf="element.agency && this.hideAgencies.has(element.agency.agency_id)">
+                *ngIf="element.agency && !this.showAgencies.has(element.agency.agency_id)">
                 <use xlink:href='./assets/icons/show.svg#show' href="./assets/icons/show.svg#show"></use>
             </svg>
             <svg
                 class="list-icon"
-                *ngIf="element.agency && !this.hideAgencies.has(element.agency.agency_id)">
+                *ngIf="element.agency && this.showAgencies.has(element.agency.agency_id)">
                 <use xlink:href='./assets/icons/hide.svg#hide' href="./assets/icons/hide.svg#hide"></use>
             </svg>
         </div>
         <hr>
-        <div *ngIf="element.agency && !this.hideAgencies.has(element.agency.agency_id)">
+        <div
+            *ngIf="element.agency"
+            [ngClass]="!this.showAgencies.has(element.agency.agency_id) ? 'hidden' : ''">
             <app-route 
                 class="route-element"
-                *ngFor="let route of element.routes" 
+                *ngFor="let route of element.routes"
                 [route]="route[0]"
                 [selected]="this.routeIds.has((element.agency ? 
                     element.agency.agency_id.toLowerCase() : '') + '/' + route[0].route_id)"

@@ -8,6 +8,7 @@
     padding: 0px;
     padding-top: 1vh;
     padding-bottom: 1vh;
+    scrollbar-width: none;
 }
 
 .agency-list::-webkit-scrollbar {

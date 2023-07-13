@@ -33,7 +33,10 @@
     </app-route-list>
 
     <app-stop-list
-        *ngIf="this.stopListSelected && !this.vehicleSelected">
+        *ngIf="this.stopListSelected && !this.vehicleSelected"
+        [agencyIds]="this.agencyIdsSelected"
+        [routeIds]="this.routeIdsSelected"
+    >
     </app-stop-list>
 </div>
 

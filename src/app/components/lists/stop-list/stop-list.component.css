@@ -2,12 +2,62 @@
     position: relative;
     z-index: 1;
     max-width: 32vw;
-    max-height: 50vh;
-    overflow-y: scroll;
+    max-height: 48vh;
+    overflow-y: auto;
     margin: 0px;
     padding: 0px;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    scrollbar-color: #c1c1c1 transparent;
 }
 
 .stop-list::-webkit-scrollbar {
-    width: 0px;
+    width: 10px;
+}
+
+.stop-list::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.stop-list::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #c1c1c1;
+}
+
+.agency-element {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0px 1.5vh;
+}
+
+.agency-element:hover {
+    cursor: pointer;
+}
+
+.agency-name {
+    margin-bottom: 1vh;
+}
+
+.list-icon {
+    max-width: 3vh;
+    max-height: 3vh;
+    margin-top: 2.5vh;
+}
+
+.information-icon {
+    max-width: 5vh;
+    max-height: 5vh;
+    margin: 0px 1.5vh;
+}
+
+.information-text {
+    position: relative;
+    top: -1.4vh;
+    font-size: 2.6vh;
+}
+
+.hidden {
+    display: none;
 }

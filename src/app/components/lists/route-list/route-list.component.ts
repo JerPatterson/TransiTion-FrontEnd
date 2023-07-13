@@ -11,7 +11,7 @@ import { RouteDto } from '@app/utils/dtos';
 export class RouteListComponent implements OnInit {    
     elements: RouteListType[] = [];
     routeIds = new Set<string>();
-    hideAgencies = new Set<string>();
+    showAgencies = new Set<string>();
 
     @Input() agencyIds: string[] = [];
     @Input() selections: string[] = [];
@@ -27,10 +27,10 @@ export class RouteListComponent implements OnInit {
     }
 
     onAgencyClick(agencyId: string) {
-        if (this.hideAgencies.has(agencyId)) {
-            this.hideAgencies.delete(agencyId);
+        if (this.showAgencies.has(agencyId)) {
+            this.showAgencies.delete(agencyId);
         } else {
-            this.hideAgencies.add(agencyId);
+            this.showAgencies.add(agencyId);
         }
     }
 

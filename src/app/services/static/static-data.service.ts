@@ -70,11 +70,11 @@ export class StaticDataService {
 
     async getStopLocationsFromAgency(agencyId: string): Promise<StopLocationDto[]> {
         agencyId = agencyId.toLowerCase();
-        const ssStopLocations = localStorage.getItem(`stops/${agencyId}`);
+        const ssStopLocations = sessionStorage.getItem(`stops/${agencyId}`);
         if (ssStopLocations) return JSON.parse(ssStopLocations);
         const response = await fetch(`${SERVER_URL}/stops/${agencyId}`);
         const stopLocations = await response.json();
-        localStorage.setItem(`stops/${agencyId}`, stopLocations);
+        sessionStorage.setItem(`stops/${agencyId}`, JSON.stringify(stopLocations));
         return stopLocations;
     }
 
