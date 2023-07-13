@@ -41,7 +41,15 @@ export class StaticDataService {
         if (ssShape) return JSON.parse(ssShape);
         const response = await fetch(`${SERVER_URL}/shapes/${agencyId}/${shapeId}`);
         const shape = await response.json();
-        localStorage.setItem(`shapes/${agencyId}/${shapeId}`, JSON.stringify(shape));
+        while (true) {
+            try {
+                localStorage.setItem(`shapes/${agencyId}/${shapeId}`, JSON.stringify(shape));
+                break;
+            } catch {
+                const key = localStorage.key(0);
+                if (key) localStorage.removeItem(key);
+            }
+        }
         return shape;
     }
 
