@@ -1,4 +1,5 @@
 import { OnChanges, Component, Input, OnDestroy } from '@angular/core';
+import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { METERS_IN_KM, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS, SECONDS_IN_HOUR } from '@app/utils/constants';
 import { RouteDto, TripDto } from '@app/utils/dtos';
@@ -30,34 +31,58 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
 
     private timeSinceUpdate = 0;
     private timeSinceUpdateInterval!: NodeJS.Timer;
+    private refreshVehicleDataInterval!: NodeJS.Timer;
 
-    constructor(private stDataService: StaticDataService) {}
+    constructor(
+        private stDataService: StaticDataService,
+        private rtDataService: RealtimeDataService,
+    ) {}
 
     ngOnChanges(): void {
-        this.clearTimer();
+        this.clearTimers();
         this.setVehicleInfoValues();
+        this.refreshVehicleDataInterval = setInterval(async () => {
+            if (!this.vehicle.vehicle?.id) return;
+            this.vehicle = await this.rtDataService.getVehicleFromAgencyById(
+                this.agencyId,  
+                this.vehicle.vehicle.id
+            );
+            this.setVehicleInfoValues();
+        }, 30 * ONE_SEC_IN_MS);
+
+        this.timeSinceUpdateInterval = setInterval(() => {
+            this.lastSeenString = this.getRoundTimeString(++this.timeSinceUpdate);
+        }, ONE_SEC_IN_MS);
     }
 
     ngOnDestroy(): void {
-        this.clearTimer()
+        this.clearTimers()
     }
 
-    private clearTimer(): void {
+    private clearTimers(): void {
         clearInterval(this.timeSinceUpdateInterval);
+        clearInterval(this.refreshVehicleDataInterval);
     }
 
     private async setVehicleInfoValues() {
-        if (this.vehicle.trip?.routeId && this.vehicle.trip?.tripId) {
+        if (this.vehicle.trip?.routeId) {
             this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip.routeId);
-            this.trip = await this.stDataService.getTrip( // TODO Stl...
-                this.agencyId, this.agencyId === 'stl' ? 
-                'JUIN23' + this.vehicle.trip.tripId : 
-                this.vehicle.trip.tripId);
+        }
+
+        if (this.vehicle.trip?.tripId) {
+            try {
+                this.trip = await this.stDataService.getTrip( // TODO Stl...
+                    this.agencyId, this.agencyId.toLowerCase() === 'stl' ? 
+                    'JUIN23' + this.vehicle.trip.tripId : 
+                    this.vehicle.trip.tripId);
+            } catch {
+                this.trip = undefined;
+            }
         } else {
-            this.route = undefined;
             this.trip = undefined;
         }
-        this.style = AGENCY_TO_STYLE.get(this.agencyId);
+
+        this.style = AGENCY_TO_STYLE.get(this.agencyId.toLowerCase());
         this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
 
         this.setLastSeenValue();
@@ -74,12 +99,6 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
         } else {
             this.timeSinceUpdate = Math.round(Date.now() / ONE_SEC_IN_MS - (this.vehicle.timestamp as number));
             this.lastSeenString = this.getRoundTimeString(this.timeSinceUpdate);
-            this.timeSinceUpdateInterval = setInterval(
-                () => {
-                    this.lastSeenString = this.getRoundTimeString(++this.timeSinceUpdate)
-                },
-                ONE_SEC_IN_MS
-            );
         }
     }
 

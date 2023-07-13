@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
-import { MAX_ZOOM, MIN_ZOOM, PARAM_SEPARATOR } from '@app/utils/constants';
+import { MAX_ZOOM, MIN_ZOOM, ONE_SEC_IN_MS, PARAM_SEPARATOR } from '@app/utils/constants';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 
@@ -17,20 +17,17 @@ export class MapComponent implements OnInit {
 
     @Input() set mergeAgencies(value: boolean) {
         this.mergeAgenciesOption = value;
-        if (!this.currentRoutes.size) this.addAllVehicles();
-        else this.addAllVehiclesFromRoutes();
+        this.refreshVehicles();
     };
 
     @Input() set showOldVehicles(value: boolean) {
         this.oldVehiclesOption = value;
-        if (!this.currentRoutes.size) this.addAllVehicles();
-        else this.addAllVehiclesFromRoutes();
+        this.refreshVehicles();
     }
 
     @Input() set agencies(values: string[]) {
         this.currentAgencies = values;
-        if (!this.currentRoutes.size) this.addAllVehicles();
-        else this.addAllVehiclesFromRoutes();
+        this.refreshVehicles();
     };
 
     @Input() set routes(values: string[]) {
@@ -47,6 +44,10 @@ export class MapComponent implements OnInit {
             this.removeSecondaryRouteShapes(values);
         }
     };
+
+    @Input() set vehicleSelected(value: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined) {
+        if (!value) this.clearRouteShapes();
+    }
 
     @Output() newVehicleSelected = new EventEmitter<GtfsRealtimeBindings.transit_realtime.IVehiclePosition>();
     @Output() newVehicleSelectedAgencyId = new EventEmitter<string>();
@@ -77,6 +78,9 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
+        setInterval(() => { 
+            this.refreshVehicles();
+        }, 30 * ONE_SEC_IN_MS)
     }
     
     private initMap(): void {
@@ -131,6 +135,11 @@ export class MapComponent implements OnInit {
         if (layer && this.map.hasLayer(layer)) {
             this.map.removeLayer(layer);
         }
+    }
+
+    private async refreshVehicles(): Promise<void> {
+        if (!this.currentRoutes.size) this.addAllVehicles();
+        else this.addAllVehiclesFromRoutes();
     }
 
     private async addAllVehicles(): Promise<void> {
