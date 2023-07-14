@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { StaticDataService } from '@app/services/static/static-data.service';
+// import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopListType } from '@app/utils/component-interface';
-import { ONE_SEC_IN_MS } from '@app/utils/constants';
+// import { ONE_SEC_IN_MS } from '@app/utils/constants';
 
 @Component({
     selector: 'app-stop-list',
@@ -18,21 +18,21 @@ export class StopListComponent implements OnChanges {
     @Input() routeIds: string[] = [];
     @Input() selections: string[] = [];
 
-    private knownAgencyIds = new Set<string>();
+    // private knownAgencyIds = new Set<string>();
     
-    constructor(private staticDataService: StaticDataService) {}
+    // constructor(private staticDataService: StaticDataService) {}
 
     ngOnChanges() {
-        const addedAgencyIds = this.agencyIds.filter((agencyId) => {
-            const isKnown = this.knownAgencyIds.has(agencyId);
-            if (!isKnown) this.knownAgencyIds.add(agencyId);
-            return !isKnown;
-        });
+        // const addedAgencyIds = this.agencyIds.filter((agencyId) => {
+        //     const isKnown = this.knownAgencyIds.has(agencyId);
+        //     if (!isKnown) this.knownAgencyIds.add(agencyId);
+        //     return !isKnown;
+        // });
 
-        setTimeout(() => {
-            this.setStopsFromAgencyIds(addedAgencyIds);
-            this.selections.forEach((stopId) => this.stopIds.add(stopId));
-        }, ONE_SEC_IN_MS);
+        // setTimeout(() => {
+        //     this.setStopsFromAgencyIds(addedAgencyIds);
+        //     this.selections.forEach((stopId) => this.stopIds.add(stopId));
+        // }, ONE_SEC_IN_MS);
     }
 
     onAgencyClick(agencyId: string) {
@@ -75,14 +75,14 @@ export class StopListComponent implements OnChanges {
     //     // }
     // }
 
-    private async setStopsFromAgencyIds(agencyIds: string[]): Promise<void> {
-        console.log(agencyIds);
-        agencyIds.forEach(async (agencyId) => {
-            this.elements.set(agencyId, {
-                agency: await this.staticDataService.getAgencyById(agencyId),
-                stops: (await this.staticDataService.getStopLocationsFromAgency(agencyId))
-                    .sort((a, b) => a.stop_name.localeCompare(b.stop_name)),
-            });
-        });
-    }
+    // private async setStopsFromAgencyIds(agencyIds: string[]): Promise<void> {
+    //     console.log(agencyIds);
+    //     agencyIds.forEach(async (agencyId) => {
+    //         this.elements.set(agencyId, {
+    //             agency: await this.staticDataService.getAgencyById(agencyId),
+    //             stops: (await this.staticDataService.getStopLocationsFromAgency(agencyId))
+    //                 .sort((a, b) => a.stop_name.localeCompare(b.stop_name)),
+    //         });
+    //     });
+    // }
 }

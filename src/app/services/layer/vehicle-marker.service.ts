@@ -157,26 +157,31 @@ export class VehicleMarkerService {
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
-                    viewBox="0 0 70 70"
+                    viewBox="0 0 80 80"
                     style="color: ${wasSeenLongAgo ? OLD_VEHICLE_COLOR : vehicleIconColor};">
                     <g
                         fill="${wasSeenLongAgo ? OLD_VEHICLE_BACKGROUND_COLOR : backgroundColor}"
-                        transform="rotate(${bearing ? bearing - 180 : 0} 35 35)">
+                        transform="rotate(${bearing ? bearing - 180 : 0} 40 40)">
                         <defs>
                             <filter id="blur">
                                 <feDropShadow dx="0" dy="0" stdDeviation="3.0"
                                     flood-color="black"/>
                             </filter>
                             <mask id="circle-mask" x="-0.2" y="-0.2" width="1.4" height="1.4">
-                                <circle cx="35" cy="35" r="25" fill="white"/>  
-                                <circle cx="35" cy="35" r="20" fill="black"/>  
+                                <circle cx="40" cy="40" r="25" fill="white"/>  
+                                <circle cx="40" cy="40" r="20" fill="black"/>  
+                            </mask>
+                            <mask id="arrow-mask" x="-0.2" y="-0.2" width="1.4" height="1.4">
+                                <path d="M40,80 15,52 40,60 65,52z" fill="white"/>
+                                <path d="M40,75 25,58 40,65 55,58z" fill="black"/> 
                             </mask>
                         </defs>
-                        <circle cx="35" cy="35" r="20" style="mask: url(#circle-mask); filter: url(#blur)"/>
-                        <circle cx="35" cy="35" r="20"/>
-                        <polygon points="35,70 20,53 35,60 50,53"/>
+                        <circle cx="40" cy="40" r="20" style="mask: url(#circle-mask); filter: url(#blur)"/>
+                        <circle cx="40" cy="40" r="20"/>
+                        <path d="M40,75 25,58 40,65 55,58z" style="mask: url(#arrow-mask); filter: url(#blur)"/> 
+                        <path d="M40,75 25,58 40,65 55,58z"/>
                     </g>
-                        <use height="32" x="0" y="17" xlink:href="${iconLink}" href="${iconLink}"></use>
+                    <use height="32" x="0" y="22" xlink:href="${iconLink}" href="${iconLink}"></use>
                 </svg>`,
             iconSize: [DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE],
             iconAnchor: [DEFAULT_ANCHOR_SHIFT, DEFAULT_ANCHOR_SHIFT],
