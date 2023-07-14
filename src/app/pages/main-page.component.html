@@ -46,7 +46,7 @@
     <button
         *ngIf="this.agencyListSelected && !this.vehicleSelected"
         [ngClass]="this.selectAllAgenciesOption ? 'selected' : ''"
-        (click)="this.changeSelectAllAgencies()">
+        (click)="this.changeSelectAllAgenciesOption()">
         <svg class="option-icon">
             <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
         </svg>
@@ -58,27 +58,27 @@
     </button>
     <button
         *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
-        [ngClass]="this.mergeAgenciesOption ? 'selected' : ''"
-        (click)="this.changeMergeAgencies()">
+        [ngClass]="this.options.mergeAllVehicleClusters ? 'selected' : ''"
+        (click)="this.changeMergeAllVehicleClustersOption()">
         <svg class="option-icon">
             <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
         </svg>
         <span 
             class="option-name"
-            *ngIf="!this.mergeAgenciesOption">
+            *ngIf="!this.options.mergeAllVehicleClusters">
             Fusionner les repères
         </span>
     </button>
     <button
         *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
-        [ngClass]="this.oldVehiclesOption ? 'selected' : ''"
-        (click)="this.changeOldVehiclesOption()">
+        [ngClass]="this.options.showOldVehicles ? 'selected' : ''"
+        (click)="this.changeShowOldVehiclesOption()">
         <svg class="option-icon">
             <use xlink:href='./assets/icons/clock.svg#clock' href="./assets/icons/clock.svg#clock"></use>
         </svg>
         <span 
             class="option-name"
-            *ngIf="!this.oldVehiclesOption">
+            *ngIf="!this.options.showOldVehicles">
             Afficher les véhicules inactifs
         </span>
     </button>
@@ -88,8 +88,8 @@
     [agencies]="this.agencyIdsSelected"
     [routes]="this.routeIdsSelected"
     [vehicleSelected]="this.vehicleSelected"
-    [mergeAgencies]="this.mergeAgenciesOption"
-    [showOldVehicles]="this.oldVehiclesOption"
+    [showOldVehicles]="this.options.showOldVehicles"
+    [mergeAllVehicleClusters]="this.options.mergeAllVehicleClusters"
     (newVehicleSelected)="this.addVehicleSlected($event)"
     (newVehicleSelectedAgencyId)="this.addVehicleSlectedAgencyId($event)">
 </app-map>

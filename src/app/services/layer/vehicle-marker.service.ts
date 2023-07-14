@@ -28,6 +28,7 @@ import {
     THIRD_CLUSTER_ALPHA,
     THIRD_CLUSTER_MAX_CHILD_COUNT
 } from '@app/utils/constants';
+import { MapRenderingOptions } from '@app/utils/component-interface';
 
 @Injectable({
     providedIn: 'root'
@@ -40,19 +41,18 @@ export class VehicleMarkerService {
 
     async createVehiclesLayer(
         agencyIds: string[],
-        clusteringAtMaxZoom: boolean,
-        showOldVehicles: boolean,
+        options: MapRenderingOptions,
         emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
     ) : Promise<L.MarkerClusterGroup> {
         const clusterGroup = await this.buildVehicleMarkerClusterGroup(
             agencyIds.length === 1 ? 
                 this.getBackgroundColor(agencyIds[0]) : DEFAULT_BACKGROUND_COLOR, 
-            clusteringAtMaxZoom,
+            options.mergeAllVehicleClusters,
         );
         
         agencyIds.map(async (agencyId) => {
             (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
-                if (!showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
+                if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
                 const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle, emitVehicleSelected);
                 if (vehicleMarker) clusterGroup.addLayer(vehicleMarker);
             });
@@ -63,8 +63,7 @@ export class VehicleMarkerService {
 
     async createVehiclesLayerFromRoutes(
         routes: string[], 
-        clusteringAtMaxZoom: boolean,
-        showOldVehicles: boolean,
+        options: MapRenderingOptions,
         emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
     ) : Promise<L.MarkerClusterGroup> {
         const firstRouteAgencyId = routes[0].split(PARAM_SEPARATOR)[0];
@@ -72,14 +71,14 @@ export class VehicleMarkerService {
         const clusterGroup = await this.buildVehicleMarkerClusterGroup(
             firstRouteAgencyId === lastRouteAgencyId ? 
                 this.getBackgroundColor(firstRouteAgencyId) : DEFAULT_BACKGROUND_COLOR, 
-            clusteringAtMaxZoom,
+            options.mergeAllVehicleClusters,
         );
 
         routes.forEach(async (route) => {
             const agencyId = route.split(PARAM_SEPARATOR)[0];
             const routeId = route.split(PARAM_SEPARATOR)[1];
             (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
-                if (!showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
+                if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
                 const vehicleMarker = await this.buildVehicleMarker(agencyId, vehicle, emitVehicleSelected);
                 if (vehicleMarker) clusterGroup.addLayer(vehicleMarker);
             });

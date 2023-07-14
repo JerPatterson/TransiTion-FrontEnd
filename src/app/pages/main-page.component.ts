@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core';
+import { MapRenderingOptions } from '@app/utils/component-interface';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 
 @Component({
@@ -7,15 +8,20 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
     styleUrls: ['./main-page.component.css']
 })
 export class MainPageComponent implements AfterContentChecked {
+    options: MapRenderingOptions = {
+        darkModeEnable: false,
+        showOldVehicles: false,
+        useVehicleClusters: true,
+        mergeAllVehicleClusters: false,
+    }
+    
     agencyIdsSelected: string[] = [];
-    mergeAgenciesOption: boolean = false;
     selectAllAgenciesOption: boolean = false;
 
     routeIdsSelected: string[] = [];
 
     vehicleSelected!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined;
-    vehicleSelectedAgencyId: string = ''; 
-    oldVehiclesOption: boolean = false;
+    vehicleSelectedAgencyId: string = '';
 
     agencyListSelected: boolean = false;
     routeListSelected: boolean = false;
@@ -27,6 +33,24 @@ export class MainPageComponent implements AfterContentChecked {
     ngAfterContentChecked() {
         this.cdref.detectChanges();
     }
+
+
+    changeDarkModeEnableOption() {
+        this.options.darkModeEnable = !this.options.darkModeEnable;
+    }
+
+    changeShowOldVehiclesOption() {
+        this.options.showOldVehicles = !this.options.showOldVehicles;
+    }
+
+    changeUseVehicleClustersOption() {
+        this.options.useVehicleClusters = !this.options.useVehicleClusters;
+    }
+
+    changeMergeAllVehicleClustersOption() {
+        this.options.mergeAllVehicleClusters = !this.options.mergeAllVehicleClusters;
+    }
+
 
     selectAgencyList(value: boolean) {
         this.agencyListSelected = value;
@@ -43,18 +67,6 @@ export class MainPageComponent implements AfterContentChecked {
 
         this.routeIdsSelected = this.routeIdsSelected
             .filter((value) => !agencyIds.includes(value.split('/')[0].toUpperCase()))
-    }
-
-    changeMergeAgencies() {
-        this.mergeAgenciesOption = !this.mergeAgenciesOption;
-    }
-
-    changeSelectAllAgencies() {
-        this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
-    }
-
-    changeMergeAgenciesOption() {
-        this.mergeAgenciesOption = !this.mergeAgenciesOption;
     }
 
     changeSelectAllAgenciesOption() {
@@ -85,9 +97,5 @@ export class MainPageComponent implements AfterContentChecked {
 
     addVehicleSlectedAgencyId(agencyId: string) {
         this.vehicleSelectedAgencyId = agencyId;
-    }
-
-    changeOldVehiclesOption() {
-        this.oldVehiclesOption = !this.oldVehiclesOption;
     }
 }

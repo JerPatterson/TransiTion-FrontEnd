@@ -4,6 +4,7 @@ import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service
 import { MAX_ZOOM, MIN_ZOOM, ONE_SEC_IN_MS, PARAM_SEPARATOR } from '@app/utils/constants';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
+import { MapRenderingOptions } from '@app/utils/component-interface';
 
 @Component({
     selector: 'app-map',
@@ -15,15 +16,24 @@ export class MapComponent implements OnInit {
     @Input() lon: number = -73.75;
     @Input() zoom: number = 12;
 
-    @Input() set mergeAgencies(value: boolean) {
-        this.mergeAgenciesOption = value;
-        this.refreshVehicles();
-    };
+    @Input() set darkModeEnable(value: boolean) {
+        this.options.darkModeEnable = value;
+    }
 
     @Input() set showOldVehicles(value: boolean) {
-        this.oldVehiclesOption = value;
+        this.options.showOldVehicles = value;
         this.refreshVehicles();
     }
+
+    @Input() set useVehicleClusters(value: boolean) {
+        this.options.useVehicleClusters = value;
+    }
+
+    @Input() set mergeAllVehicleClusters(value: boolean) {
+        this.options.mergeAllVehicleClusters = value;
+        this.refreshVehicles();
+    }
+
 
     @Input() set agencies(values: string[]) {
         this.currentAgencies = values;
@@ -59,8 +69,13 @@ export class MapComponent implements OnInit {
 
     private currentAgencies: string[] = [];
     private currentRoutes = new Set<string>();
-    private mergeAgenciesOption: boolean = false;
-    private oldVehiclesOption: boolean = false;
+
+    private options: MapRenderingOptions = {
+        darkModeEnable: false,
+        showOldVehicles: false,
+        useVehicleClusters: true,
+        mergeAllVehicleClusters: false,
+    };
 
     private readonly emitVehicleSelected = (
         agencyId: string, 
@@ -105,6 +120,12 @@ export class MapComponent implements OnInit {
             subdomains: 'abcd',
         }).addTo(this.map);
 
+        // L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
+        //     maxZoom: 22,
+        //     attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
+        //     subdomains: 'abcd',
+        // }).addTo(this.map);
+
         this.map.createPane('semitransparent').style.opacity = '0.5';
     }
 
@@ -145,7 +166,7 @@ export class MapComponent implements OnInit {
     private async addAllVehicles(): Promise<void> {
         await this.clearVehicles();
 
-        if (this.mergeAgenciesOption) {
+        if (this.options.mergeAllVehicleClusters) {
             await this.addAllVehiclesLayer(this.currentAgencies)
         } else {
             this.currentAgencies.forEach(async (agencyId) => {
@@ -157,8 +178,7 @@ export class MapComponent implements OnInit {
     private async addAllVehiclesLayer(agencyIds: string[]): Promise<void> {
         const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
             agencyIds,
-            this.mergeAgenciesOption,
-            this.oldVehiclesOption,
+            this.options,
             this.emitVehicleSelected,
         );
         this.vehicleLayers.push(vehiclesLayer);
@@ -167,12 +187,11 @@ export class MapComponent implements OnInit {
 
     private async addAllVehiclesFromRoutes(): Promise<void> {
         await this.clearVehicles();
-
         if (!this.currentRoutes.size) return;
         const currentRoutesSorted = [...this.currentRoutes]
             .sort((a, b) => a.localeCompare(b));
 
-        if (this.mergeAgenciesOption) {
+        if (this.options.mergeAllVehicleClusters) {
             await this.addAllVehiclesFromRoutesLayer(currentRoutesSorted);
         } else {
             let routes: string[] = [];
@@ -194,8 +213,7 @@ export class MapComponent implements OnInit {
         const vehiclesLayer = await this.vehicleMarkerService
             .createVehiclesLayerFromRoutes(
                 routes,
-                this.mergeAgenciesOption,
-                this.oldVehiclesOption,
+                this.options,
                 this.emitVehicleSelected,
             );
         this.vehicleLayers.push(vehiclesLayer);
@@ -225,9 +243,9 @@ export class MapComponent implements OnInit {
     }
 
     private async addSecondaryRouteShape(route: string): Promise<void> {
-        const tripShapes = await this.tripShapeService.createSecondaryTripShapesLayer([route]);
-        this.routeToSecondaryShapeLayers.set(route, tripShapes);
-        this.map.addLayer(tripShapes);
+        const tripShape = await this.tripShapeService.createSecondaryTripShapesLayer([route]);
+        this.routeToSecondaryShapeLayers.set(route, tripShape);
+        this.map.addLayer(tripShape);
     }
 
     private async removeSecondaryRouteShapes(routes: string[]): Promise<void> {
