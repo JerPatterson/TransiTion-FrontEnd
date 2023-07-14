@@ -11,14 +11,14 @@ export class TripShapeService {
 
     constructor(private staticDataService: StaticDataService) {}
     
-    async createTripShapeLayer(agencyId: string, tripId: string, routeId?: string | null): Promise<L.LayerGroup> {
+    async createTripLayer(agencyId: string, tripId: string, routeId?: string | null): Promise<L.LayerGroup> {
         const shapeId = (await this.staticDataService.getTrip(agencyId, agencyId.toLowerCase() === 'stl' ? 'JUIN23' + tripId : tripId)).shape_id;
         const shapeColor = await this.getShapeColor(agencyId, routeId);
         const shapePts = await this.staticDataService.getShapeById(agencyId, shapeId);
         return L.layerGroup().addLayer(await this.buildTripShape(shapePts, shapeColor));
     }
 
-    async createSecondaryTripShapesLayer(routes: string[]): Promise<L.LayerGroup> {
+    async createSemiTransparentTripsLayer(routes: string[]): Promise<L.LayerGroup> {
         const shapeIds = new Set<string>();
         const shapeLayer = L.layerGroup();
         const canvasRenderer = L.canvas({pane: 'semitransparent'});

@@ -43,20 +43,20 @@ export class MapComponent implements OnInit {
     @Input() set routes(values: string[]) {
         if (!values.length) {
             this.addAllVehicles();
-            this.clearAllRouteShapes();
+            this.clearAllTripShapes();
             this.currentRoutes = new Set();
         }
         else if (values.length > this.currentRoutes.size) {
             this.addAllVehiclesFromRoutes();
-            this.addSecondaryRouteShapes(values);
+            this.addSemiTransparentRoutes(values);
         } else if (values.length < this.currentRoutes.size) {
             this.addAllVehiclesFromRoutes();
-            this.removeSecondaryRouteShapes(values);
+            this.removeSemiTransparentRoutes(values);
         }
     };
 
     @Input() set vehicleSelected(value: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined) {
-        if (!value) this.clearRouteShapes();
+        if (!value) this.clearSemiTransparentTripShapes();
     }
 
     @Output() newVehicleSelected = new EventEmitter<GtfsRealtimeBindings.transit_realtime.IVehiclePosition>();
@@ -64,8 +64,8 @@ export class MapComponent implements OnInit {
 
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
-    private routeShapeLayers: L.LayerGroup[] = [];
-    private routeToSecondaryShapeLayers = new Map<string, L.LayerGroup>();
+    private routeLayers: L.LayerGroup[] = [];
+    private routeToSemiTransparentLayers = new Map<string, L.LayerGroup>();
 
     private currentAgencies: string[] = [];
     private currentRoutes = new Set<string>();
@@ -83,7 +83,7 @@ export class MapComponent implements OnInit {
     ) => {
         this.newVehicleSelected.emit(vehicle);
         this.newVehicleSelectedAgencyId.emit(agencyId);
-        this.addRouteShape(agencyId, vehicle.trip);
+        this.addRoute(agencyId, vehicle.trip);
     };
 
     constructor(
@@ -134,18 +134,21 @@ export class MapComponent implements OnInit {
         this.vehicleLayers = [];
     }
 
-    private async clearRouteShapes(): Promise<void> {
-        await this.clearLayers(this.routeShapeLayers);
-        this.routeShapeLayers = [];
+    private async clearAllTripShapes(): Promise<void> {
+        this.clearTripShapes();
+        this.clearSemiTransparentTripShapes();
     }
 
-    private async clearAllRouteShapes(): Promise<void> {
-        await this.clearLayers(this.routeShapeLayers);
-        this.routeToSecondaryShapeLayers.forEach(async (layer) => {
+    private async clearTripShapes(): Promise<void> {
+        await this.clearLayers(this.routeLayers);
+        this.routeLayers = [];
+    }
+
+    private async clearSemiTransparentTripShapes(): Promise<void> {
+        this.routeToSemiTransparentLayers.forEach(async (layer) => {
             this.clearLayer(layer);
         });
-        this.routeShapeLayers = [];
-        this.routeToSecondaryShapeLayers = new Map<string, L.LayerGroup>();
+        this.routeToSemiTransparentLayers = new Map<string, L.LayerGroup>();
     }
 
     private async clearLayers(layers: L.LayerGroup[]): Promise<void> {
@@ -158,14 +161,14 @@ export class MapComponent implements OnInit {
         }
     }
 
+
     private async refreshVehicles(): Promise<void> {
+        await this.clearVehicles();
         if (!this.currentRoutes.size) this.addAllVehicles();
         else this.addAllVehiclesFromRoutes();
     }
 
     private async addAllVehicles(): Promise<void> {
-        await this.clearVehicles();
-
         if (this.options.mergeAllVehicleClusters) {
             await this.addAllVehiclesLayer(this.currentAgencies)
         } else {
@@ -186,7 +189,6 @@ export class MapComponent implements OnInit {
     }
 
     private async addAllVehiclesFromRoutes(): Promise<void> {
-        await this.clearVehicles();
         if (!this.currentRoutes.size) return;
         const currentRoutesSorted = [...this.currentRoutes]
             .sort((a, b) => a.localeCompare(b));
@@ -220,46 +222,47 @@ export class MapComponent implements OnInit {
         this.map.addLayer(vehiclesLayer);
     }
 
-    private async addRouteShape(
+
+    private async addRoute(
         agencyId: string, 
         tripDescriptor?: GtfsRealtimeBindings.transit_realtime.ITripDescriptor | null
     ): Promise<void> {
-        await this.clearRouteShapes();
+        await this.clearAllTripShapes();
         if (tripDescriptor && tripDescriptor.tripId) {
-            const tripShape = await this.tripShapeService.createTripShapeLayer(
+            const trip = await this.tripShapeService.createTripLayer(
                 agencyId,
                 tripDescriptor.tripId,
                 tripDescriptor.routeId,
             );
-            this.routeShapeLayers.push(tripShape);
-            this.map.addLayer(tripShape);
+            this.routeLayers.push(trip);
+            this.map.addLayer(trip);
         }
     }
 
-    private async addSecondaryRouteShapes(routes: string[]): Promise<void> {
+    private async addSemiTransparentRoutes(routes: string[]): Promise<void> {
         const addedRoutes = routes.filter((route) => !this.currentRoutes.has(route));
-        addedRoutes.forEach((addedRoute) =>  this.addSecondaryRouteShape(addedRoute));
+        addedRoutes.forEach((addedRoute) =>  this.addSemiTransparentRoute(addedRoute));
         this.currentRoutes = new Set(routes);
     }
 
-    private async addSecondaryRouteShape(route: string): Promise<void> {
-        const tripShape = await this.tripShapeService.createSecondaryTripShapesLayer([route]);
-        this.routeToSecondaryShapeLayers.set(route, tripShape);
-        this.map.addLayer(tripShape);
+    private async addSemiTransparentRoute(route: string): Promise<void> {
+        const tripLayer = await this.tripShapeService.createSemiTransparentTripsLayer([route]);
+        this.routeToSemiTransparentLayers.set(route, tripLayer);
+        this.map.addLayer(tripLayer);
     }
 
-    private async removeSecondaryRouteShapes(routes: string[]): Promise<void> {
+    private async removeSemiTransparentRoutes(routes: string[]): Promise<void> {
         const routesSet = new Set(routes);
         const removedRoutes = [...this.currentRoutes].filter((route) => !routesSet.has(route));
-        removedRoutes.forEach((removedRoute) => this.removeSecondaryRouteShape(removedRoute));
+        removedRoutes.forEach((removedRoute) => this.removeSemiTransparentRoute(removedRoute));
         this.currentRoutes = new Set(routes);
     }
 
-    private async removeSecondaryRouteShape(route: string): Promise<void> {
-        const tripShapesLayer = this.routeToSecondaryShapeLayers.get(route);
-        if (!tripShapesLayer) return;
-        await this.clearLayer(tripShapesLayer);
-        this.routeToSecondaryShapeLayers.delete(route);
+    private async removeSemiTransparentRoute(route: string): Promise<void> {
+        const tripsLayer = this.routeToSemiTransparentLayers.get(route);
+        if (!tripsLayer) return;
+        await this.clearLayer(tripsLayer);
+        this.routeToSemiTransparentLayers.delete(route);
     }
 }
     
