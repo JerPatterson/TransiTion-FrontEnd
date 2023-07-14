@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import L from 'leaflet';
 import 'leaflet.markercluster';
+import 'leaflet-markers-canvas';
 import { RealtimeDataService } from 'src/app/services/realtime/realtime-data.service';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 import { StaticDataService } from 'src/app/services/static/static-data.service';
@@ -49,7 +50,7 @@ export class VehicleMarkerService {
                 this.getBackgroundColor(agencyIds[0]) : DEFAULT_BACKGROUND_COLOR, 
             options.mergeAllVehicleClusters,
         );
-        
+
         agencyIds.map(async (agencyId) => {
             (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
                 if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
@@ -57,7 +58,6 @@ export class VehicleMarkerService {
                 if (vehicleMarker) clusterGroup.addLayer(vehicleMarker);
             });
         });
-
         return clusterGroup;
     }
 
@@ -65,7 +65,7 @@ export class VehicleMarkerService {
         routes: string[], 
         options: MapRenderingOptions,
         emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
-    ) : Promise<L.MarkerClusterGroup> {
+    ) : Promise<L.LayerGroup> {
         const firstRouteAgencyId = routes[0].split(PARAM_SEPARATOR)[0];
         const lastRouteAgencyId = routes[routes.length - 1].split(PARAM_SEPARATOR)[0];
         const clusterGroup = await this.buildVehicleMarkerClusterGroup(
@@ -150,9 +150,15 @@ export class VehicleMarkerService {
         const vehicleIconColor = this.getIconColor(agencyId);
         const backgroundColor = this.getBackgroundColor(agencyId);
 
+        // return L.icon({
+        //     iconUrl: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 70 70" style="color: ${wasSeenLongAgo ? OLD_VEHICLE_COLOR : vehicleIconColor};"><g fill="${wasSeenLongAgo ? OLD_VEHICLE_BACKGROUND_COLOR : backgroundColor}" transform="rotate(${bearing ? bearing - 180 : 0} 35 35)"><defs><filter id="blur"><feDropShadow dx="0" dy="0" stdDeviation="3.0" flood-color="black"/></filter><mask id="circle-mask" x="-0.2" y="-0.2" width="1.4" height="1.4"><circle cx="35" cy="35" r="25" fill="white"/><circle cx="35" cy="35" r="20" fill="black"/></mask></defs><circle cx="35" cy="35" r="20" style="mask: url(%23circle-mask); filter: url(%23blur)"/><circle cx="35" cy="35" r="20"/><polygon points="35,70 20,53 35,60 50,53"/></g><use height="32" x="0" y="17" xlink:href="${iconLink}" href="${iconLink}"></use></svg>`,
+        //     iconSize: [DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE],
+        //     iconAnchor: [DEFAULT_ANCHOR_SHIFT, DEFAULT_ANCHOR_SHIFT],
+        // });
         return L.divIcon({
             className: 'vehicle-icon',
-            html: `
+            // iconUrl: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 70 70" style="color: ${wasSeenLongAgo ? OLD_VEHICLE_COLOR : vehicleIconColor};"><g fill="${wasSeenLongAgo ? OLD_VEHICLE_BACKGROUND_COLOR : backgroundColor}" transform="rotate(${bearing ? bearing - 180 : 0} 35 35)"><defs><filter id="blur"><feDropShadow dx="0" dy="0" stdDeviation="3.0" flood-color="black"/></filter><mask id="circle-mask" x="-0.2" y="-0.2" width="1.4" height="1.4"><circle cx="35" cy="35" r="25" fill="white"/><circle cx="35" cy="35" r="20" fill="black"/></mask></defs><circle cx="35" cy="35" r="20" style="mask: url(%23circle-mask); filter: url(%23blur)"/><circle cx="35" cy="35" r="20"/><polygon points="35,70 20,53 35,60 50,53"/></g><use height="32" x="0" y="17" xlink:href="${iconLink}" href="${iconLink}"></use></svg>`,
+            iconUrl: `data:image/svg+xml,
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink"
