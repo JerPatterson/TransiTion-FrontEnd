@@ -71,5 +71,49 @@ AGENCY_TO_STYLE.set('cithsl', {
 });
 AGENCY_TO_STYLE.set('rtl', {
     backgroundColor: '#921d2f',
+    vehicleIconColor: '#ffffff',
+});
+AGENCY_TO_STYLE.set('ctc', {
+    backgroundColor: '#113b6c',
+    vehicleIconColor: '#ffffff',
+});
+AGENCY_TO_STYLE.set('sttr', {
+    backgroundColor: '#5ba33b',
     vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('stlevis', {
+    backgroundColor: '#008baf',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('stsag', {
+    backgroundColor: '#0273c0',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('sts', {
+    backgroundColor: '#12365b',
+    vehicleIconColor: '#ffffff',
+});
+AGENCY_TO_STYLE.set('tug', {
+    backgroundColor: '#99c962',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('linter', {
+    backgroundColor: '#e67230',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('tchsl', {
+    backgroundColor: '#79b636',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('tcsjr', {
+    backgroundColor: '#b3324e',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('tcmrcm', {
+    backgroundColor: '#4f7f3b',
+    vehicleIconColor: '#000000',
+});
+AGENCY_TO_STYLE.set('tcmt', {
+    backgroundColor: '#005a7a',
+    vehicleIconColor: '#ffffff',
 });

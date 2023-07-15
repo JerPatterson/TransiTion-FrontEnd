@@ -18,9 +18,15 @@
             </use>
         </svg>
         <div>
-            <p class="vehicle-identifier">
+            <p 
+                class="vehicle-identifier"
+                *ngIf="this.vehicle.vehicle?.id?.includes('zenbus')">
+                ???
+            </p>
+            <p 
+                class="vehicle-identifier"
+                *ngIf="!this.vehicle.vehicle?.id?.includes('zenbus')">
                 {{ this.vehicle.vehicle?.id }}
-            
             </p>
             <p class="vehicle-last-update">
                 Il y a {{ this.lastSeenString }}
