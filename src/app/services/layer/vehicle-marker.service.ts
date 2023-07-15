@@ -35,6 +35,8 @@ import { MapRenderingOptions } from '@app/utils/component-interface';
     providedIn: 'root'
 })
 export class VehicleMarkerService {
+    private markersCanvas = new L.MarkersCanvas();
+
     constructor(
         private stDataService: StaticDataService,
         private rtDataService: RealtimeDataService,
@@ -61,15 +63,15 @@ export class VehicleMarkerService {
                 });
             });
         } else {
-            const markersCanvas = new L.MarkersCanvas();
             agencyIds.map(async (agencyId) => {
                 (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
                     if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
                     const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, emitVehicleSelected);
-                    if (vehicleMarker) markersCanvas.addMarker(vehicleMarker);
+                    if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
             });
-            layerGroup = L.layerGroup().addLayer(markersCanvas);
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
+            layerGroup.on('remove', () => this.markersCanvas.clear());
         }
 
         return layerGroup;
@@ -96,11 +98,21 @@ export class VehicleMarkerService {
                 (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
                     if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
                     const vehicleMarker = await this.buildVehicleMarkerCluster(agencyId, vehicle, emitVehicleSelected);
-                    if (vehicleMarker) vehicleMarker.addTo(layerGroup);
+                    if (vehicleMarker) layerGroup.addLayer(vehicleMarker);
                 });
             });
         } else {
-            layerGroup = new L.MarkersCanvas() as any as L.LayerGroup;
+            routes.forEach(async (route) => {
+                const agencyId = route.split(PARAM_SEPARATOR)[0];
+                const routeId = route.split(PARAM_SEPARATOR)[1];
+                (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
+                    if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
+                    const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, emitVehicleSelected);
+                    if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
+                });
+            });
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
+            layerGroup.on('remove', () => this.markersCanvas.clear());
         }
 
         return layerGroup;
@@ -228,12 +240,6 @@ export class VehicleMarkerService {
         const wasSeenLongAgo = this.wasSeenLongAgo(timestamp);
         const route = routeId ? await this.stDataService.getRouteById(agencyId, routeId) : undefined;
         const iconSVG = await this.getIconSVGFromRouteType(iconColor, route?.route_type);
-
-        console.log(this.getIconUrlWithBearing(
-            bearing ? bearing : 0,
-            iconSVG,
-            wasSeenLongAgo ? OLD_VEHICLE_BACKGROUND_COLOR : backgroundColor,
-        ));
 
         return L.icon({
             iconUrl: bearing ? 
@@ -395,17 +401,6 @@ export class VehicleMarkerService {
                 xmlns:xlink="http://www.w3.org/1999/xlink"
                 viewBox="0 0 80 80">
                 <g fill="${backgroundColor.replace('#', '%23')}">
-                    <defs>
-                        <filter id="blur">
-                            <feDropShadow dx="0" dy="0" stdDeviation="3.0"
-                                flood-color="black"/>
-                        </filter>
-                        <mask id="circle-mask" x="-0.2" y="-0.2" width="1.4" height="1.4">
-                            <circle cx="40" cy="40" r="25" fill="white"/>  
-                            <circle cx="40" cy="40" r="20" fill="black"/>  
-                        </mask>
-                    </defs>
-                    <circle cx="40" cy="40" r="20" style="mask: url(%23circle-mask); filter: url(%23blur)"/>
                     <circle cx="40" cy="40" r="20"/>
                 </g>
                 ${iconSVG}

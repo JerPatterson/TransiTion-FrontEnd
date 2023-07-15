@@ -27,6 +27,7 @@ export class MapComponent implements OnInit {
 
     @Input() set useVehicleClusters(value: boolean) {
         this.options.useVehicleClusters = value;
+        this.refreshVehicles();
     }
 
     @Input() set mergeAllVehicleClusters(value: boolean) {
@@ -42,17 +43,18 @@ export class MapComponent implements OnInit {
 
     @Input() set routes(values: string[]) {
         if (!values.length) {
-            this.addAllVehicles();
             this.clearAllTripShapes();
             this.currentRoutes = new Set();
         }
         else if (values.length > this.currentRoutes.size) {
-            this.addAllVehiclesFromRoutes();
+            this.clearTripShapes();
             this.addSemiTransparentRoutes(values);
         } else if (values.length < this.currentRoutes.size) {
-            this.addAllVehiclesFromRoutes();
+            this.clearTripShapes();
             this.removeSemiTransparentRoutes(values);
         }
+
+        this.refreshVehicles();
     };
 
     @Input() set vehicleSelected(value: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined) {
@@ -100,8 +102,7 @@ export class MapComponent implements OnInit {
     
     private initMap(): void {
         const TomTomTileLayer = L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
-            maxZoom: 22,
-            attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
+            attribution: '&copy; <a href="https://tomtom.com" target="_blank">1992 - 2023 TomTom.</a> ',
             subdomains: 'abcd',
         });
 
@@ -109,8 +110,8 @@ export class MapComponent implements OnInit {
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         });
 
-        const STLTileLayer = L.tileLayer('https://navigoservprod.stl.laval.qc.ca/FCT/mbtiles-1.php?id=routier_stl_couleur/{z}/{x}/{y}.png', {
-            attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',
+        const ArcGISLayer = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '&copy; <a href="http://www.esri.com/">Esri</a>, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
         });
         
         this.map = L.map('map', {
@@ -121,18 +122,19 @@ export class MapComponent implements OnInit {
             layers: [TomTomTileLayer]
         }).setView([this.lat, this.lon], this.zoom);
 
+        this.map.invalidateSize({ animate: true });
+
         const layerControl = L.control.layers({ 'TomTom': TomTomTileLayer }).addTo(this.map);
         layerControl.addBaseLayer(OSMTileLayer, 'OpenStreetMaps');
-        layerControl.addBaseLayer(STLTileLayer, 'Société de transport de Laval');
+        layerControl.addBaseLayer(ArcGISLayer, 'ArcGIS Satellite');
 
-        // L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
-        //     maxZoom: 22,
-        //     attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
-        //     subdomains: 'abcd',
-        // }).addTo(this.map);
-
-        this.map.invalidateSize({ animate: true });
-        this.map.createPane('semitransparent').style.opacity = '0.5';
+        const markerPane = this.map.createPane('marker');
+        const shapesPane = this.map.createPane('shapes');
+        const semitransparentPane = this.map.createPane('semitransparent');
+        markerPane.style.zIndex = '220';
+        shapesPane.style.zIndex = '210';
+        semitransparentPane.style.zIndex = '205';
+        semitransparentPane.style.opacity = '0.5';
     }
 
     private async clearVehicles(): Promise<void> {
@@ -191,7 +193,9 @@ export class MapComponent implements OnInit {
             this.emitVehicleSelected,
         );
         this.vehicleLayers.push(vehiclesLayer);
-        this.map.addLayer(vehiclesLayer);
+        vehiclesLayer.addTo(this.map);
+        if (!this.options.useVehicleClusters)
+            this.map.setZoom(this.map.getZoom());
     }
 
     private async addAllVehiclesFromRoutes(): Promise<void> {
@@ -225,7 +229,9 @@ export class MapComponent implements OnInit {
                 this.emitVehicleSelected,
             );
         this.vehicleLayers.push(vehiclesLayer);
-        this.map.addLayer(vehiclesLayer);
+        vehiclesLayer.addTo(this.map);
+        if (!this.options.useVehicleClusters)
+            this.map.setZoom(this.map.getZoom());
     }
 
 
@@ -233,7 +239,7 @@ export class MapComponent implements OnInit {
         agencyId: string, 
         tripDescriptor?: GtfsRealtimeBindings.transit_realtime.ITripDescriptor | null
     ): Promise<void> {
-        await this.clearAllTripShapes();
+        await this.clearTripShapes();
         if (tripDescriptor && tripDescriptor.tripId) {
             const trip = await this.tripShapeService.createTripLayer(
                 agencyId,
