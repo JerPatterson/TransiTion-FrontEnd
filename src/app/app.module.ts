@@ -13,7 +13,7 @@ import { RouteComponent } from './components/elements/route/route.component';
 import { StopComponent } from './components/elements/stop/stop.component';
 import { AgencyComponent } from './components/elements/agency/agency.component';
 import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
-import { VehicleInfoComponent } from './components/vehicle-info/vehicle-info.component';
+import { VehicleInfoComponent } from './components/info/vehicle-info.component';
 
 @NgModule({
   declarations: [
