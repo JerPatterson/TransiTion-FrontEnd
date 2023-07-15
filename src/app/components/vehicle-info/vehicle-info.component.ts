@@ -86,10 +86,9 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
             this.trip = undefined;
         }
 
-        this.bearing = this.vehicle.position?.bearing ? this.vehicle.position.bearing : 0;
-
         this.setLastSeenValue();
         this.setSpeedValue();
+        this.setBearingValue();
         this.setOccupancyStatusValue();
         this.setVehicleStopStatusValue();
         this.setCongestionLevelValue();
@@ -123,6 +122,12 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
                 Math.round(this.vehicle.position.speed * SECONDS_IN_HOUR / METERS_IN_KM)
             } km/h`
         }
+    }
+
+    private setBearingValue(): void {
+        this.bearing = -1;
+        if (this.vehicle.position?.bearing && this.vehicle.position?.bearing >= 0) 
+            this.bearing = this.vehicle.position?.bearing - 180;
     }
 
     private setOccupancyStatusValue(): void {

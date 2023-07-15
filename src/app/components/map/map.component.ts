@@ -99,26 +99,31 @@ export class MapComponent implements OnInit {
     }
     
     private initMap(): void {
+        const TomTomTileLayer = L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
+            maxZoom: 22,
+            attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
+            subdomains: 'abcd',
+        });
+
+        const OSMTileLayer = L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        });
+
+        const STLTileLayer = L.tileLayer('https://navigoservprod.stl.laval.qc.ca/FCT/mbtiles-1.php?id=routier_stl_couleur/{z}/{x}/{y}.png', {
+            attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',
+        });
+        
         this.map = L.map('map', {
             minZoom: MIN_ZOOM,
             maxZoom: MAX_ZOOM,
             zoomControl: false,
             preferCanvas: true,
+            layers: [TomTomTileLayer]
         }).setView([this.lat, this.lon], this.zoom);
-        
-        // L.tileLayer('https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-        //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        // }).addTo(this.map);
 
-        // L.tileLayer('https://navigoservprod.stl.laval.qc.ca/FCT/mbtiles-1.php?id=routier_stl_couleur/{z}/{x}/{y}.png', {
-        //     attribution: '<a href="https://https://stlaval.ca/">&copy; STL 2023</a>',
-        // }).addTo(this.map);
-
-        L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/main/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
-            maxZoom: 22,
-            attribution: '<a href="https://tomtom.com" target="_blank">&copy;  1992 - 2023 TomTom.</a> ',
-            subdomains: 'abcd',
-        }).addTo(this.map);
+        const layerControl = L.control.layers({ 'TomTom': TomTomTileLayer }).addTo(this.map);
+        layerControl.addBaseLayer(OSMTileLayer, 'OpenStreetMaps');
+        layerControl.addBaseLayer(STLTileLayer, 'Société de transport de Laval');
 
         // L.tileLayer('https://{s}.api.tomtom.com/map/1/tile/basic/night/{z}/{x}/{y}.png?key=3GZCUZbHUOBdGhlDtQiCvnBskUWTev4L&tileSize=256&language=fr-FR', {
         //     maxZoom: 22,
@@ -126,6 +131,7 @@ export class MapComponent implements OnInit {
         //     subdomains: 'abcd',
         // }).addTo(this.map);
 
+        this.map.invalidateSize({ animate: true });
         this.map.createPane('semitransparent').style.opacity = '0.5';
     }
 

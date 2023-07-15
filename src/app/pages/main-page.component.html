@@ -58,6 +58,19 @@
     </button>
     <button
         *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
+        [ngClass]="!this.options.useVehicleClusters ? 'selected' : ''"
+        (click)="this.changeUseVehicleClustersOption()">
+        <svg class="option-icon">
+            <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
+        </svg>
+        <span 
+            class="option-name"
+            *ngIf="this.options.useVehicleClusters">
+            Garder les repères individuels
+        </span>
+    </button>
+    <button
+        *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
         [ngClass]="this.options.mergeAllVehicleClusters ? 'selected' : ''"
         (click)="this.changeMergeAllVehicleClustersOption()">
         <svg class="option-icon">
@@ -89,6 +102,7 @@
     [routes]="this.routeIdsSelected"
     [vehicleSelected]="this.vehicleSelected"
     [showOldVehicles]="this.options.showOldVehicles"
+    [useVehicleClusters]="this.options.useVehicleClusters"
     [mergeAllVehicleClusters]="this.options.mergeAllVehicleClusters"
     (newVehicleSelected)="this.addVehicleSlected($event)"
     (newVehicleSelectedAgencyId)="this.addVehicleSlectedAgencyId($event)">

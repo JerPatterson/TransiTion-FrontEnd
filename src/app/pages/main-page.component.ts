@@ -44,6 +44,7 @@ export class MainPageComponent implements AfterContentChecked {
     }
 
     changeUseVehicleClustersOption() {
+        this.options.mergeAllVehicleClusters = false;
         this.options.useVehicleClusters = !this.options.useVehicleClusters;
     }
 
