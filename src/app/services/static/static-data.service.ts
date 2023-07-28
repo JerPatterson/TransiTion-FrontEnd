@@ -40,7 +40,7 @@ export class StaticDataService {
         const ssShape = localStorage.getItem(`shapes/${agencyId}/${shapeId}`);
         if (ssShape) return JSON.parse(ssShape);
         const response = await fetch(`${SERVER_URL}/shapes/${agencyId}/${shapeId}`);
-        const shape = await response.json();
+        const shape = (await response.json()).shapes;
         while (true) {
             try {
                 localStorage.setItem(`shapes/${agencyId}/${shapeId}`, JSON.stringify(shape));
@@ -53,7 +53,7 @@ export class StaticDataService {
         return shape;
     }
 
-    async getTrip(agencyId: string, tripId: string): Promise<TripDto> {
+    async getTripById(agencyId: string, tripId: string): Promise<TripDto> {
         const response = await fetch(`${SERVER_URL}/trips/${agencyId}/${tripId}`);
         return response.json();
     }

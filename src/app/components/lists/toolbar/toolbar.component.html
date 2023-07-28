@@ -1,7 +1,7 @@
 <div class="toolbar">
     <button 
         class="tool"
-        [ngClass]="this.agencyListSelected ? 'selected' : ''"
+        [ngClass]="this.componentDisplayed === 1 ? 'selected' : ''"
         (click)="this.handleAgencyListClick()">
         <svg class="tool">
             <use xlink:href='../assets/icons/agency.svg#agency' href="./assets/icons/agency.svg#agency"></use>
@@ -10,7 +10,7 @@
     </button>
     <button 
         class="tool"
-        [ngClass]="this.routeListSelected ? 'selected' : ''"
+        [ngClass]="this.componentDisplayed === 2 ? 'selected' : ''"
         (click)="this.handleRouteListClick()">
         <svg class="tool">
             <use xlink:href='../assets/icons/route.svg#route' href="./assets/icons/route.svg#route"></use>
@@ -19,7 +19,7 @@
     </button>
     <button 
         class="tool"
-        [ngClass]="this.stopListSelected ? 'selected' : ''"
+        [ngClass]="this.componentDisplayed === 3 ? 'selected' : ''"
         (click)="this.handleStopListClick()">
         <svg class="tool">
             <use xlink:href='../assets/icons/stop-sign.svg#stop-sign' href="./assets/icons/stop-sign.svg#stop-sign"></use>
@@ -28,7 +28,7 @@
     </button>
     <button 
         class="tool"
-        [ngClass]="this.vehicleListSelected ? 'selected' : ''"
+        [ngClass]="this.componentDisplayed === 4 ? 'selected' : ''"
         (click)="this.handleVehicleListClick()">
         <svg class="tool">
             <use xlink:href='../assets/icons/bus.svg#bus' href="./assets/icons/bus.svg#bus"></use>

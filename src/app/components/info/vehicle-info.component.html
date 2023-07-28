@@ -4,49 +4,49 @@
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 70 70"
-            [ngStyle]="{color: this.style?.vehicleIconColor}">
+            [ngStyle]="{color: this.attributes.style?.vehicleIconColor}">
             <g
-                [attr.fill]="this.style?.backgroundColor"
-                [attr.transform]="'rotate(' + this.bearing + ' 35 35)'">
+                [attr.fill]="this.attributes.style?.backgroundColor"
+                [attr.transform]="'rotate(' + (this.attributes.bearing - 180) + ' 35 35)'">
                 <circle cx="35" cy="35" r="20"/>
-                <path *ngIf="this.bearing >= 0" d="M35,70 20,53 35,60 50,53z"/>
+                <path *ngIf="this.attributes.bearing >= 0" d="M35,70 20,53 35,60 50,53z"/>
             </g>
             <use 
                 height="32" x="0" y="17" 
-                [attr.xlink:href]="this.iconLink" 
-                [attr.href]="this.iconLink">
+                [attr.xlink:href]="this.attributes.iconLink" 
+                [attr.href]="this.attributes.iconLink">
             </use>
         </svg>
         <div>
             <p 
                 class="vehicle-identifier"
-                *ngIf="this.vehicle.vehicle?.id?.includes('zenbus')">
-                ???
+                *ngIf="this.vehicleId.vehicleId.includes('zenbus')">
+                Inconnu
             </p>
             <p 
                 class="vehicle-identifier"
-                *ngIf="!this.vehicle.vehicle?.id?.includes('zenbus')">
-                {{ this.vehicle.vehicle?.id }}
+                *ngIf="!this.vehicleId.vehicleId.includes('zenbus')">
+                {{ this.vehicleId.vehicleId }}
             </p>
             <p class="vehicle-last-update">
-                Il y a {{ this.lastSeenString }}
+                Il y a {{ this.attributes.lastSeenString }}
             </p>
         </div>
     </div>
 
     <hr>
     <app-route 
-        *ngIf="this.route"
-        [route]="this.route"
-        [trip]="this.trip">
+        *ngIf="this.attributes.route"
+        [route]="this.attributes.route"
+        [trip]="this.attributes.trip">
     </app-route>
-    <hr *ngIf="this.route">
+    <hr *ngIf="this.attributes.route">
 
     <div class="vehicle-info-container">
         <div
             class="vehicle-info"
-            *ngIf="this.speedKmHrString">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            *ngIf="this.attributes.speedKmHrString">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/speed.svg#speed' href="./assets/icons/speed.svg#speed"></use>
             </svg>
             <div>
@@ -54,15 +54,15 @@
                     Vitesse
                 </p>
                 <p class="vehicle-info-value">
-                    {{ this.speedKmHrString }}
+                    {{ this.attributes.speedKmHrString }}
                 </p>
             </div>
         </div>
 
         <div
             class="vehicle-info"
-            *ngIf="this.vehicle.trip?.startTime">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            *ngIf="this.vehicle?.trip?.startTime">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/clock.svg#clock' href="./assets/icons/clock.svg#clock"></use>
             </svg>
             <div>
@@ -70,15 +70,15 @@
                     Heure du départ
                 </p>
                 <p class="vehicle-info-value">         
-                    {{ this.vehicle.trip?.startTime }}
+                    {{ this.vehicle?.trip?.startTime }}
                 </p>
             </div>
         </div>
 
         <div
             class="vehicle-info"
-            *ngIf="this.occupancyString">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            *ngIf="this.attributes.occupancyString">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/occupancy.svg#occupancy' href="./assets/icons/occupancy.svg#occupancy"></use>
             </svg>
             <div>
@@ -86,15 +86,15 @@
                     Achalandage
                 </p>
                 <p class="vehicle-info-value">
-                    {{ this.occupancyString }}
+                    {{ this.attributes.occupancyString }}
                 </p>
             </div>
         </div>
 
         <div
             class="vehicle-info"
-            *ngIf="this.stopStatusString">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            *ngIf="this.attributes.stopStatusString">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/route.svg#route' href="./assets/icons/route.svg#route"></use>
             </svg>
             <div>
@@ -102,15 +102,15 @@
                     Statut du trajet
                 </p>
                 <p class="vehicle-info-value">
-                    {{ this.stopStatusString }}
+                    {{ this.attributes.stopStatusString }}
                 </p>
             </div>
         </div>
 
         <div
             class="vehicle-info"
-            *ngIf="this.vehicle.currentStopSequence">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            *ngIf="this.vehicle?.currentStopSequence">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/stop.svg#stop' href="./assets/icons/stop.svg#stop"></use>
             </svg>
             <div>
@@ -118,13 +118,13 @@
                     Numéro de séquence d'arrêt
                 </p>
                 <p class="vehicle-info-value">
-                    {{ this.vehicle.currentStopSequence }}
+                    {{ this.vehicle?.currentStopSequence }}
                 </p>
             </div>
         </div>
 
         <div class="vehicle-info">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/schedule.svg#schedule' href="./assets/icons/schedule.svg#schedule"></use>
             </svg>
             <div>
@@ -132,15 +132,15 @@
                     Relation avec l'horaire
                 </p>
                 <p class="vehicle-info-value">
-                    {{ this.scheduleRelationshipString }}
+                    {{ this.attributes.scheduleRelationshipString }}
                 </p>
             </div>
         </div>
 
         <div
             class="vehicle-info"
-            *ngIf="this.congestionLevelString">
-            <svg [ngStyle]="{color: this.style?.backgroundColor}">
+            *ngIf="this.attributes.congestionLevelString">
+            <svg [ngStyle]="{color: this.attributes.style?.backgroundColor}">
                 <use xlink:href='./assets/icons/traffic.svg#traffic' href="./assets/icons/traffic.svg#traffic"></use>
             </svg>
             <div>
@@ -148,7 +148,7 @@
                     Niveau de congestion
                 </p>
                 <p class="vehicle-info-value">
-                    {{ this.congestionLevelString }}
+                    {{ this.attributes.congestionLevelString }}
                 </p>
             </div>
         </div>

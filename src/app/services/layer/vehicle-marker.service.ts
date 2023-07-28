@@ -29,7 +29,7 @@ import {
     THIRD_CLUSTER_ALPHA,
     THIRD_CLUSTER_MAX_CHILD_COUNT
 } from '@app/utils/constants';
-import { MapRenderingOptions } from '@app/utils/component-interface';
+import { MapRenderingOptions, VehicleId } from '@app/utils/component-interface';
 
 @Injectable({
     providedIn: 'root'
@@ -45,7 +45,7 @@ export class VehicleMarkerService {
     async createVehiclesLayer(
         agencyIds: string[],
         options: MapRenderingOptions,
-        emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
+        emitVehicleSelected: (v: VehicleId) => void,
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         if (options.useVehicleClusters) {
@@ -80,7 +80,7 @@ export class VehicleMarkerService {
     async createVehiclesLayerFromRoutes(
         routes: string[], 
         options: MapRenderingOptions,
-        emitVehicleSelected: (a: string, v: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) => void,
+        emitVehicleSelected: (v: VehicleId) => void,
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         const firstRouteAgencyId = routes[0].split(PARAM_SEPARATOR)[0];
@@ -146,10 +146,7 @@ export class VehicleMarkerService {
     private async buildVehicleMarkerCluster(
         agencyId: string,
         vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
-        emitMarkerClicked: (
-            agencyId: string,
-            vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition
-        ) => void,
+        emitMarkerClicked: (v: VehicleId) => void,
     ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker(
@@ -164,7 +161,10 @@ export class VehicleMarkerService {
                 },
             ).addEventListener(
                 'click', 
-                () => emitMarkerClicked(agencyId, vehicle),
+                () => emitMarkerClicked({
+                    agencyId,
+                    vehicleId: vehicle.vehicle?.id ? vehicle.vehicle?.id : ''
+                }),
             );
     
         return marker;
@@ -205,10 +205,7 @@ export class VehicleMarkerService {
     private async buildVehicleMarkerCanvas(
         agencyId: string,
         vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
-        emitMarkerClicked: (
-            agencyId: string,
-            vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition
-        ) => void,
+        emitMarkerClicked: (v: VehicleId) => void,
     ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker(
@@ -223,7 +220,10 @@ export class VehicleMarkerService {
                 },
             ).addEventListener(
                 'click', 
-                () => emitMarkerClicked(agencyId, vehicle),
+                () => emitMarkerClicked({
+                    agencyId,
+                    vehicleId: vehicle.vehicle?.id ? vehicle.vehicle?.id : ''
+                }),
             );
     
         return marker;

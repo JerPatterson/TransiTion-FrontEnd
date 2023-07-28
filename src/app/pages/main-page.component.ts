@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core';
-import { MapRenderingOptions } from '@app/utils/component-interface';
-import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
+import { MapSelectionIdentifiers, MapRenderingOptions, RouteId, MapComponentDisplayed, MapSelectionOptions, VehicleId } from '@app/utils/component-interface';
 
 @Component({
     selector: 'app-main-page',
@@ -14,26 +13,27 @@ export class MainPageComponent implements AfterContentChecked {
         useVehicleClusters: true,
         mergeAllVehicleClusters: false,
     }
-    
-    agencyIdsSelected: string[] = [];
-    selectAllAgenciesOption: boolean = false;
 
-    routeIdsSelected: string[] = [];
+    selectOptions: MapSelectionOptions = {
+        allAgencies: false,
+        allRoutes: false,
+    }
 
-    vehicleSelected!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition | undefined;
-    vehicleSelectedAgencyId: string = '';
+    selections: MapSelectionIdentifiers = {
+        agencies: [],
+        routes: [],
+        vehicle: undefined,
+        stop: undefined,
+    }
 
-    agencyListSelected: boolean = false;
-    routeListSelected: boolean = false;
-    stopListSelected: boolean = false;
-    vehicleListSelected: boolean = false;
+    componentDisplayed = MapComponentDisplayed.None;
+
 
     constructor(private cdref: ChangeDetectorRef) {}
 
     ngAfterContentChecked() {
         this.cdref.detectChanges();
     }
-
 
     changeDarkModeEnableOption() {
         this.options.darkModeEnable = !this.options.darkModeEnable;
@@ -52,51 +52,43 @@ export class MainPageComponent implements AfterContentChecked {
         this.options.mergeAllVehicleClusters = !this.options.mergeAllVehicleClusters;
     }
 
-
-    selectAgencyList(value: boolean) {
-        this.agencyListSelected = value;
-        this.vehicleSelected = undefined;
+    changeSelectAllAgenciesOption() {
+        this.selectOptions.allAgencies = !this.selectOptions.allAgencies;
     }
 
+    changeSelectAllRoutesOption() {
+        this.selectOptions.allRoutes = !this.selectOptions.allRoutes;
+    }
+
+    handleNewComponentToDisplay(componentToDisplay: MapComponentDisplayed) {
+        this.componentDisplayed = componentToDisplay;
+    }
+
+
     addAgencyIds(agencyIds: string[]) {
-        this.agencyIdsSelected = this.agencyIdsSelected.concat(agencyIds);
+        this.selections.agencies = this.selections.agencies.concat(agencyIds);
     }
 
     removeAgencyIds(agencyIds: string[]) {
-        this.agencyIdsSelected = this.agencyIdsSelected
+        this.selections.agencies = this.selections.agencies
             .filter((value) => !agencyIds.includes(value));
 
-        this.routeIdsSelected = this.routeIdsSelected
-            .filter((value) => !agencyIds.includes(value.split('/')[0].toUpperCase()))
+        this.selections.routes = this.selections.routes
+            .filter((value) => !agencyIds.includes(value.agencyId))
     }
 
-    changeSelectAllAgenciesOption() {
-        this.selectAllAgenciesOption = !this.selectAllAgenciesOption;
+    addRouteId(routeId: RouteId) {
+        this.selections.routes = this.selections.routes.concat([routeId]);
     }
 
-    selectRouteList(value: boolean) {
-        this.routeListSelected = value;
-        this.vehicleSelected = undefined;
+    removeRouteId(routeId: RouteId) {
+        this.selections.routes = this.selections.routes
+            .filter((value) => value.agencyId !== routeId.agencyId
+                || value.routeId !== routeId.routeId);
     }
 
-    addRouteId(routeId: string) {
-        this.routeIdsSelected = this.routeIdsSelected.concat([routeId]);
-    }
-
-    removeRouteId(routeId: string) {
-        this.routeIdsSelected = this.routeIdsSelected
-            .filter((value) => value !== routeId);
-    }
-
-    addVehicleSlected(vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition) {
-        this.agencyListSelected = false;
-        this.routeListSelected = false;
-        this.stopListSelected = false;
-        this.vehicleListSelected= false;
-        this.vehicleSelected = vehicle;
-    }
-
-    addVehicleSlectedAgencyId(agencyId: string) {
-        this.vehicleSelectedAgencyId = agencyId;
+    addVehicleSlected(vehicle: VehicleId) {
+        this.componentDisplayed = MapComponentDisplayed.VehicleInfo;
+        this.selections.vehicle = vehicle;
     }
 }

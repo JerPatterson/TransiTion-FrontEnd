@@ -1,5 +1,5 @@
 <div class="route-list">
-    <div *ngIf="!this.elements.length">
+    <div *ngIf="!this.routes.length">
         <svg class="information-icon">
             <use xlink:href='./assets/icons/information.svg#information' href="./assets/icons/information.svg#information"></use>
         </svg>
@@ -8,36 +8,35 @@
 
     <div
         class="agency-route-list"
-        *ngFor="let element of this.elements">
+        *ngFor="let route of this.routes">
         <div
             class="agency-element"
-            (click)="this.onAgencyClick(element.agency ? element.agency.agency_id : '')">
+            (click)="this.onAgencyClick(route.agency ? route.agency.agency_id : '')">
             <h3 class="agency-name">
-                {{ element.agency ? 
-                    element.agency.agency_name : element.routes[0][0].agency_id.toUpperCase() }}
+                {{ route.agency ? 
+                    route.agency.agency_name : route.routes[0].agency_id.toUpperCase() }}
             </h3>
             <svg 
                 class="list-icon"
-                *ngIf="element.agency && !this.showAgencies.has(element.agency.agency_id)">
+                *ngIf="route.agency && !this.agencyIdsSelected.has(route.agency.agency_id)">
                 <use xlink:href='./assets/icons/show.svg#show' href="./assets/icons/show.svg#show"></use>
             </svg>
             <svg
                 class="list-icon"
-                *ngIf="element.agency && this.showAgencies.has(element.agency.agency_id)">
+                *ngIf="route.agency && this.agencyIdsSelected.has(route.agency.agency_id)">
                 <use xlink:href='./assets/icons/hide.svg#hide' href="./assets/icons/hide.svg#hide"></use>
             </svg>
         </div>
         <hr>
         <div
-            *ngIf="element.agency"
-            [ngClass]="!this.showAgencies.has(element.agency.agency_id) ? 'hidden' : ''">
+            *ngIf="route.agency"
+            [ngClass]="!this.agencyIdsSelected.has(route.agency.agency_id) ? 'hidden' : ''">
             <app-route 
                 class="route-element"
-                *ngFor="let route of element.routes"
-                [route]="route[0]"
-                [selected]="this.routeIds.has((element.agency ? 
-                    element.agency.agency_id.toLowerCase() : '') + '/' + route[0].route_id)"
-                (click)="this.onRouteClick(route[0].agency_id, route)">
+                *ngFor="let route of route.routes"
+                [route]="route"
+                [selected]="this.routeIdsSelected.has(route.agency_id + '/' + route.route_id.split('/').pop())"
+                (click)="this.onRouteClick(route.agency_id, route)">
             </app-route>
         </div>
     </div>

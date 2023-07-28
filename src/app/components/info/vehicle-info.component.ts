@@ -1,10 +1,11 @@
 import { OnChanges, Component, Input, OnDestroy } from '@angular/core';
 import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { StaticDataService } from '@app/services/static/static-data.service';
+import { VehicleId } from '@app/utils/component-interface';
 import { METERS_IN_KM, ONE_MINUTE_IN_SEC, ONE_SEC_IN_MS, SECONDS_IN_HOUR } from '@app/utils/constants';
-import { RouteDto, TripDto } from '@app/utils/dtos';
 import { RouteType } from '@app/utils/enums';
-import { AGENCY_TO_STYLE, AgencyStyle } from '@app/utils/styles';
+import { VehicleAttributes } from '@app/utils/info.components';
+import { AGENCY_TO_STYLE } from '@app/utils/styles';
 import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 
 
@@ -14,48 +15,35 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
     styleUrls: ['./vehicle-info.component.css']
 })
 export class VehicleInfoComponent implements OnChanges, OnDestroy {
-    route: RouteDto | undefined;
-    trip: TripDto | undefined;
-    style: AgencyStyle | undefined;
+    @Input() vehicleId!: VehicleId;
 
-    bearing: number = 0;
-    iconLink: string = '';
-    lastSeenString: string = '';
-    speedKmHrString: string = '';
-    occupancyString: string = '';
-    stopStatusString: string = '';
-    congestionLevelString: string = '';
-    scheduleRelationshipString: string = '';
-
-    @Input() agencyId!: string;
-    @Input() vehicle!: GtfsRealtimeBindings.transit_realtime.IVehiclePosition;
+    attributes: VehicleAttributes = {} as VehicleAttributes;
+    vehicle?: GtfsRealtimeBindings.transit_realtime.IVehiclePosition;
 
     private timeSinceUpdate = 0;
     private timeSinceUpdateInterval!: NodeJS.Timer;
     private refreshVehicleDataInterval!: NodeJS.Timer;
+
 
     constructor(
         private stDataService: StaticDataService,
         private rtDataService: RealtimeDataService,
     ) {}
 
+
     ngOnChanges(): void {
         this.clearTimers();
-        this.style = AGENCY_TO_STYLE.get(this.agencyId.toLowerCase());
-        this.iconLink = this.getIconLinkFromRouteType(this.route?.route_type);
+        this.setVehicleAttributes();
+        this.attributes.style = AGENCY_TO_STYLE.get(this.vehicleId.agencyId);
+        this.attributes.iconLink = this.getIconLinkFromRouteType(this.attributes.route?.route_type);
 
-        this.setVehicleInfoValues();
-        this.refreshVehicleDataInterval = setInterval(async () => {
-            if (!this.vehicle.vehicle?.id) return;
-            this.vehicle = await this.rtDataService.getVehicleFromAgencyById(
-                this.agencyId,  
-                this.vehicle.vehicle.id
-            );
-            this.setVehicleInfoValues();
+
+        this.refreshVehicleDataInterval = setInterval(() => {
+            this.setVehicleAttributes();
         }, 30 * ONE_SEC_IN_MS);
 
         this.timeSinceUpdateInterval = setInterval(() => {
-            this.lastSeenString = this.getRoundTimeString(++this.timeSinceUpdate);
+            this.attributes.lastSeenString = this.getRoundTimeString(++this.timeSinceUpdate);
         }, ONE_SEC_IN_MS);
     }
 
@@ -68,22 +56,19 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
         clearInterval(this.refreshVehicleDataInterval);
     }
 
-    private async setVehicleInfoValues() {
-        if (this.vehicle.trip?.routeId) {
-            this.route = await this.stDataService.getRouteById(this.agencyId, this.vehicle.trip.routeId);
+    private async setVehicleAttributes() {
+        await this.setVehicle();
+
+        if (this.vehicle?.trip?.routeId) {
+            await this.setRoute(this.vehicleId.agencyId, this.vehicle?.trip.routeId);
+        } else {
+            this.attributes.route = undefined;
         }
 
-        if (this.vehicle.trip?.tripId) {
-            try {
-                this.trip = await this.stDataService.getTrip( // TODO Stl...
-                    this.agencyId, this.agencyId.toLowerCase() === 'stl' ? 
-                    'JUIN23' + this.vehicle.trip.tripId : 
-                    this.vehicle.trip.tripId);
-            } catch {
-                this.trip = undefined;
-            }
+        if (this.vehicle?.trip?.tripId) {
+            await this.setTrip(this.vehicleId.agencyId, this.vehicle?.trip.tripId);
         } else {
-            this.trip = undefined;
+            this.attributes.trip = undefined;
         }
 
         this.setLastSeenValue();
@@ -95,12 +80,38 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
         this.setScheduleRelationshipValue();
     }
 
+
+    private async setVehicle() {
+        if (!this.vehicleId) return;
+        this.vehicle = await this.rtDataService.getVehicleFromAgencyById(
+            this.vehicleId.agencyId,  
+            this.vehicleId.vehicleId
+        );
+    }
+
+    private async setRoute(agencyId: string, routeId: string) {
+        try {
+            this.attributes.route = await this.stDataService.getRouteById(agencyId, routeId);
+        } catch {
+            this.attributes.route = undefined;
+        }
+    }
+
+    private async setTrip(agencyId: string, tripId: string) {
+        try {
+            this.attributes.trip = await this.stDataService.getTripById(agencyId, tripId);
+        } catch {
+            this.attributes.trip = undefined;
+        }
+    }
+
+
     private setLastSeenValue(): void {
-        if (!this.vehicle.timestamp) {
-            this.lastSeenString = 'une période indéterminée...';
+        if (!this.vehicle?.timestamp) {
+            this.attributes.lastSeenString = 'une période indéterminée...';
         } else {
             this.timeSinceUpdate = Math.round(Date.now() / ONE_SEC_IN_MS - (this.vehicle.timestamp as number));
-            this.lastSeenString = this.getRoundTimeString(this.timeSinceUpdate);
+            this.attributes.lastSeenString = this.getRoundTimeString(this.timeSinceUpdate);
         }
     }
 
@@ -115,140 +126,129 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
     }
 
     private setSpeedValue(): void {
-        if (!this.vehicle.position?.speed) {
-            this.speedKmHrString = ''
+        if (!this.vehicle?.position?.speed) {
+            this.attributes.speedKmHrString = ''
         } else {
-            this.speedKmHrString = `${
-                Math.round(this.vehicle.position.speed * SECONDS_IN_HOUR / METERS_IN_KM)
+            this.attributes.speedKmHrString = `${
+                Math.round(this.vehicle?.position.speed * SECONDS_IN_HOUR / METERS_IN_KM)
             } km/h`
         }
     }
 
     private setBearingValue(): void {
-        this.bearing = -1;
-        if (this.vehicle.position?.bearing && this.vehicle.position?.bearing >= 0) 
-            this.bearing = this.vehicle.position?.bearing - 180;
+        this.attributes.bearing = -1;
+        if (!this.vehicle?.position?.bearing) return;
+        if (this.vehicle?.position?.bearing >= 0)
+            this.attributes.bearing = this.vehicle?.position?.bearing;
     }
 
     private setOccupancyStatusValue(): void {
-        if (!this.vehicle.occupancyStatus) {
-            this.occupancyString = ''
-        } else {
-            const occupancyStatusType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.OccupancyStatus;
-            switch (this.vehicle.occupancyStatus as any) {
-                case 'EMPTY':
-                case occupancyStatusType.EMPTY:
-                    this.occupancyString = 'Vide';
-                    break;
-                case 'MANY_SEATS_AVAILABLE':
-                case occupancyStatusType.MANY_SEATS_AVAILABLE:
-                    this.occupancyString = 'Plusieurs sièges diponibles';
-                    break;
-                case 'FEW_SEATS_AVAILABLE':
-                case occupancyStatusType.FEW_SEATS_AVAILABLE:
-                    this.occupancyString = 'Quelques sièges disponibles';
-                    break;
-                case 'STANDING_ROOM_ONLY':
-                case occupancyStatusType.STANDING_ROOM_ONLY:
-                    this.occupancyString = 'Places debout seulement';
-                    break;
-                case 'CRUSHED_STANDING_ROOM_ONLY':
-                case occupancyStatusType.CRUSHED_STANDING_ROOM_ONLY:
-                    this.occupancyString = 'Pratiquement plein';
-                    break;
-                case 'FULL':
-                case occupancyStatusType.FULL:
-                    this.occupancyString = 'Plein';
-                    break;
-                case 'NOT_BOARDABLE':
-                case 'NOT_ACCEPTING_PASSENGER':
-                case occupancyStatusType.NOT_BOARDABLE:
-                case occupancyStatusType.NOT_ACCEPTING_PASSENGERS:
-                    this.occupancyString = "N'accepte pas de passagers";
-                    break;
-                default:
-                    this.occupancyString = 'Inconnue';
-            }
+        const occupancyStatusType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.OccupancyStatus;
+        switch (this.vehicle?.occupancyStatus as any) {
+            case 'EMPTY':
+            case occupancyStatusType.EMPTY:
+                this.attributes.occupancyString = 'Vide';
+                break;
+            case 'MANY_SEATS_AVAILABLE':
+            case occupancyStatusType.MANY_SEATS_AVAILABLE:
+                this.attributes.occupancyString = 'Plusieurs sièges diponibles';
+                break;
+            case 'FEW_SEATS_AVAILABLE':
+            case occupancyStatusType.FEW_SEATS_AVAILABLE:
+                this.attributes.occupancyString = 'Quelques sièges disponibles';
+                break;
+            case 'STANDING_ROOM_ONLY':
+            case occupancyStatusType.STANDING_ROOM_ONLY:
+                this.attributes.occupancyString = 'Places debout seulement';
+                break;
+            case 'CRUSHED_STANDING_ROOM_ONLY':
+            case occupancyStatusType.CRUSHED_STANDING_ROOM_ONLY:
+                this.attributes.occupancyString = 'Pratiquement plein';
+                break;
+            case 'FULL':
+            case occupancyStatusType.FULL:
+                this.attributes.occupancyString = 'Plein';
+                break;
+            case 'NOT_BOARDABLE':
+            case 'NOT_ACCEPTING_PASSENGER':
+            case occupancyStatusType.NOT_BOARDABLE:
+            case occupancyStatusType.NOT_ACCEPTING_PASSENGERS:
+                this.attributes.occupancyString = "N'accepte pas de passagers";
+                break;
+            default:
+                this.attributes.occupancyString = 'Inconnu';
         }
     }
 
     private setVehicleStopStatusValue(): void {
-        if (!this.vehicle.currentStatus) {
-            this.stopStatusString = ''
-        } else {
-            const vehicleStopStatusType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.VehicleStopStatus;
-            switch (this.vehicle.currentStatus as any) {
-                case 'INCOMING_AT':
-                case vehicleStopStatusType.INCOMING_AT:
-                    this.stopStatusString = "Tout près de l'arrêt";
-                    break;
-                case 'STOPPED_AT':
-                case vehicleStopStatusType.STOPPED_AT:
-                    this.stopStatusString = "À l'arrêt";
-                    break;
-                case 'IN_TRANSIT_TO':
-                case vehicleStopStatusType.IN_TRANSIT_TO:
-                    this.stopStatusString = 'En déplacement';
-                    break;
-                default:
-                    this.stopStatusString = 'Inconnue';
-            }
+        const vehicleStopStatusType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.VehicleStopStatus;
+        switch (this.vehicle?.currentStatus as any) {
+            case 'INCOMING_AT':
+            case vehicleStopStatusType.INCOMING_AT:
+                this.attributes.stopStatusString = "Tout près de l'arrêt";
+                break;
+            case 'STOPPED_AT':
+            case vehicleStopStatusType.STOPPED_AT:
+                this.attributes.stopStatusString = "À l'arrêt";
+                break;
+            case 'IN_TRANSIT_TO':
+            case vehicleStopStatusType.IN_TRANSIT_TO:
+                this.attributes.stopStatusString = 'En déplacement';
+                break;
+            default:
+                this.attributes.stopStatusString = 'Inconnu';
         }
     }
 
     private setScheduleRelationshipValue(): void {
         const scheduleRelationshipType = GtfsRealtimeBindings.transit_realtime.TripDescriptor.ScheduleRelationship;
-        switch (this.vehicle.currentStatus as any) {
+        switch (this.vehicle?.currentStatus as any) {
             case 'ADDED':
             case scheduleRelationshipType.ADDED:
-                this.scheduleRelationshipString = 'Ajouté';
+                this.attributes.scheduleRelationshipString = 'Ajouté';
                 break;
             case 'CANCELED':
             case scheduleRelationshipType.CANCELED:
-                this.scheduleRelationshipString = 'Annulé';
+                this.attributes.scheduleRelationshipString = 'Annulé';
                 break;
             case 'DUPLICATED':
             case scheduleRelationshipType.DUPLICATED:
-                this.scheduleRelationshipString = 'Dupliqué';
+                this.attributes.scheduleRelationshipString = 'Dupliqué';
                 break;
             case 'REPLACEMENT':
             case scheduleRelationshipType.REPLACEMENT:
-                this.scheduleRelationshipString = 'Remplacement';
+                this.attributes.scheduleRelationshipString = 'Remplacement';
                 break;
             case 'UNSCHEDULE':
                 case scheduleRelationshipType.UNSCHEDULED:
-                    this.scheduleRelationshipString = 'Non-prévu';
+                    this.attributes.scheduleRelationshipString = 'Non-prévu';
                     break;
             default:
-                this.scheduleRelationshipString = 'Prévu';
+                this.attributes.scheduleRelationshipString = 'Prévu';
         }
     }
 
     private setCongestionLevelValue(): void {
-        if (!this.vehicle.congestionLevel) {
-            this.congestionLevelString = ''
-        } else {
-            const congestionLevelType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.CongestionLevel;
-            switch (this.vehicle.currentStatus as any) {
-                case 'RUNNING_SMOOTHLY':
-                case congestionLevelType.RUNNING_SMOOTHLY:
-                    this.congestionLevelString = 'Fluide';
-                    break;
-                case 'STOP_AND_GO':
-                case congestionLevelType.STOP_AND_GO:
-                    this.congestionLevelString = 'Au ralenti';
-                    break;
-                case 'CONGESTION':
-                case congestionLevelType.CONGESTION:
-                    this.congestionLevelString = 'Congestion';
-                    break;
-                case 'SEVERE_CONGESTION':
-                case congestionLevelType.SEVERE_CONGESTION:
-                    this.congestionLevelString = 'Congestion sévère';
-                    break;
-                default:
-                    this.congestionLevelString = 'Inconnue';
-            }
+        const congestionLevelType = GtfsRealtimeBindings.transit_realtime.VehiclePosition.CongestionLevel;
+        switch (this.vehicle?.currentStatus as any) {
+            case 'RUNNING_SMOOTHLY':
+            case congestionLevelType.RUNNING_SMOOTHLY:
+                this.attributes.congestionLevelString = 'Fluide';
+                break;
+            case 'STOP_AND_GO':
+            case congestionLevelType.STOP_AND_GO:
+                this.attributes.congestionLevelString = 'Au ralenti';
+                break;
+            case 'CONGESTION':
+            case congestionLevelType.CONGESTION:
+                this.attributes.congestionLevelString = 'Congestion';
+                break;
+            case 'SEVERE_CONGESTION':
+            case congestionLevelType.SEVERE_CONGESTION:
+                this.attributes.congestionLevelString = 'Congestion sévère';
+                break;
+            default:
+                this.attributes.congestionLevelString = 'Inconnu';
         }
     }
 

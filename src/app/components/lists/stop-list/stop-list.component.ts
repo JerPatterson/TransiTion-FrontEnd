@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core';
+import { RouteId } from '@app/utils/component-interface';
+import { AgencyStopElement } from '@app/utils/list.components';
 // import { StaticDataService } from '@app/services/static/static-data.service';
-import { StopListType } from '@app/utils/component-interface';
 // import { ONE_SEC_IN_MS } from '@app/utils/constants';
 
 @Component({
@@ -9,13 +10,13 @@ import { StopListType } from '@app/utils/component-interface';
     styleUrls: ['./stop-list.component.css']
 })
 export class StopListComponent implements OnChanges {
-    elements = new Map<string, StopListType>();
+    elements = new Map<string, AgencyStopElement>();
     stopIds = new Set<string>();
     showAgencies = new Set<string>();
     showRoutes = new Set<string>();
 
     @Input() agencyIds: string[] = [];
-    @Input() routeIds: string[] = [];
+    @Input() routeIds: RouteId[] = [];
     @Input() selections: string[] = [];
 
     // private knownAgencyIds = new Set<string>();

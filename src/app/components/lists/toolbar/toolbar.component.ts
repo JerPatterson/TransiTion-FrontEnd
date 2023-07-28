@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MapComponentDisplayed } from '@app/utils/component-interface';
 
 @Component({
     selector: 'app-toolbar',
@@ -6,52 +7,34 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
     styleUrls: ['./toolbar.component.css']
 })
 export class ToolbarComponent {
-    @Input() agencyListSelected: boolean = false;
-    @Input() routeListSelected: boolean = false;
-    @Input() stopListSelected: boolean = false;
-    @Input() vehicleListSelected: boolean = false;
-
-    @Output() agencyListClick = new EventEmitter<boolean>();
-    @Output() routeListClick = new EventEmitter<boolean>();
-    @Output() stopListClick = new EventEmitter<boolean>();
-    @Output() vehicleListClick = new EventEmitter<boolean>();
+    @Input() componentDisplayed = MapComponentDisplayed.None;
+    @Output() newComponentToDisplay = new EventEmitter<MapComponentDisplayed>();
 
     handleAgencyListClick() {
-        this.routeListSelected = false;
-        this.stopListSelected = false;
-        this.vehicleListSelected = false;
-        this.agencyListSelected = !this.agencyListSelected;
+        this.componentDisplayed = (this.componentDisplayed !== MapComponentDisplayed.AgencyList) ?
+            MapComponentDisplayed.AgencyList : MapComponentDisplayed.None;
         this.emitNewSelection();
     }
 
     handleRouteListClick() {
-        this.agencyListSelected = false;
-        this.stopListSelected = false;
-        this.vehicleListSelected = false;
-        this.routeListSelected = !this.routeListSelected;
+        this.componentDisplayed = (this.componentDisplayed !== MapComponentDisplayed.RouteList) ?
+            MapComponentDisplayed.RouteList : MapComponentDisplayed.None;
         this.emitNewSelection();
     }
 
     handleStopListClick() {
-        this.agencyListSelected = false;
-        this.routeListSelected= false;
-        this.vehicleListSelected = false;
-        this.stopListSelected = !this.stopListSelected;
+        this.componentDisplayed = (this.componentDisplayed !== MapComponentDisplayed.StopList) ?
+            MapComponentDisplayed.StopList : MapComponentDisplayed.None;
         this.emitNewSelection();
     }
 
     handleVehicleListClick() {
-        this.agencyListSelected = false
-        this.routeListSelected= false;
-        this.stopListSelected = false;
-        this.vehicleListSelected = !this.vehicleListSelected;
+        this.componentDisplayed = (this.componentDisplayed !== MapComponentDisplayed.VehicleList) ?
+            MapComponentDisplayed.VehicleList : MapComponentDisplayed.None;
         this.emitNewSelection();
     }
 
     private emitNewSelection() {
-        this.agencyListClick.emit(this.agencyListSelected);
-        this.routeListClick.emit(this.routeListSelected);
-        this.stopListClick.emit(this.stopListSelected);
-        this.vehicleListClick.emit(this.vehicleListSelected);
+        this.newComponentToDisplay.emit(this.componentDisplayed);
     }
 }

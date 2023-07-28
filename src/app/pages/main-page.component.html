@@ -1,63 +1,55 @@
 <app-toolbar
-    (agencyListClick)="this.selectAgencyList($event)"
-    (routeListClick)="this.routeListSelected = $event"
-    (stopListClick)="this.stopListSelected = $event"
-    (vehicleListClick)="this.vehicleListSelected = $event"
-    [agencyListSelected]="this.agencyListSelected"
-    [routeListSelected]="this.routeListSelected"
-    [stopListSelected]="this.stopListSelected"
-    [vehicleListSelected]="this.vehicleListSelected">
+    (newComponentToDisplay)="this.handleNewComponentToDisplay($event)"
+    [componentDisplayed]="this.componentDisplayed">
 </app-toolbar>
 
 <div class="list-container">
     <app-vehicle-info
-        *ngIf="this.vehicleSelected"
-        [vehicle]="this.vehicleSelected"
-        [agencyId]="this.vehicleSelectedAgencyId">
+        *ngIf="this.componentDisplayed === 5 && this.selections.vehicle"
+        [vehicleId]="this.selections.vehicle">
     </app-vehicle-info>
 
     <app-agency-list
-        [ngClass]="this.agencyListSelected && !this.vehicleSelected ? '' : 'hidden'"
-        [selections]="this.agencyIdsSelected"
-        [selectAll]="this.selectAllAgenciesOption"
+        [ngClass]="this.componentDisplayed === 1 ? '' : 'hidden'"
+        [selections]="this.selections.agencies"
+        [selectAll]="this.selectOptions.allAgencies"
         (addAgencyIds)="this.addAgencyIds($event)"
         (removeAgencyIds)="this.removeAgencyIds($event)">
     </app-agency-list>
 
     <app-route-list
-        [ngClass]="this.routeListSelected && !this.vehicleSelected ? '' : 'hidden'"
-        [agencyIds]="this.agencyIdsSelected"
-        [selections]="this.routeIdsSelected"
+        [ngClass]="this.componentDisplayed === 2 ? '' : 'hidden'"
+        [agencyIds]="this.selections.agencies"
+        [selections]="this.selections.routes"
         (addRouteId)="this.addRouteId($event)"
         (removeRouteId)="this.removeRouteId($event)">
     </app-route-list>
 
     <app-stop-list
-        [ngClass]="this.stopListSelected && !this.vehicleSelected ? '' : 'hidden'"
-        [agencyIds]="this.agencyIdsSelected"
-        [routeIds]="this.routeIdsSelected"
-    >
+        [ngClass]="this.componentDisplayed === 3 ? '' : 'hidden'"
+        [agencyIds]="this.selections.agencies"
+        [routeIds]="this.selections.routes">
     </app-stop-list>
 </div>
 
 <div
     class="option-container"
-    *ngIf="this.agencyListSelected || this.routeListSelected">
+    *ngIf="this.componentDisplayed === 1 || this.componentDisplayed === 2">
     <button
-        *ngIf="this.agencyListSelected && !this.vehicleSelected"
-        [ngClass]="this.selectAllAgenciesOption ? 'selected' : ''"
+        *ngIf="componentDisplayed === 1"
+        [ngClass]="this.selectOptions.allAgencies ? 'selected' : ''"
         (click)="this.changeSelectAllAgenciesOption()">
         <svg class="option-icon">
             <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
         </svg>
         <span
             class="option-name"
-            *ngIf="!this.selectAllAgenciesOption">
+            *ngIf="!this.selectOptions.allAgencies">
             Tout sélectionner
         </span>
     </button>
     <button
-        *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
+        *ngIf="this.selections.agencies.length"
         [ngClass]="!this.options.useVehicleClusters ? 'selected' : ''"
         (click)="this.changeUseVehicleClustersOption()">
         <svg class="option-icon">
@@ -70,7 +62,7 @@
         </span>
     </button>
     <button
-        *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
+        *ngIf="this.selections.agencies.length"
         [ngClass]="this.options.mergeAllVehicleClusters ? 'selected' : ''"
         (click)="this.changeMergeAllVehicleClustersOption()">
         <svg class="option-icon">
@@ -83,7 +75,7 @@
         </span>
     </button>
     <button
-        *ngIf="this.agencyIdsSelected.length && !this.vehicleSelected"
+        *ngIf="this.selections.agencies.length"
         [ngClass]="this.options.showOldVehicles ? 'selected' : ''"
         (click)="this.changeShowOldVehiclesOption()">
         <svg class="option-icon">
@@ -98,12 +90,11 @@
 </div>
 
 <app-map 
-    [agencies]="this.agencyIdsSelected"
-    [routes]="this.routeIdsSelected"
-    [vehicleSelected]="this.vehicleSelected"
+    [agencies]="this.selections.agencies"
+    [routes]="this.selections.routes"
+    [vehicle]="this.selections.vehicle"
     [showOldVehicles]="this.options.showOldVehicles"
     [useVehicleClusters]="this.options.useVehicleClusters"
     [mergeAllVehicleClusters]="this.options.mergeAllVehicleClusters"
-    (newVehicleSelected)="this.addVehicleSlected($event)"
-    (newVehicleSelectedAgencyId)="this.addVehicleSlectedAgencyId($event)">
+    (newVehicleSelected)="this.addVehicleSlected($event)">
 </app-map>
