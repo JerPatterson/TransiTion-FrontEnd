@@ -12,6 +12,7 @@ export interface AgencyDto {
 }
 
 export interface StopDto {
+  agency_id: string;
   stop_id: string;
   stop_code?: string;
   stop_name: string;

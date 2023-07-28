@@ -29,14 +29,14 @@
         </div>
         <hr>
         <div
-            *ngIf="route.agency"
-            [ngClass]="!this.agencyIdsSelected.has(route.agency.agency_id) ? 'hidden' : ''">
+            class="route-viewport"
+            *ngIf="this.agencyIdsSelected.has(route.agency.agency_id)">
             <app-route 
                 class="route-element"
                 *ngFor="let route of route.routes"
                 [route]="route"
                 [selected]="this.routeIdsSelected.has(route.agency_id + '/' + route.route_id.split('/').pop())"
-                (click)="this.onRouteClick(route.agency_id, route)">
+                (click)="this.onRouteClick(route.agency_id, route.route_id)">
             </app-route>
         </div>
     </div>

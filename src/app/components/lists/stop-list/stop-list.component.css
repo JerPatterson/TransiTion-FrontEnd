@@ -58,6 +58,12 @@
     font-size: 2.6vh;
 }
 
-.hidden {
-    display: none;
+.stop-viewport {
+    height: 38vh;
+    width: 31vw;
+    scrollbar-width: 0px;
+}
+
+.stop-viewport::-webkit-scrollbar {
+    width: 0px;
 }

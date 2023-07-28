@@ -1,89 +1,83 @@
-import { Component, Input, OnChanges } from '@angular/core';
-import { RouteId } from '@app/utils/component-interface';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { RouteId, StopId } from '@app/utils/component-interface';
 import { AgencyStopElement } from '@app/utils/list.components';
-// import { StaticDataService } from '@app/services/static/static-data.service';
-// import { ONE_SEC_IN_MS } from '@app/utils/constants';
+import { StaticDataService } from '@app/services/static/static-data.service';
+import { StopDto } from '@app/utils/dtos';
 
 @Component({
     selector: 'app-stop-list',
     templateUrl: './stop-list.component.html',
     styleUrls: ['./stop-list.component.css']
 })
-export class StopListComponent implements OnChanges {
-    elements = new Map<string, AgencyStopElement>();
-    stopIds = new Set<string>();
-    showAgencies = new Set<string>();
-    showRoutes = new Set<string>();
+export class StopListComponent {
+    stops: AgencyStopElement[] = [];
+    stopIdSelected?: string; 
+    routeIdsSelected = new Set<string>();
+    agencyIdsSelected = new Set<string>();
 
-    @Input() agencyIds: string[] = [];
-    @Input() routeIds: RouteId[] = [];
-    @Input() selections: string[] = [];
+    agencyIdsToShow = new Set<string>();
+    private knownAgencyIds = new Set<string>();
 
-    // private knownAgencyIds = new Set<string>();
+    @Input() set agencyIds(values: string[]) {
+        this.setStops(values);
+        this.agencyIdsToShow = new Set(values);
+    };
+
+    @Input() set routeIds(values: RouteId[]) {
+
+    };
+
+    @Input() set selection(value: StopId) {
+        this.stopIdSelected = `${value.agencyId}/${value.stopId}`;
+    };
+
+    @Output() clearStopId = new EventEmitter<void>();
+    @Output() newStopId = new EventEmitter<StopId>();
+
+    constructor(private staticDataService: StaticDataService) {}
     
-    // constructor(private staticDataService: StaticDataService) {}
 
-    ngOnChanges() {
-        // const addedAgencyIds = this.agencyIds.filter((agencyId) => {
-        //     const isKnown = this.knownAgencyIds.has(agencyId);
-        //     if (!isKnown) this.knownAgencyIds.add(agencyId);
-        //     return !isKnown;
-        // });
-
-        // setTimeout(() => {
-        //     this.setStopsFromAgencyIds(addedAgencyIds);
-        //     this.selections.forEach((stopId) => this.stopIds.add(stopId));
-        // }, ONE_SEC_IN_MS);
-    }
+    trackByStop = (_: number, stop: StopDto) => stop.stop_id;
 
     onAgencyClick(agencyId: string) {
-        if (this.showAgencies.has(agencyId)) {
-            this.showAgencies.delete(agencyId);
+        if (this.agencyIdsSelected.has(agencyId)) {
+            this.agencyIdsSelected.delete(agencyId);
         } else {
-            this.showAgencies.add(agencyId);
+            this.agencyIdsSelected.add(agencyId);
         }
     }
 
-    onRouteClick(routeIds: string[]) {
-        routeIds.forEach((routeId) => {
-            if (this.showRoutes.has(routeId)) {
-                this.showRoutes.delete(routeId);
-            } else {
-                this.showRoutes.add(routeId);
-            }
-        });
+    onRouteClick(agencyId: string, routeId: string) {
+        if (this.routeIdsSelected.has(`${agencyId}/${routeId}`)) {
+            this.routeIdsSelected.delete(`${agencyId}/${routeId}`);
+        } else {
+            this.routeIdsSelected.add(`${agencyId}/${routeId}`);
+        }
     }
 
     onStopClick(agencyId: string, stopId: string) {
-        console.log(agencyId, stopId);
-        this.selections.push(stopId);
+        const uniqueStopId = `${agencyId}/${stopId}`;
+        if (this.routeIdsSelected.has(uniqueStopId)) {
+            this.routeIdsSelected.delete(uniqueStopId);
+            this.clearStopId.emit();
+        } else {
+            this.routeIdsSelected.add(uniqueStopId);
+            this.newStopId.emit({ agencyId, stopId });
+        }
     }
-    
-    // private async setStops() {
-    //     // if (this.routeIds.length) {
-    //     //     this.routeIds.forEach((routeId) => {
-    //     //         console.log(routeId);
-    //     //     });
-    //     // } else {
-    //     //     this.elements = await Promise.all(this.agencyIds.map(async (agencyId) => {
-    //     //         return {
-    //     //             agency: await this.staticDataService.getAgencyById(agencyId),
-    //     //             stops: (await this.staticDataService.getStopLocationsFromAgency(agencyId))
-    //     //                 .sort((a, b) => a.stop_name.localeCompare(b.stop_name)),
-    //     //         };
-    //     //     }));
-    //     //     console.log(this.elements);
-    //     // }
-    // }
 
-    // private async setStopsFromAgencyIds(agencyIds: string[]): Promise<void> {
-    //     console.log(agencyIds);
-    //     agencyIds.forEach(async (agencyId) => {
-    //         this.elements.set(agencyId, {
-    //             agency: await this.staticDataService.getAgencyById(agencyId),
-    //             stops: (await this.staticDataService.getStopLocationsFromAgency(agencyId))
-    //                 .sort((a, b) => a.stop_name.localeCompare(b.stop_name)),
-    //         });
-    //     });
-    // }
+    private async setStops(agencyIds: string[]) {
+        this.stops = this.stops.concat(await Promise.all(
+            agencyIds
+                .filter((agencyId) =>
+                    !this.knownAgencyIds.has(agencyId)
+                ).map(async (agencyId) => {
+                    this.knownAgencyIds.add(agencyId);
+                    return {
+                        agency: await this.staticDataService.getAgencyById(agencyId),
+                        stops: await this.staticDataService.getStops(agencyId),
+                    };
+                })
+        ));
+    }
 }

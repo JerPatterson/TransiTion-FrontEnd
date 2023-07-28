@@ -1,5 +1,5 @@
 <div class="stop-list">
-    <div *ngIf="!this.agencyIds.length">
+    <div *ngIf="!this.agencyIdsToShow.size">
         <svg class="information-icon">
             <use
                 xlink:href='./assets/icons/information.svg#information'
@@ -11,18 +11,17 @@
 
     <div
         class="agency-stop-list"
-        *ngFor="let agencyId of this.agencyIds">
-        <div
-            *ngIf="this.elements.get(agencyId) as content">
+        *ngFor="let stop of this.stops">
+        <div *ngIf="this.agencyIdsToShow.has(stop.agency.agency_id)">
             <div
                 class="agency-element"
-                (click)="this.onAgencyClick(agencyId)">
+                (click)="this.onAgencyClick(stop.agency.agency_id)">
                 <h3 class="agency-name">
-                    {{ content?.agency?.agency_name }}
+                    {{ stop.agency.agency_name }}
                 </h3>
                 <svg 
                     class="list-icon"
-                    *ngIf="!this.showAgencies.has(agencyId)">
+                    *ngIf="!this.agencyIdsSelected.has(stop.agency.agency_id)">
                     <use 
                         xlink:href='./assets/icons/show.svg#show'
                         href="./assets/icons/show.svg#show">
@@ -30,7 +29,7 @@
                 </svg>
                 <svg
                     class="list-icon"
-                    *ngIf="this.showAgencies.has(agencyId)">
+                    *ngIf="this.agencyIdsSelected.has(stop.agency.agency_id)">
                     <use
                         xlink:href='./assets/icons/hide.svg#hide'
                         href="./assets/icons/hide.svg#hide">
@@ -38,15 +37,15 @@
                 </svg>
             </div>
             <hr>
-            <div
-                *ngIf="this.elements.get(agencyId)"
-                [ngClass]="!this.showAgencies.has(agencyId) ? 'hidden' : ''">
-                <app-stop 
-                    class="stop-element"
-                    *ngFor="let stop of content?.stops" 
-                    [stop]="stop"
-                    (click)="this.onStopClick(agencyId, stop.stop_id)">
-                </app-stop>
+            <div *ngIf="this.agencyIdsSelected.has(stop.agency.agency_id)">
+                <cdk-virtual-scroll-viewport class="stop-viewport" [itemSize]="100">
+                    <app-stop 
+                        class="stop-element"
+                        *cdkVirtualFor="let stop of stop.stops; trackBy: this.trackByStop"
+                        [stop]="stop"
+                        (click)="this.onStopClick(stop.agency_id, stop.stop_id)">
+                    </app-stop>
+                </cdk-virtual-scroll-viewport>
             </div>
         </div>
     </div>

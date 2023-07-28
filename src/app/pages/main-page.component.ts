@@ -75,7 +75,6 @@ export class MainPageComponent implements AfterContentChecked {
 
         this.selections.routes = this.selections.routes
             .filter((value) => !agencyIds.includes(value.agencyId));
-        console.log(this.selections.routes);
     }
 
     addRouteId(routeId: RouteId) {

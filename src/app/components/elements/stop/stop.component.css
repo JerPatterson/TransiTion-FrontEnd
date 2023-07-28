@@ -5,6 +5,11 @@
 
 .stop-container:hover {
     cursor: pointer;
+    background-color: #dbe2e6 !important;
+}
+
+.stop-container.selected {
+    background-color: #c1cacf !important;
 }
 
 .stop-info {

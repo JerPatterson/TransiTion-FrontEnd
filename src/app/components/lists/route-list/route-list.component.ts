@@ -38,8 +38,8 @@ export class RouteListComponent {
         }
     }
 
-    onRouteClick(agencyId: string, route: RouteDto) {
-        route.route_id.split('/')
+    onRouteClick(agencyId: string, routeId: string) {
+        routeId.split('/')
             .forEach((routeId) => {
                 const uniqueRouteId = `${agencyId}/${routeId}`;
                 if (this.routeIdsSelected.has(uniqueRouteId)) {

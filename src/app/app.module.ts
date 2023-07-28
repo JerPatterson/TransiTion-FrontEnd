@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { AppComponent } from '@app/components/app/app.component';
 import { AppRoutingModule } from '@app/app-routing.module';
@@ -32,6 +32,7 @@ import { VehicleInfoComponent } from './components/info/vehicle-info.component';
   imports: [
     AppRoutingModule,
     BrowserModule,
+    ScrollingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

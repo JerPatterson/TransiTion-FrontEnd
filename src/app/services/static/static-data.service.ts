@@ -17,8 +17,8 @@ export class StaticDataService {
         return agencies;
     }
 
-    async getAgencyById(agencyId: string): Promise<AgencyDto | undefined> {
-        return (await this.getAgencies()).find((agency) => agency.agency_id === agencyId);
+    async getAgencyById(agencyId: string): Promise<AgencyDto> {
+        return (await this.getAgencies()).find((agency) => agency.agency_id === agencyId) as AgencyDto;
     }
 
     async getRoutes(agencyId: string): Promise<RouteDto[]> {
@@ -76,6 +76,11 @@ export class StaticDataService {
         const stopLocations = await response.json();
         sessionStorage.setItem(`stops/${agencyId}`, JSON.stringify(stopLocations));
         return stopLocations;
+    }
+
+    async getStops(agencyId: string): Promise<StopDto[]> {
+        const response = await fetch(`${SERVER_URL}/stops/${agencyId}`);
+        return response.json();
     }
 
     async getStopById(agencyId: string, stopId: string): Promise<StopDto> {

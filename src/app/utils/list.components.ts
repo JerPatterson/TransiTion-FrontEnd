@@ -1,4 +1,4 @@
-import { AgencyDto, RouteDto, StopLocationDto } from "./dtos";
+import { AgencyDto, RouteDto, StopDto } from "./dtos";
 
 export interface AgencyRouteElement {
     agency: AgencyDto; 
@@ -7,5 +7,5 @@ export interface AgencyRouteElement {
 
 export interface AgencyStopElement {
     agency: AgencyDto;
-    stops: StopLocationDto[];
+    stops: StopDto[];
 }
