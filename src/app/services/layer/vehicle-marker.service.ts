@@ -45,7 +45,7 @@ export class VehicleMarkerService {
     async createVehiclesLayer(
         agencyIds: string[],
         options: MapRenderingOptions,
-        emitVehicleSelected: (v: VehicleId) => void,
+        emitVehicleSelected: (v: VehicleId, rId: string, tId: string) => void,
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         if (options.useVehicleClusters) {
@@ -80,7 +80,7 @@ export class VehicleMarkerService {
     async createVehiclesLayerFromRoutes(
         routes: string[], 
         options: MapRenderingOptions,
-        emitVehicleSelected: (v: VehicleId) => void,
+        emitVehicleSelected: (v: VehicleId, rId: string, tId: string) => void,
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         const firstRouteAgencyId = routes[0].split(PARAM_SEPARATOR)[0];
@@ -146,7 +146,7 @@ export class VehicleMarkerService {
     private async buildVehicleMarkerCluster(
         agencyId: string,
         vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
-        emitMarkerClicked: (v: VehicleId) => void,
+        emitMarkerClicked: (v: VehicleId, rId: string, tId: string) => void,
     ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker(
@@ -161,10 +161,11 @@ export class VehicleMarkerService {
                 },
             ).addEventListener(
                 'click', 
-                () => emitMarkerClicked({
-                    agencyId,
-                    vehicleId: vehicle.vehicle?.id ? vehicle.vehicle?.id : ''
-                }),
+                () => emitMarkerClicked(
+                    { agencyId, vehicleId: vehicle.vehicle?.id as string },
+                    vehicle.trip?.routeId as string,
+                    vehicle.trip?.tripId as string,
+                ),
             );
     
         return marker;
@@ -205,7 +206,7 @@ export class VehicleMarkerService {
     private async buildVehicleMarkerCanvas(
         agencyId: string,
         vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
-        emitMarkerClicked: (v: VehicleId) => void,
+        emitMarkerClicked: (v: VehicleId, rId: string, tId: string) => void,
     ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
         const marker = L.marker(
@@ -220,10 +221,11 @@ export class VehicleMarkerService {
                 },
             ).addEventListener(
                 'click', 
-                () => emitMarkerClicked({
-                    agencyId,
-                    vehicleId: vehicle.vehicle?.id ? vehicle.vehicle?.id : ''
-                }),
+                () => emitMarkerClicked(
+                    { agencyId, vehicleId: vehicle.vehicle?.id as string },
+                    vehicle.trip?.routeId as string,
+                    vehicle.trip?.tripId as string,
+                ),
             );
     
         return marker;

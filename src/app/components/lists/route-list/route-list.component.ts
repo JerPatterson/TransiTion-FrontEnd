@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteId } from '@app/utils/component-interface';
 import { AgencyDto, RouteDto } from '@app/utils/dtos';
@@ -9,24 +9,26 @@ import { AgencyRouteElement } from '@app/utils/list.components';
     templateUrl: './route-list.component.html',
     styleUrls: ['./route-list.component.css']
 })
-export class RouteListComponent implements OnChanges {    
+export class RouteListComponent {    
     routes: AgencyRouteElement[] = [];
     routeIdsSelected = new Set<string>();
     agencyIdsSelected = new Set<string>();
 
-    @Input() agencyIds: string[] = [];
-    @Input() selections: RouteId[] = [];
+    @Input() set agencyIds(values: string[]) {
+        this.setRoutes(values);
+    };
+
+    @Input() set selections(values: RouteId[]) {
+        this.routeIdsSelected = new Set();
+        values.forEach((selection) =>
+            this.routeIdsSelected.add(`${selection.agencyId}/${selection.routeId}`));
+    };
 
     @Output() addRouteId = new EventEmitter<RouteId>();
     @Output() removeRouteId = new EventEmitter<RouteId>();
 
     constructor(private staticDataService: StaticDataService) {}
 
-    ngOnChanges() {
-        this.setRoutes();
-        this.selections.forEach((selection) =>
-            this.routeIdsSelected.add(`${selection.agencyId}/${selection.routeId}`));
-    }
 
     onAgencyClick(agencyId: string) {
         if (this.agencyIdsSelected.has(agencyId)) {
@@ -50,9 +52,9 @@ export class RouteListComponent implements OnChanges {
             });
     }
 
-    private async setRoutes() {
+    private async setRoutes(agencyIds: string[]) {
         this.routes = await Promise.all(
-            this.agencyIds.map(async (agencyId) => {
+            agencyIds.map(async (agencyId) => {
                 return {
                     agency: await this.staticDataService.getAgencyById(agencyId) as AgencyDto,
                     routes: (await this.getUniqueRoutesByShortName(agencyId))

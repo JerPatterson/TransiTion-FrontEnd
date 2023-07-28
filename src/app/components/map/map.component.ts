@@ -43,9 +43,7 @@ export class MapComponent implements OnInit {
     @Input() set routes(routeIds: RouteId[]) {
         if (!routeIds.length) {
             this.clearAllTripShapes();
-            this.currentRoutes = new Set();
-        }
-        else if (routeIds.length > this.currentRoutes.size) {
+        } else if (routeIds.length > this.currentRoutes.size) {
             this.clearTripShapes();
             this.addSemiTransparentRoutes(routeIds);
         } else if (routeIds.length < this.currentRoutes.size) {
@@ -77,8 +75,9 @@ export class MapComponent implements OnInit {
         mergeAllVehicleClusters: false,
     };
 
-    private readonly emitVehicleSelected = (vehicleId: VehicleId) => {
+    private readonly emitVehicleSelected = (vehicleId: VehicleId, routeId: string, tripId: string) => {
         this.newVehicleSelected.emit(vehicleId);
+        this.addTripShape(vehicleId.agencyId, routeId, tripId);
     };
 
     constructor(
@@ -130,6 +129,7 @@ export class MapComponent implements OnInit {
         semitransparentPane.style.opacity = '0.5';
     }
 
+
     private async clearVehicles(): Promise<void> {
         await this.clearLayers(this.vehicleLayers);
         this.vehicleLayers = [];
@@ -138,6 +138,7 @@ export class MapComponent implements OnInit {
     private async clearAllTripShapes(): Promise<void> {
         this.clearTripShapes();
         this.clearSemiTransparentTripShapes();
+        this.currentRoutes = new Set();
     }
 
     private async clearTripShapes(): Promise<void> {
@@ -180,11 +181,8 @@ export class MapComponent implements OnInit {
     }
 
     private async addAllVehiclesLayer(agencyIds: string[]): Promise<void> {
-        const vehiclesLayer = await this.vehicleMarkerService.createVehiclesLayer(
-            agencyIds,
-            this.options,
-            this.emitVehicleSelected,
-        );
+        const vehiclesLayer = await this.vehicleMarkerService
+            .createVehiclesLayer(agencyIds, this.options, this.emitVehicleSelected);
         this.vehicleLayers.push(vehiclesLayer);
         vehiclesLayer.addTo(this.map);
         if (!this.options.useVehicleClusters)
@@ -216,11 +214,7 @@ export class MapComponent implements OnInit {
 
     private async addAllVehiclesFromRoutesLayer(routes: string[]): Promise<void> {
         const vehiclesLayer = await this.vehicleMarkerService
-            .createVehiclesLayerFromRoutes(
-                routes,
-                this.options,
-                this.emitVehicleSelected,
-            );
+            .createVehiclesLayerFromRoutes(routes, this.options, this.emitVehicleSelected);
         this.vehicleLayers.push(vehiclesLayer);
         vehiclesLayer.addTo(this.map);
         if (!this.options.useVehicleClusters)
@@ -228,29 +222,23 @@ export class MapComponent implements OnInit {
     }
 
 
-    // private async addRoute(
-    //     agencyId: string, 
-    //     tripDescriptor?: GtfsRealtimeBindings.transit_realtime.ITripDescriptor | null
-    // ): Promise<void> {
-    //     await this.clearTripShapes();
-    //     if (tripDescriptor && tripDescriptor.tripId) {
-    //         const trip = await this.tripShapeService.createTripLayer(
-    //             agencyId,
-    //             tripDescriptor.tripId,
-    //             tripDescriptor.routeId,
-    //         );
-    //         this.routeLayers.push(trip);
-    //         this.map.addLayer(trip);
-    //     }
-    // }
+    private async addTripShape(agencyId: string, routeId: string, tripId: string): Promise<void> {
+        this.clearTripShapes();
+        const tripLayer = await this.tripShapeService
+            .createTripLayer(agencyId, routeId, tripId);
+        this.routeLayers.push(tripLayer);
+        this.map.addLayer(tripLayer);
+    }
 
     private async addSemiTransparentRoutes(routeIds: RouteId[]): Promise<void> {
-        const addedRoutes = routeIds.filter((routeId) => !this.currentRoutes.has(`${routeId.agencyId}/${routeId.routeId}`));
-        addedRoutes.forEach((routeId) => {
-            const routeIdString = `${routeId.agencyId}/${routeId.routeId}`;
-            this.currentRoutes.add(routeIdString);
-            this.addSemiTransparentRoute(routeIdString);
-        });
+        routeIds
+            .filter((routeId) => 
+                !this.currentRoutes.has(`${routeId.agencyId}/${routeId.routeId}`)
+            ).forEach((routeId) => {
+                const routeIdString = `${routeId.agencyId}/${routeId.routeId}`;
+                this.currentRoutes.add(routeIdString);
+                this.addSemiTransparentRoute(routeIdString);
+            });
     }
 
     private async addSemiTransparentRoute(route: string): Promise<void> {
@@ -261,8 +249,9 @@ export class MapComponent implements OnInit {
 
     private async removeSemiTransparentRoutes(routeIds: RouteId[]): Promise<void> {
         const routesSet = new Set(routeIds.map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
-        const removedRoutes = [...this.currentRoutes].filter((route) => !routesSet.has(route));
-        removedRoutes.forEach((removedRoute) => this.removeSemiTransparentRoute(removedRoute));
+        [...this.currentRoutes]
+            .filter((route) => !routesSet.has(route))
+            .forEach((removedRoute) => this.removeSemiTransparentRoute(removedRoute));
         this.currentRoutes = routesSet;
     }
 
