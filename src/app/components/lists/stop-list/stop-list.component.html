@@ -11,17 +11,17 @@
 
     <div
         class="agency-stop-list"
-        *ngFor="let stop of this.stops">
-        <div *ngIf="this.agencyIdsToShow.has(stop.agency.agency_id)">
+        *ngFor="let stops of this.stops">
+        <div *ngIf="this.agencyIdsToShow.has(stops.agency.agency_id)">
             <div
                 class="agency-element"
-                (click)="this.onAgencyClick(stop.agency.agency_id)">
+                (click)="this.onAgencyClick(stops.agency.agency_id)">
                 <h3 class="agency-name">
-                    {{ stop.agency.agency_name }}
+                    {{ stops.agency.agency_name }}
                 </h3>
                 <svg 
                     class="list-icon"
-                    *ngIf="!this.agencyIdsSelected.has(stop.agency.agency_id)">
+                    *ngIf="!this.agencyIdsSelected.has(stops.agency.agency_id)">
                     <use 
                         xlink:href='./assets/icons/show.svg#show'
                         href="./assets/icons/show.svg#show">
@@ -29,7 +29,7 @@
                 </svg>
                 <svg
                     class="list-icon"
-                    *ngIf="this.agencyIdsSelected.has(stop.agency.agency_id)">
+                    *ngIf="this.agencyIdsSelected.has(stops.agency.agency_id)">
                     <use
                         xlink:href='./assets/icons/hide.svg#hide'
                         href="./assets/icons/hide.svg#hide">
@@ -37,13 +37,14 @@
                 </svg>
             </div>
             <hr>
-            <div *ngIf="this.agencyIdsSelected.has(stop.agency.agency_id)">
+            <div *ngIf="this.agencyIdsSelected.has(stops.agency.agency_id)">
                 <cdk-virtual-scroll-viewport class="stop-viewport" [itemSize]="100">
                     <app-stop 
                         class="stop-element"
-                        *cdkVirtualFor="let stop of stop.stops; trackBy: this.trackByStop"
+                        *cdkVirtualFor="let stop of stops.stops; trackBy: this.trackByStop"
                         [stop]="stop"
-                        (click)="this.onStopClick(stop.agency_id, stop.stop_id)">
+                        [selected]="this.stopIdSelected === (stops.agency.agency_id + '/' + stop.stop_id)"
+                        (click)="this.onStopClick(stops.agency.agency_id, stop.stop_id)">
                     </app-stop>
                 </cdk-virtual-scroll-viewport>
             </div>

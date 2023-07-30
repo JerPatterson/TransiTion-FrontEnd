@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AgencyDto, RouteDto, ShapeDto, StopDto, StopLocationDto, TimeDto, TripDto } from '@app/utils/dtos';
+import { AgencyDto, RouteDto, ShapeDto, StopDto, TimeDto, TripDto } from '@app/utils/dtos';
 import { SERVER_URL } from '@app/utils/env';
 
 @Injectable({
@@ -68,19 +68,14 @@ export class StaticDataService {
         return response.json();
     }
 
-    async getStopLocationsFromAgency(agencyId: string): Promise<StopLocationDto[]> {
+    async getStopsFromAgency(agencyId: string): Promise<StopDto[]> {
         agencyId = agencyId.toLowerCase();
-        const ssStopLocations = sessionStorage.getItem(`stops/${agencyId}`);
-        if (ssStopLocations) return JSON.parse(ssStopLocations);
+        const ssStops = sessionStorage.getItem(`stops/${agencyId}`);
+        if (ssStops) return JSON.parse(ssStops);
         const response = await fetch(`${SERVER_URL}/stops/${agencyId}`);
-        const stopLocations = await response.json();
-        sessionStorage.setItem(`stops/${agencyId}`, JSON.stringify(stopLocations));
-        return stopLocations;
-    }
-
-    async getStops(agencyId: string): Promise<StopDto[]> {
-        const response = await fetch(`${SERVER_URL}/stops/${agencyId}`);
-        return response.json();
+        const stops = await response.json();
+        sessionStorage.setItem(`stops/${agencyId}`, JSON.stringify(stops));
+        return stops;
     }
 
     async getStopById(agencyId: string, stopId: string): Promise<StopDto> {

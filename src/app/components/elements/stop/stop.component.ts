@@ -8,4 +8,5 @@ import { StopLocationDto } from '@app/utils/dtos';
 })
 export class StopComponent {
     @Input() stop!: StopLocationDto;
+    @Input() selected: boolean = false;
 }

@@ -57,11 +57,11 @@ export class StopListComponent {
 
     onStopClick(agencyId: string, stopId: string) {
         const uniqueStopId = `${agencyId}/${stopId}`;
-        if (this.routeIdsSelected.has(uniqueStopId)) {
-            this.routeIdsSelected.delete(uniqueStopId);
+        if (this.stopIdSelected === uniqueStopId) {
+            this.stopIdSelected = '';
             this.clearStopId.emit();
         } else {
-            this.routeIdsSelected.add(uniqueStopId);
+            this.stopIdSelected = uniqueStopId;
             this.newStopId.emit({ agencyId, stopId });
         }
     }
@@ -75,7 +75,7 @@ export class StopListComponent {
                     this.knownAgencyIds.add(agencyId);
                     return {
                         agency: await this.staticDataService.getAgencyById(agencyId),
-                        stops: await this.staticDataService.getStops(agencyId),
+                        stops: await this.staticDataService.getStopsFromAgency(agencyId),
                     };
                 })
         ));
