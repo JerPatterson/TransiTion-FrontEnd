@@ -7,17 +7,31 @@ import { StaticDataService } from '@app/services/static/static-data.service';
     providedIn: 'root'
 })
 export class StopMarkerService {
+    private stopLayer?: L.LayerGroup;
     
     constructor(private staticDataService: StaticDataService) {}
 
-    async createStopLayerFromTrip(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
-        let layerGroup = L.layerGroup();
-        (await this.staticDataService.getStopsFromTrip(agencyId, tripId))
-            .forEach(async (stop) => {
-                layerGroup.addLayer(await this.buildStopMarker(stop, color));
-            });
+    async createTripStopLayer(agencyId: string, tripId: string, color: string) {
+        this.clearTripStopLayer();
+        this.stopLayer = await this.buildTripStopLayer(
+            agencyId, tripId, color
+        );
 
-        return layerGroup;
+        return this.stopLayer;
+    }
+
+    async clearTripStopLayer(): Promise<void> {
+        this.stopLayer?.remove();
+        this.stopLayer = undefined;
+    }
+
+    private async buildTripStopLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
+        const stopMarkers = await Promise.all(
+            (await this.staticDataService.getStopsFromTrip(agencyId, tripId))
+                .map(async (stop) => await this.buildStopMarker(stop, color))
+        );
+
+        return L.layerGroup(stopMarkers);
     }
 
     private async buildStopMarker(stop: StopDto, color: string): Promise<L.CircleMarker> {

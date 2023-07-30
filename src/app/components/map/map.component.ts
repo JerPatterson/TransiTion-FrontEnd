@@ -45,28 +45,33 @@ export class MapComponent implements OnInit {
         if (!routeIds.length) {
             this.clearAllTripShapes();
         } else if (routeIds.length > this.currentRoutes.size) {
-            this.clearTripShapes();
-            this.addSemiTransparentRoutes(routeIds);
+            this.clearTripShape();
+            this.addRouteShapes(routeIds);
         } else if (routeIds.length < this.currentRoutes.size) {
-            this.clearTripShapes();
-            this.removeSemiTransparentRoutes(routeIds);
+            this.clearTripShape();
+            this.removeRouteShapes(routeIds);
         }
+
+        // TODO TEMP
+        routeIds.forEach((routeId) => {
+            const routeIdString = `${routeId.agencyId}/${routeId.routeId}`;
+            this.currentRoutes.add(routeIdString);
+        });
         
-        this.clearStops();
+        this.clearTripStops();
         this.refreshVehicles();
     };
 
     @Input() set vehicle(value: VehicleId | null | undefined) {
-        if (!value) this.clearTripShapes();
+        if (!value) this.clearTripShape();
     }
 
     @Output() newVehicleSelected = new EventEmitter<VehicleId>();
 
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
-    private stopLayers: L.LayerGroup[] = [];
-    private routeLayers: L.LayerGroup[] = [];
-    private routeToSemiTransparentLayers = new Map<string, L.LayerGroup>();
+
+    private stopsLayer?: L.LayerGroup;
 
     private currentAgencies: string[] = [];
     private currentRoutes = new Set<string>();
@@ -120,6 +125,7 @@ export class MapComponent implements OnInit {
         }).setView([this.lat, this.lon], this.zoom);
 
         this.map.invalidateSize({ animate: true });
+        this.map.on('zoomend', () => this.addLayerIfHigherZoomLevel(this.stopsLayer, 12));
 
         const layerControl = L.control.layers({ 'TomTom': TomTomTileLayer }).addTo(this.map);
         layerControl.addBaseLayer(OSMTileLayer, 'OpenStreetMaps');
@@ -142,27 +148,22 @@ export class MapComponent implements OnInit {
         this.vehicleLayers = [];
     }
 
-    private async clearStops(): Promise<void> {
-        await this.clearLayers(this.stopLayers);
-        this.stopLayers = [];
+    private async clearTripStops(): Promise<void> {
+        this.stopsLayer = undefined;
+        this.stopMarkerService.clearTripStopLayer();
     }
 
     private async clearAllTripShapes(): Promise<void> {
-        this.clearTripShapes();
-        this.clearSemiTransparentTripShapes();
-        this.currentRoutes = new Set();
+        this.clearTripShape();
+        this.clearRouteShape();
     }
 
-    private async clearTripShapes(): Promise<void> {
-        await this.clearLayers(this.routeLayers);
-        this.routeLayers = [];
+    private async clearTripShape(): Promise<void> {
+        this.tripShapeService.clearTripShapeLayer();
     }
 
-    private async clearSemiTransparentTripShapes(): Promise<void> {
-        this.routeToSemiTransparentLayers.forEach(async (layer) => {
-            this.clearLayer(layer);
-        });
-        this.routeToSemiTransparentLayers = new Map<string, L.LayerGroup>();
+    private async clearRouteShape(): Promise<void> {
+        this.tripShapeService.clearRouteShapeLayers();
     }
 
     private async clearLayers(layers: L.LayerGroup[]): Promise<void> {
@@ -171,7 +172,7 @@ export class MapComponent implements OnInit {
 
     private async clearLayer(layer: L.LayerGroup): Promise<void> {
         if (layer && this.map.hasLayer(layer)) {
-            this.map.removeLayer(layer);
+            layer.remove();
         }
     }
 
@@ -235,52 +236,29 @@ export class MapComponent implements OnInit {
 
 
     private async addTripStops(agencyId: string, tripId: string, color: string): Promise<void> {
-        this.clearStops();
-        const stopLayer = await this.stopMarkerService
-            .createStopLayerFromTrip(agencyId, tripId, color);
-        this.stopLayers.push(stopLayer);
-        this.map.addLayer(stopLayer);
+        this.stopsLayer = (await this.stopMarkerService
+            .createTripStopLayer(agencyId, tripId, color)).addTo(this.map);
+    }
+
+    private async addLayerIfHigherZoomLevel(layer: L.Layer | undefined, comparisonZoomLevel: number) {
+        if (this.map.getZoom() > comparisonZoomLevel) {
+            layer?.addTo(this.map);
+        } else if (layer && this.map.hasLayer(layer)) {
+            layer?.remove();
+        }
     }
 
 
     private async addTripShape(agencyId: string, tripId: string, color: string): Promise<void> {
-        this.clearTripShapes();
-        const tripLayer = await this.tripShapeService
-            .createTripLayer(agencyId, tripId, color);
-        this.routeLayers.push(tripLayer);
-        this.map.addLayer(tripLayer);
+        (await this.tripShapeService.createTripShapeLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
-    private async addSemiTransparentRoutes(routeIds: RouteId[]): Promise<void> {
-        routeIds
-            .filter((routeId) => 
-                !this.currentRoutes.has(`${routeId.agencyId}/${routeId.routeId}`)
-            ).forEach((routeId) => {
-                const routeIdString = `${routeId.agencyId}/${routeId.routeId}`;
-                this.currentRoutes.add(routeIdString);
-                this.addSemiTransparentRoute(routeIdString);
-            });
+    private async addRouteShapes(routeIds: RouteId[]) {
+        (await this.tripShapeService.addRouteShapeLayer(routeIds)).addTo(this.map);
     }
 
-    private async addSemiTransparentRoute(route: string): Promise<void> {
-        const tripLayer = await this.tripShapeService.createSemiTransparentTripsLayer([route]);
-        this.routeToSemiTransparentLayers.set(route, tripLayer);
-        this.map.addLayer(tripLayer);
-    }
-
-    private async removeSemiTransparentRoutes(routeIds: RouteId[]): Promise<void> {
-        const routesSet = new Set(routeIds.map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
-        [...this.currentRoutes]
-            .filter((route) => !routesSet.has(route))
-            .forEach((removedRoute) => this.removeSemiTransparentRoute(removedRoute));
-        this.currentRoutes = routesSet;
-    }
-
-    private async removeSemiTransparentRoute(route: string): Promise<void> {
-        const tripsLayer = this.routeToSemiTransparentLayers.get(route);
-        if (!tripsLayer) return;
-        await this.clearLayer(tripsLayer);
-        this.routeToSemiTransparentLayers.delete(route);
+    private async removeRouteShapes(routeIds: RouteId[]) {
+        await this.tripShapeService.removeRouteShapeLayer(routeIds);
     }
 }
     
