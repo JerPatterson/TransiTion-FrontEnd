@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import L from 'leaflet';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { ShapeDto } from '@app/utils/dtos';
-import { DEFAULT_SHAPE_COLOR, PARAM_SEPARATOR } from '@app/utils/constants';
+import { DEFAULT_ROUTE_COLOR, PARAM_SEPARATOR } from '@app/utils/constants';
 
 @Injectable({
     providedIn: 'root'
@@ -11,11 +11,11 @@ export class TripShapeService {
 
     constructor(private staticDataService: StaticDataService) {}
     
-    async createTripLayer(agencyId: string, routeId: string, tripId: string): Promise<L.LayerGroup> {
-        const shapeColor = await this.getShapeColor(agencyId, routeId);
+    async createTripLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
         const shapeId = (await this.staticDataService.getTripById(agencyId, tripId)).shape_id;
         const shapePts = await this.staticDataService.getShapeById(agencyId, shapeId);
-        return L.layerGroup([await this.buildTripShape(shapePts, shapeColor)], {pane: 'shapes'});
+        const canvasRenderer = L.canvas({pane: 'shapes'});
+        return L.layerGroup([await this.buildTripShape(shapePts, color, canvasRenderer)], {pane: 'shapes'});
     }
 
     async createSemiTransparentTripsLayer(routes: string[]): Promise<L.LayerGroup> {
@@ -49,6 +49,6 @@ export class TripShapeService {
     private async getShapeColor(agencyId: string, routeId?: string | null): Promise<string> {
         let color: string | undefined;
        if (routeId) color = (await this.staticDataService.getRouteById(agencyId, routeId))?.route_color;
-       return color ? `#${color}` : DEFAULT_SHAPE_COLOR;
+       return color ? `#${color}` : DEFAULT_ROUTE_COLOR;
     }
 }

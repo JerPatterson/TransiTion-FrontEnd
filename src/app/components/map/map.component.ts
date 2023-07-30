@@ -4,6 +4,7 @@ import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service
 import { MAX_ZOOM, MIN_ZOOM, ONE_SEC_IN_MS, PARAM_SEPARATOR } from '@app/utils/constants';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 import { MapRenderingOptions, RouteId, VehicleId } from '@app/utils/component-interface';
+import { StopMarkerService } from '@app/services/layer/stop-marker.service';
 
 @Component({
     selector: 'app-map',
@@ -50,18 +51,20 @@ export class MapComponent implements OnInit {
             this.clearTripShapes();
             this.removeSemiTransparentRoutes(routeIds);
         }
-
+        
+        this.clearStops();
         this.refreshVehicles();
     };
 
     @Input() set vehicle(value: VehicleId | null | undefined) {
-        if (!value) this.clearSemiTransparentTripShapes();
+        if (!value) this.clearTripShapes();
     }
 
     @Output() newVehicleSelected = new EventEmitter<VehicleId>();
 
     private map!: L.Map;
     private vehicleLayers: L.LayerGroup[] = [];
+    private stopLayers: L.LayerGroup[] = [];
     private routeLayers: L.LayerGroup[] = [];
     private routeToSemiTransparentLayers = new Map<string, L.LayerGroup>();
 
@@ -75,13 +78,15 @@ export class MapComponent implements OnInit {
         mergeAllVehicleClusters: false,
     };
 
-    private readonly emitVehicleSelected = (vehicleId: VehicleId, routeId: string, tripId: string) => {
+    private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
         this.newVehicleSelected.emit(vehicleId);
-        this.addTripShape(vehicleId.agencyId, routeId, tripId);
+        this.addTripShape(vehicleId.agencyId, tripId, color);
+        this.addTripStops(vehicleId.agencyId, tripId, color);
     };
 
     constructor(
         private vehicleMarkerService: VehicleMarkerService,
+        private stopMarkerService: StopMarkerService,
         private tripShapeService: TripShapeService,
     ) {}
 
@@ -120,19 +125,26 @@ export class MapComponent implements OnInit {
         layerControl.addBaseLayer(OSMTileLayer, 'OpenStreetMaps');
         layerControl.addBaseLayer(ArcGISLayer, 'ArcGIS Satellite');
 
-        const markerPane = this.map.createPane('marker');
-        const shapesPane = this.map.createPane('shapes');
-        const semitransparentPane = this.map.createPane('semitransparent');
-        markerPane.style.zIndex = '220';
-        shapesPane.style.zIndex = '210';
-        semitransparentPane.style.zIndex = '205';
-        semitransparentPane.style.opacity = '0.5';
+        this.map.createPane('marker');
+        this.map.createPane('stopmarker');
+        this.map.createPane('shapes');
+        this.map.createPane('semitransparent');
+        (this.map.getPane('marker') as HTMLElement).style.zIndex = '399';
+        (this.map.getPane('stopmarker') as HTMLElement).style.zIndex = '398';
+        (this.map.getPane('shapes') as HTMLElement).style.zIndex = '397';
+        (this.map.getPane('semitransparent') as HTMLElement).style.zIndex = '396';
+        (this.map.getPane('semitransparent') as HTMLElement).style.opacity = '0.5';
     }
 
 
     private async clearVehicles(): Promise<void> {
         await this.clearLayers(this.vehicleLayers);
         this.vehicleLayers = [];
+    }
+
+    private async clearStops(): Promise<void> {
+        await this.clearLayers(this.stopLayers);
+        this.stopLayers = [];
     }
 
     private async clearAllTripShapes(): Promise<void> {
@@ -222,10 +234,19 @@ export class MapComponent implements OnInit {
     }
 
 
-    private async addTripShape(agencyId: string, routeId: string, tripId: string): Promise<void> {
+    private async addTripStops(agencyId: string, tripId: string, color: string): Promise<void> {
+        this.clearStops();
+        const stopLayer = await this.stopMarkerService
+            .createStopLayerFromTrip(agencyId, tripId, color);
+        this.stopLayers.push(stopLayer);
+        this.map.addLayer(stopLayer);
+    }
+
+
+    private async addTripShape(agencyId: string, tripId: string, color: string): Promise<void> {
         this.clearTripShapes();
         const tripLayer = await this.tripShapeService
-            .createTripLayer(agencyId, routeId, tripId);
+            .createTripLayer(agencyId, tripId, color);
         this.routeLayers.push(tripLayer);
         this.map.addLayer(tripLayer);
     }

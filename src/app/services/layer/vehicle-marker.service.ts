@@ -14,6 +14,7 @@ import {
     DEFAULT_CLUSTER_ICON_SIZE,
     DEFAULT_ICON_COLOR,
     DEFAULT_ICON_SIZE,
+    DEFAULT_ROUTE_COLOR,
     DISABLE_CLUSTER_ZOOM,
     FIRST_CLUSTER_ALPHA,
     FIRST_CLUSTER_MAX_CHILD_COUNT,
@@ -80,7 +81,7 @@ export class VehicleMarkerService {
     async createVehiclesLayerFromRoutes(
         routes: string[], 
         options: MapRenderingOptions,
-        emitVehicleSelected: (v: VehicleId, rId: string, tId: string) => void,
+        emitVehicleSelected: (v: VehicleId, tId: string, c: string) => void,
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         const firstRouteAgencyId = routes[0].split(PARAM_SEPARATOR)[0];
@@ -161,10 +162,10 @@ export class VehicleMarkerService {
                 },
             ).addEventListener(
                 'click', 
-                () => emitMarkerClicked(
+                async () => emitMarkerClicked(
                     { agencyId, vehicleId: vehicle.vehicle?.id as string },
-                    vehicle.trip?.routeId as string,
                     vehicle.trip?.tripId as string,
+                    await this.getRouteColor(agencyId, vehicle.trip?.routeId),
                 ),
             );
     
@@ -221,10 +222,10 @@ export class VehicleMarkerService {
                 },
             ).addEventListener(
                 'click', 
-                () => emitMarkerClicked(
+                async () => emitMarkerClicked(
                     { agencyId, vehicleId: vehicle.vehicle?.id as string },
-                    vehicle.trip?.routeId as string,
                     vehicle.trip?.tripId as string,
+                    await this.getRouteColor(agencyId, vehicle.trip?.routeId),
                 ),
             );
     
@@ -259,6 +260,13 @@ export class VehicleMarkerService {
         });
     }
 
+
+    private async getRouteColor(agencyId: string, routeId?: string | null) {
+        if (!routeId) return DEFAULT_ROUTE_COLOR;
+        const route = await this.stDataService.getRouteById(agencyId, routeId);
+
+        return route?.route_color ? `#${route.route_color}` : DEFAULT_ROUTE_COLOR;
+    }
 
     private wasSeenLongAgo(timestamp?: number | null): boolean {
         if (!timestamp) return true;
