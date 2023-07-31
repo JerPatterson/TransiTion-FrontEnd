@@ -11,8 +11,8 @@ export class StopMarkerService {
     
     constructor(private staticDataService: StaticDataService) {}
 
-    async createTripStopLayer(agencyId: string, tripId: string, color: string) {
-        this.clearTripStopLayer();
+    async createTripStopsLayer(agencyId: string, tripId: string, color: string) {
+        this.clearTripStopsLayer();
         this.stopLayer = await this.buildTripStopLayer(
             agencyId, tripId, color
         );
@@ -20,7 +20,7 @@ export class StopMarkerService {
         return this.stopLayer;
     }
 
-    async clearTripStopLayer(): Promise<void> {
+    async clearTripStopsLayer(): Promise<void> {
         this.stopLayer?.remove();
         this.stopLayer = undefined;
     }
