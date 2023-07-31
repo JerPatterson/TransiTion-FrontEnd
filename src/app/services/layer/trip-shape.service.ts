@@ -39,7 +39,7 @@ export class TripShapeService {
                     return this.buildRouteShapeLayer(routeId);
                 })
             ),
-            { pane: 'shapes' },
+            { pane: 'tripshape' },
         ); 
     }
 
@@ -62,7 +62,7 @@ export class TripShapeService {
     private async buildTripShapeLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
         const trip = await this.staticDataService.getTripById(agencyId, tripId);
         const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
-        const renderer = L.canvas({ pane: 'shapes' });
+        const renderer = L.canvas({ pane: 'tripshape' });
         return L.layerGroup([await this.buildTripShape(shapePts, color, renderer)]);
     }
 
@@ -89,7 +89,7 @@ export class TripShapeService {
     async buildTripShapesLayer(routeIds: RouteId[]): Promise<L.GeoJSON> {
         const shapeIds = new Set<string>();
         const shapeLayer = L.geoJSON();
-        const canvasRenderer = L.canvas({ pane: 'semitransparent' });
+        const canvasRenderer = L.canvas({ pane: 'routeshapes' });
 
         for (let routeId of routeIds) {
             const trips = await this.staticDataService.getTodayTripsFromRoute(routeId.agencyId, routeId.routeId);

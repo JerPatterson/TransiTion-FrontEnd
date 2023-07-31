@@ -41,7 +41,9 @@ export class StopMarkerService {
             color: color,
             fillColor: "#ffffff",
             pane: 'stopmarker',
+            interactive: true,
         });
+
         return marker.bindPopup(`${stop.stop_name} [${stop.stop_code}]`);
     }
 }

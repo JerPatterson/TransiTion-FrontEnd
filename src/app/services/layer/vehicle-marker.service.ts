@@ -125,7 +125,7 @@ export class VehicleMarkerService {
                     if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'vehiclemarker' });
             layerGroup.on('remove', () => this.markersCanvas.clear());
         }
 
@@ -166,7 +166,7 @@ export class VehicleMarkerService {
                     if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'vehiclemarker' });
             layerGroup.on('remove', () => this.markersCanvas.clear());
         }
 

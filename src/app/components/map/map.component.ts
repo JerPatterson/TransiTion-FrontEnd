@@ -190,18 +190,18 @@ export class MapComponent implements OnInit {
     }
 
     private setMapPanes() {
-        this.map.createPane('marker');
-        (this.map.getPane('marker') as HTMLElement).style.zIndex = '399';
+        this.map.createPane('vehiclemarker');
+        (this.map.getPane('vehiclemarker') as HTMLElement).style.zIndex = '399';
 
         this.map.createPane('stopmarker');
         (this.map.getPane('stopmarker') as HTMLElement).style.zIndex = '398';
 
-        this.map.createPane('shapes');
-        (this.map.getPane('shapes') as HTMLElement).style.zIndex = '397';
+        this.map.createPane('tripshape');
+        (this.map.getPane('tripshape') as HTMLElement).style.zIndex = '397';
 
-        this.map.createPane('semitransparent');
-        (this.map.getPane('semitransparent') as HTMLElement).style.zIndex = '396';
-        (this.map.getPane('semitransparent') as HTMLElement).style.opacity = '0.5';
+        this.map.createPane('routeshapes');
+        (this.map.getPane('routeshapes') as HTMLElement).style.zIndex = '396';
+        (this.map.getPane('routeshapes') as HTMLElement).style.opacity = '0.5';
     }
 }
     
