@@ -97,7 +97,7 @@ AGENCY_TO_STYLE.set('tug', {
     backgroundColor: '#99c962',
     vehicleIconColor: '#000000',
 });
-AGENCY_TO_STYLE.set('linter', {
+AGENCY_TO_STYLE.set('tacl', {
     backgroundColor: '#e67230',
     vehicleIconColor: '#000000',
 });
