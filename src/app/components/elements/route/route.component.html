@@ -26,6 +26,13 @@
             [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
             <use xlink:href='./assets/icons/bus.svg#bus' href="./assets/icons/bus.svg#bus"></use>
         </svg>
+
+        <svg
+            class="route-type-icon"
+            *ngIf="route.route_type === 1501"
+            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
+            <use xlink:href='./assets/icons/taxi.svg#taxi' href="./assets/icons/taxi.svg#taxi"></use>
+        </svg>
     </div>
 
     <div [ngClass]="this.trip ? 'route-info-with-trip' : 'route-info'">
