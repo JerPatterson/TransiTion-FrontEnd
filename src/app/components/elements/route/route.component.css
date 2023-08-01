@@ -1,6 +1,6 @@
 .route-container {
-    display: flex;
-    flex-direction: row;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 }
 
 .route-container.clickable:hover {
@@ -12,59 +12,37 @@
     background-color: #c1cacf !important;
 }
 
-.route-info {
-    padding: 1.2vh 0%;
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
 }
 
-.route-info-with-trip {
-    padding: 2vh 0%;
+.route-type {
+    width: 6vh;
+    height: 6vh;
+    padding-top: 0.5vh;
+    padding-bottom: 0.5vh;
+    padding-left: 1vh;
+    padding-right: 0.5vh;
+}
+
+.route-identifier-container {
+    margin-top: 1vh;
 }
 
 .route-identifier {
     font-size: 4vh;
-    font-weight: bolder;
-    margin: 0px;
-    padding: 0.5vh 1.5vh;
-    line-height: 80%;
-    border-radius: 4px;
 }
 
-.route-with-trip-identifier {
-    font-size: 4vh;
-    font-weight: bolder;
-    margin: 0px;
-    padding: 0px;
-    line-height: 80%;
+.route-name-container {
+    display: table;
+    margin-left: 3.5vh;
 }
 
 .route-name {
-    font-size: 2.2vh;
-    margin: 0px;
-    margin-top: 1.8vh;
-    margin-left: 1vh;
-    padding: 0px;
-}
-
-.direction-name {
-    position: relative;
-    top: -0.8vh;
-    font-size: 2vh;
-}
-
-.route-type {
-    margin: 0px;
-    padding-left: 1.5vh;
-    padding-right: 1.5vh;
-    align-items: center;
-}
-
-.route-type-icon {
-    max-width: 6vh;
-    max-height: 6vh;
-}
-
-.direction-icon {
-    margin-top: 0.5vh;
-    max-width: 3vh;
-    max-height: 3vh;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: left;
+    font-size: 2.4vh;
 }

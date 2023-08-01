@@ -14,6 +14,9 @@ import { StopComponent } from './components/elements/stop/stop.component';
 import { AgencyComponent } from './components/elements/agency/agency.component';
 import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
 import { VehicleInfoComponent } from './components/info/vehicle-info.component';
+import { RouteIdentifierComponent } from './components/elements/route-identifier/route-identifier.component';
+import { RouteTypeIconComponent } from './components/elements/route-type/route-type.component';
+import { TripDirectionComponent } from './components/elements/trip-direction/trip-direction.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +31,9 @@ import { VehicleInfoComponent } from './components/info/vehicle-info.component';
     AgencyComponent,
     ToolbarComponent,
     VehicleInfoComponent,
+    RouteIdentifierComponent,
+    RouteTypeIconComponent,
+    TripDirectionComponent,
   ],
   imports: [
     AppRoutingModule,

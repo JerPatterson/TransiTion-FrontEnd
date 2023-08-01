@@ -1,0 +1,13 @@
+<div
+    class="main with-background"
+    *ngIf="!this.showAgency"
+    [ngStyle]="{ 'color': this.color, 'background-color': this.backgroundColor }">
+    {{ this.route.route_short_name }}
+</div>
+
+<div
+    class="main"
+    *ngIf="this.showAgency"
+    [ngStyle]="{ 'color': this.color }">
+    {{ this.route.route_short_name }} · {{ this.route.agency_id.toUpperCase() }}
+</div>

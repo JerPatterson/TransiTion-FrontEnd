@@ -1,0 +1,14 @@
+.main {
+    width: fit-content;
+    height: fit-content;
+    margin: 0%;
+    padding: 0%;
+    font-weight: bolder;
+    line-height: 80%;
+    white-space: nowrap;
+    border-radius: 4px;
+}
+
+.main.with-background {
+    padding: 10% 20%;
+}

@@ -1,77 +1,36 @@
 <div 
     class="route-container"
-    [ngClass]="{'clickable' : !this.trip, 'selected': this.selected}"
-    [ngStyle]="{'background-color': this.trip ? '#' + route.route_color : 'transparent'}">
+    [ngClass]="{ 'clickable' : !this.trip, 'selected': this.selected }"
+    [ngStyle]="{ 'background-color': this.trip ? '#' + this.route.route_color : 'transparent' }">
 
-    <div
-        class="route-type"
-        [ngStyle]="{'padding': this.trip ? '2vh' : '0.5vh'}">
-        <svg
-            class="route-type-icon"
-            *ngIf="route.route_type === 1"
-            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
-            <use xlink:href='./assets/icons/subway.svg#subway' href="./assets/icons/subway.svg#subway"></use>
-        </svg>
+    <div class="flex-row">
+        <app-route-type
+            class="route-type"
+            [route]="this.route"
+            [applyColor]="this.trip ? true : false">
+        </app-route-type>
 
-        <svg
-            class="route-type-icon"
-            *ngIf="route.route_type === 2"
-            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
-            <use xlink:href='./assets/icons/train.svg#train' href="./assets/icons/train.svg#train"></use>
-        </svg>
+        <div class="route-identifier-container">
+            <app-route-identifier
+                class="route-identifier"
+                [route]="this.route"
+                [showAgency]="this.trip ? true : false">
+            </app-route-identifier>
 
-        <svg
-            class="route-type-icon"
-            *ngIf="route.route_type === 3"
-            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
-            <use xlink:href='./assets/icons/bus.svg#bus' href="./assets/icons/bus.svg#bus"></use>
-        </svg>
-
-        <svg
-            class="route-type-icon"
-            *ngIf="route.route_type === 1501"
-            [ngStyle]="{'color': this.trip ? '#' + route.route_text_color : '#000'}">
-            <use xlink:href='./assets/icons/taxi.svg#taxi' href="./assets/icons/taxi.svg#taxi"></use>
-        </svg>
-    </div>
-
-    <div [ngClass]="this.trip ? 'route-info-with-trip' : 'route-info'">
-        <div 
-            class="route-identifier"
-            *ngIf="!this.trip"
-            [ngStyle]="{
-                'color': '#' + route.route_text_color,
-                'background-color': '#' + route.route_color,
-            }">
-            {{ route.route_short_name }}
+            <app-trip-direction
+                class="trip-direction"
+                *ngIf="this.trip"
+                [trip]="this.trip"
+                [route]="this.route">
+            </app-trip-direction>
         </div>
 
-        <div 
-            class="route-with-trip-identifier"
-            *ngIf="this.trip"
-            [ngStyle]="{'color': '#' + route.route_text_color }">
-            {{ route.route_short_name }} · {{ route.agency_id.toUpperCase() }}
+        <div class="route-name-container">
+            <p
+                class="route-name"
+                *ngIf="!this.trip">
+                {{ this.route.route_long_name }}
+            </p>
         </div>
-
-        <div
-            *ngIf="this.trip"
-            [ngStyle]="{'color': '#' + route.route_text_color }">
-            <svg
-                class="direction-icon"
-                [ngStyle]="{'color': '#' + route.route_text_color}">
-                <use xlink:href='./assets/icons/arrow.svg#arrow' href="./assets/icons/arrow.svg#arrow"></use>
-            </svg>
-            <span class="direction-name">
-                {{ trip.trip_headsign }}
-            </span>
-        </div>
-    </div>
-
-    <div
-        class="route-name"
-        *ngIf="!this.trip">
-        <span>
-            {{ route.route_long_name }}
-        </span>
     </div>
 </div>

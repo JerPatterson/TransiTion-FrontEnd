@@ -1,0 +1,11 @@
+.direction-icon {
+    margin-top: 0.5vh;
+    max-width: 3vh;
+    max-height: 3vh;
+}
+
+.direction-name {
+    position: relative;
+    top: -1vh;
+    font-size: 2.2vh;
+}

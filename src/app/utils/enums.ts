@@ -23,6 +23,7 @@ export enum RouteType {
   Funicular,
   Trolleybus = 11,
   Monorail = 12,
+  SharedTaxi = 1501,
 }
 
 export enum PickupType {
