@@ -43,6 +43,6 @@
 .route-name {
     display: table-cell;
     vertical-align: middle;
-    text-align: left;
+    text-align: lef;
     font-size: 2.4vh;
 }

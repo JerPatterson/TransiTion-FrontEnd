@@ -9,13 +9,13 @@ import { RouteListComponent } from '@app/components/lists/route-list/route-list.
 import { StopListComponent } from '@app/components/lists/stop-list/stop-list.component';
 import { MainPageComponent } from '@app/pages/main-page.component';
 import { MapComponent } from '@app/components/map/map.component';
-import { RouteComponent } from './components/elements/route/route.component';
-import { StopComponent } from './components/elements/stop/stop.component';
-import { AgencyComponent } from './components/elements/agency/agency.component';
-import { ToolbarComponent } from './components/lists/toolbar/toolbar.component';
-import { VehicleInfoComponent } from './components/info/vehicle-info.component';
+import { RouteComponent } from './components/list-elements/route/route.component';
+import { StopComponent } from './components/list-elements/stop/stop.component';
+import { AgencyComponent } from './components/list-elements/agency/agency.component';
+import { ToolbarComponent } from './components/toolbar/toolbar.component';
+import { VehicleInfoComponent } from './components/info-elements/vehicle-info.component';
 import { RouteIdentifierComponent } from './components/elements/route-identifier/route-identifier.component';
-import { RouteTypeIconComponent } from './components/elements/route-type/route-type.component';
+import { RouteTypeComponent } from './components/elements/route-type/route-type.component';
 import { TripDirectionComponent } from './components/elements/trip-direction/trip-direction.component';
 
 @NgModule({
@@ -32,7 +32,7 @@ import { TripDirectionComponent } from './components/elements/trip-direction/tri
     ToolbarComponent,
     VehicleInfoComponent,
     RouteIdentifierComponent,
-    RouteTypeIconComponent,
+    RouteTypeComponent,
     TripDirectionComponent,
   ],
   imports: [

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RouteTypeIconComponent } from './route-type.component';
+import { RouteTypeComponent } from './route-type.component';
 
-describe('RouteTypeIconComponent', () => {
-    let component: RouteTypeIconComponent;
-    let fixture: ComponentFixture<RouteTypeIconComponent>;
+describe('RouteTypeComponent', () => {
+    let component: RouteTypeComponent;
+    let fixture: ComponentFixture<RouteTypeComponent>;
     
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ RouteTypeIconComponent ]
+            declarations: [ RouteTypeComponent ]
         })
         .compileComponents();
         
-        fixture = TestBed.createComponent(RouteTypeIconComponent);
+        fixture = TestBed.createComponent(RouteTypeComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -7,7 +7,7 @@ import { RouteType } from '@app/utils/enums';
     templateUrl: './route-type.component.html',
     styleUrls: ['./route-type.component.css']
 })
-export class RouteTypeIconComponent implements OnChanges {
+export class RouteTypeComponent implements OnChanges {
     @Input() route!: RouteDto;
     @Input() applyColor!: boolean;
 
