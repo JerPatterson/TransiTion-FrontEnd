@@ -1,45 +1,33 @@
-<div
-    class="stop-container"
-    [ngClass]="{'selected': this.selected}">
-
-    <div class="stop-type">
-        <svg
-            class="stop-type-icon"
-            *ngIf="stop.stop_shelter">
-            <use 
-                xlink:href='./assets/icons/stop.svg#stop'
-                href="./assets/icons/stop.svg#stop">
-            </use>
+<div class="stop-container" [ngClass]="{ 'selected': this.selected }">
+    <div class="stop-identifier-container">
+        <svg class="stop-type">
+            <use [attr.xlink:href]='this.stopIconHref' [attr.href]="this.stopIconHref" />
         </svg>
 
-        <svg
-            class="stop-type-icon"
-            *ngIf="!stop.stop_shelter">
-            <use
-                xlink:href='./assets/icons/stop-sign.svg#stop-sign'
-                href="./assets/icons/stop-sign.svg#stop-sign">
-            </use>
-        </svg>
-    </div>
-
-    <div class="stop-info">
-        <div class="stop-name-row">
-            <span class="stop-name">
-                {{ stop.stop_name }}
-            </span>
-            <span class="stop-feature-container">
-                <svg
-                    class="stop-feature"
-                    *ngIf="stop.wheelchair_boarding === 1">
-                    <use
-                        xlink:href='./assets/icons/wheelchair.svg#wheelchair'
-                        href="./assets/icons/wheelchair.svg#wheelchair">
-                    </use>
-                </svg>
-            </span>
-        </div>
         <div class="stop-identifier">
             {{ stop.stop_code }}
+        </div>
+    </div>
+
+    <div class="stop-info-container">
+        <span class="stop-name">
+            {{ stop.stop_name }}
+        </span>
+
+        <div class="stop-feature-container">
+            <svg class="stop-feature" *ngIf="stop.wheelchair_boarding === 1">
+                <use [attr.xlink:href]='this.wheelchairIconHref' [attr.href]="this.wheelchairIconHref" />
+            </svg>
+
+            <div
+                class="route-identifier"
+                *ngFor="let route of this.routes">
+                <app-route-identifier
+                    *ngIf="route"
+                    [route]="route"
+                    [showAgency]="false">
+                </app-route-identifier>
+            </div>
         </div>
     </div>
 </div>

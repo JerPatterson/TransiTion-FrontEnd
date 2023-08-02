@@ -15,7 +15,7 @@
 .flex-row {
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: flex-start;
 }
 
 .route-type {
@@ -43,6 +43,5 @@
 .route-name {
     display: table-cell;
     vertical-align: middle;
-    text-align: lef;
     font-size: 2.4vh;
 }

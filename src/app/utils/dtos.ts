@@ -27,8 +27,8 @@ export interface StopDto {
   wheelchair_boarding?: WheelchairBoardingType;
   level_id?: string;
   platform_code?: string;
-  stop_shelter: boolean;
-  stop_display: boolean;
+  stop_shelter: number;
+  route_ids: string[];
 }
 
 export interface StopLocationDto {
@@ -38,7 +38,7 @@ export interface StopLocationDto {
   stop_lat: number;
   stop_lon: number;
   wheelchair_boarding?: WheelchairBoardingType;
-  stop_shelter: boolean;
+  stop_shelter: number;
 }
 
 export interface RouteDto {

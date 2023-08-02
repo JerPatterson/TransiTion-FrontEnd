@@ -43,6 +43,7 @@
                         class="stop-element"
                         *cdkVirtualFor="let stop of stops.stops; trackBy: this.trackByStop"
                         [stop]="stop"
+                        [agencyId]="stops.agency.agency_id"
                         [selected]="this.stopIdSelected === (stops.agency.agency_id + '/' + stop.stop_id)"
                         (click)="this.onStopClick(stops.agency.agency_id, stop.stop_id)">
                     </app-stop>
