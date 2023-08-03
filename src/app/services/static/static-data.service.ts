@@ -83,6 +83,12 @@ export class StaticDataService {
         return response.json();
     }
 
+    async getStopByIds(agencyId: string, stopIds: string[]): Promise<StopDto[]> {
+        const wantedStopIds = new Set(stopIds);
+        const stops = await this.getStopsFromAgency(agencyId);
+        return stops.filter((stop) => wantedStopIds.has(stop.stop_id));
+    }
+
     async getStopsFromRoute(agencyId: string, routeId: string): Promise<StopDto[]> {
         const response = await fetch(`${SERVER_URL}/stops/route/${agencyId}/${routeId}`);
         return response.json();

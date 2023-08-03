@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteId } from '@app/utils/component-interface';
 import { AgencyDto, RouteDto } from '@app/utils/dtos';
-import { AgencyRouteElement } from '@app/utils/list.components';
+import { AgencyRoutesElement } from '@app/utils/list.components';
 
 @Component({
     selector: 'app-route-list',
@@ -10,7 +10,7 @@ import { AgencyRouteElement } from '@app/utils/list.components';
     styleUrls: ['./route-list.component.css']
 })
 export class RouteListComponent {    
-    routes: AgencyRouteElement[] = [];
+    routes: AgencyRoutesElement[] = [];
     routeIdsSelected = new Set<string>();
     agencyIdsSelected = new Set<string>();
 

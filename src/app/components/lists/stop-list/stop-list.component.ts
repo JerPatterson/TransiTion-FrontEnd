@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouteId, StopId } from '@app/utils/component-interface';
-import { AgencyStopElement } from '@app/utils/list.components';
+import { AgencyRouteStopsElement, AgencyStopsElement } from '@app/utils/list.components';
 import { StaticDataService } from '@app/services/static/static-data.service';
-import { StopDto } from '@app/utils/dtos';
+import { RouteDto, StopDto } from '@app/utils/dtos';
 
 @Component({
     selector: 'app-stop-list',
@@ -10,13 +10,17 @@ import { StopDto } from '@app/utils/dtos';
     styleUrls: ['./stop-list.component.css']
 })
 export class StopListComponent {
-    stops: AgencyStopElement[] = [];
-    stopIdSelected?: string; 
+    stops: AgencyStopsElement[] = [];
+    routeStops: AgencyRouteStopsElement[] = [];
+
+    stopIdSelected?: string;
     routeIdsSelected = new Set<string>();
     agencyIdsSelected = new Set<string>();
 
     agencyIdsToShow = new Set<string>();
+    routeIdsToShow = new Set<string>();
     private knownAgencyIds = new Set<string>();
+    private knownRouteIds = new Set<string>();
 
     @Input() set agencyIds(values: string[]) {
         this.setStops(values);
@@ -24,7 +28,10 @@ export class StopListComponent {
     };
 
     @Input() set routeIds(values: RouteId[]) {
-
+        this.setRouteStops(values);
+        this.routeIdsToShow = new Set(
+            values.map(value => `${value.agencyId}/${value.routeId}`)
+        );
     };
 
     @Input() set selection(value: StopId) {
@@ -79,5 +86,29 @@ export class StopListComponent {
                     };
                 })
         ));
+    }
+
+    private async setRouteStops(routeIds: RouteId[]) {
+        this.routeStops = this.routeStops.concat(await Promise.all(
+            routeIds
+                .filter((routeId) =>
+                    !this.knownRouteIds.has(`${routeId.agencyId}/${routeId.routeId}`)
+                ).sort((a, b) =>
+                    (`${a.agencyId}${a.routeId}`).localeCompare(`${b.agencyId}${b.routeId}`)
+                ).map(async (routeId) => {
+                    this.knownRouteIds.add(`${routeId.agencyId}/${routeId.routeId}`);
+                    const route = await this.staticDataService.getRouteById(routeId.agencyId, routeId.routeId) as RouteDto;
+                    const stops = (await this.staticDataService.getStopByIds(routeId.agencyId, route.stop_ids))
+                        .map((stop) => {
+                            return {
+                                ...stop,
+                                route_ids: stop.route_ids.filter((value) => value != routeId.routeId),
+                            }
+                        });
+                    return { route, stops };
+                })
+        ));
+
+        console.log(this.routeStops);
     }
 }

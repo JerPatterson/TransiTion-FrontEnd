@@ -4,7 +4,7 @@
     top: 0.8vh;
     left: 5.5vw;
     max-width: 32vw;
-    max-height: fit-content;
+    height: fit-content;
     padding: 0px;
     border-radius: 8px;
     background-color: #f0f8ff;

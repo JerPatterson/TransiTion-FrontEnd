@@ -54,8 +54,9 @@ export interface RouteDto {
   route_sort_order?: number;
   continuous_pickup?: number;
   continuous_drop_off?: number;
-  wheelchair_boarding?: number;
-  night_only?: boolean;
+  wheelchair_boarding?: WheelchairBoardingType;
+  night_only?: number;
+  stop_ids: string[];
 }
 
 export interface TripDto {
