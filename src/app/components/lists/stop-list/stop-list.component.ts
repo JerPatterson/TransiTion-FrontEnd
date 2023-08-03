@@ -35,14 +35,14 @@ export class StopListComponent {
         );
     };
 
-    @Input() set selection(values: StopId[]) {
+    @Input() set selections(values: StopId[]) {
         this.stopIdsSelected = new Set(
             values.map((value) => `${value.agencyId}/${value.stopId}`)
         );
     };
 
     @Output() removeStopId = new EventEmitter<StopId>();
-    @Output() newStopId = new EventEmitter<StopId>();
+    @Output() addStopId = new EventEmitter<StopId>();
 
     constructor(private staticDataService: StaticDataService) {}
     
@@ -73,7 +73,7 @@ export class StopListComponent {
             this.removeStopId.emit({ agencyId, stopId });
         } else {
             this.stopIdsSelected.add(uniqueStopId);
-            this.newStopId.emit({ agencyId, stopId });
+            this.addStopId.emit({ agencyId, stopId });
         }
     }
 

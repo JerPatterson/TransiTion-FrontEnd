@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, AfterContentChecked } from '@angular/core';
-import { MapSelectionIdentifiers, MapRenderingOptions, RouteId, MapComponentDisplayed, MapSelectionOptions, VehicleId } from '@app/utils/component-interface';
+import { MapSelectionIdentifiers, MapRenderingOptions, RouteId, MapComponentDisplayed, MapSelectionOptions, VehicleId, StopId } from '@app/utils/component-interface';
 
 @Component({
     selector: 'app-main-page',
@@ -23,7 +23,7 @@ export class MainPageComponent implements AfterContentChecked {
         agencies: [],
         routes: [],
         vehicle: undefined,
-        stop: undefined,
+        stops: [],
     }
 
     componentDisplayed = MapComponentDisplayed.None;
@@ -85,6 +85,17 @@ export class MainPageComponent implements AfterContentChecked {
         this.selections.routes = this.selections.routes
             .filter((value) => value.agencyId !== routeId.agencyId
                 || value.routeId !== routeId.routeId);
+    }
+
+    addStopId(stopId: StopId) {
+        this.selections.stops = this.selections.stops.concat([stopId]);
+        console.log(this.selections.stops);
+    }
+
+    removeStopId(routeId: StopId) {
+        this.selections.stops = this.selections.stops
+            .filter((value) => value.agencyId !== routeId.agencyId
+                || value.stopId !== routeId.stopId);
     }
 
     addVehicleSlected(vehicle: VehicleId) {

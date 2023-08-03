@@ -28,7 +28,10 @@
     <app-stop-list
         [ngClass]="this.componentDisplayed === 3 ? '' : 'hidden'"
         [agencyIds]="this.selections.agencies"
-        [routeIds]="this.selections.routes">
+        [routeIds]="this.selections.routes"
+        [selections]="this.selections.stops"
+        (addStopId)="this.addStopId($event)"
+        (removeStopId)="this.removeStopId($event)">
     </app-stop-list>
 </div>
 
