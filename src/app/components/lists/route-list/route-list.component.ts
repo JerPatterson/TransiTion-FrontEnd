@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { RouteId } from '@app/utils/component-interface';
-import { AgencyDto, RouteDto } from '@app/utils/dtos';
+import { RouteDto } from '@app/utils/dtos';
 import { AgencyRoutesElement } from '@app/utils/list.components';
 
 @Component({
@@ -11,6 +11,7 @@ import { AgencyRoutesElement } from '@app/utils/list.components';
 })
 export class RouteListComponent {    
     routes: AgencyRoutesElement[] = [];
+
     routeIdsSelected = new Set<string>();
     agencyIdsSelected = new Set<string>();
 
@@ -21,7 +22,8 @@ export class RouteListComponent {
     @Input() set selections(values: RouteId[]) {
         this.routeIdsSelected = new Set();
         values.forEach((selection) =>
-            this.routeIdsSelected.add(`${selection.agencyId}/${selection.routeId}`));
+            this.routeIdsSelected.add(`${selection.agencyId}/${selection.routeId}`)
+        );
     };
 
     @Output() addRouteId = new EventEmitter<RouteId>();
@@ -56,7 +58,7 @@ export class RouteListComponent {
         this.routes = await Promise.all(
             agencyIds.map(async (agencyId) => {
                 return {
-                    agency: await this.staticDataService.getAgencyById(agencyId) as AgencyDto,
+                    agency: await this.staticDataService.getAgencyById(agencyId),
                     routes: (await this.getUniqueRoutesByShortName(agencyId))
                         .sort((a, b) => {
                             const aNumber = a.route_id.match(/\d+/)?.[0];

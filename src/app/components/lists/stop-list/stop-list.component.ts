@@ -13,12 +13,13 @@ export class StopListComponent {
     stops: AgencyStopsElement[] = [];
     routeStops: AgencyRouteStopsElement[] = [];
 
-    stopIdSelected?: string;
+    stopIdsSelected = new Set<string>();
     routeIdsSelected = new Set<string>();
     agencyIdsSelected = new Set<string>();
 
     agencyIdsToShow = new Set<string>();
     routeIdsToShow = new Set<string>();
+
     private knownAgencyIds = new Set<string>();
     private knownRouteIds = new Set<string>();
 
@@ -34,11 +35,13 @@ export class StopListComponent {
         );
     };
 
-    @Input() set selection(value: StopId) {
-        this.stopIdSelected = `${value.agencyId}/${value.stopId}`;
+    @Input() set selection(values: StopId[]) {
+        this.stopIdsSelected = new Set(
+            values.map((value) => `${value.agencyId}/${value.stopId}`)
+        );
     };
 
-    @Output() clearStopId = new EventEmitter<void>();
+    @Output() removeStopId = new EventEmitter<StopId>();
     @Output() newStopId = new EventEmitter<StopId>();
 
     constructor(private staticDataService: StaticDataService) {}
@@ -46,7 +49,7 @@ export class StopListComponent {
 
     trackByStop = (_: number, stop: StopDto) => stop.stop_id;
 
-    onAgencyClick(agencyId: string) {
+    onAgencyClick(agencyId: string): void {
         if (this.agencyIdsSelected.has(agencyId)) {
             this.agencyIdsSelected.delete(agencyId);
         } else {
@@ -54,26 +57,27 @@ export class StopListComponent {
         }
     }
 
-    onRouteClick(agencyId: string, routeId: string) {
-        if (this.routeIdsSelected.has(`${agencyId}/${routeId}`)) {
-            this.routeIdsSelected.delete(`${agencyId}/${routeId}`);
+    onRouteClick(agencyId: string, routeId: string): void {
+        const uniqueRouteId = `${agencyId}/${routeId}`;
+        if (this.routeIdsSelected.has(uniqueRouteId)) {
+            this.routeIdsSelected.delete(uniqueRouteId);
         } else {
-            this.routeIdsSelected.add(`${agencyId}/${routeId}`);
+            this.routeIdsSelected.add(uniqueRouteId);
         }
     }
 
-    onStopClick(agencyId: string, stopId: string) {
+    onStopClick(agencyId: string, stopId: string): void {
         const uniqueStopId = `${agencyId}/${stopId}`;
-        if (this.stopIdSelected === uniqueStopId) {
-            this.stopIdSelected = '';
-            this.clearStopId.emit();
+        if (this.stopIdsSelected.has(uniqueStopId)) {
+            this.stopIdsSelected.delete(uniqueStopId);
+            this.removeStopId.emit({ agencyId, stopId });
         } else {
-            this.stopIdSelected = uniqueStopId;
+            this.stopIdsSelected.add(uniqueStopId);
             this.newStopId.emit({ agencyId, stopId });
         }
     }
 
-    private async setStops(agencyIds: string[]) {
+    private async setStops(agencyIds: string[]): Promise<void> {
         this.stops = this.stops.concat(await Promise.all(
             agencyIds
                 .filter((agencyId) =>
@@ -88,7 +92,7 @@ export class StopListComponent {
         ));
     }
 
-    private async setRouteStops(routeIds: RouteId[]) {
+    private async setRouteStops(routeIds: RouteId[]): Promise<void> {
         this.routeStops = this.routeStops.concat(await Promise.all(
             routeIds
                 .filter((routeId) =>
@@ -108,7 +112,5 @@ export class StopListComponent {
                     return { route, stops };
                 })
         ));
-
-        console.log(this.routeStops);
     }
 }

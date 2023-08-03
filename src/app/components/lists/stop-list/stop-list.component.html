@@ -45,7 +45,7 @@
                             *cdkVirtualFor="let stop of stops.stops; trackBy: this.trackByStop"
                             [stop]="stop"
                             [agencyId]="stops.agency.agency_id"
-                            [selected]="this.stopIdSelected === (stops.agency.agency_id + '/' + stop.stop_id)"
+                            [selected]="this.stopIdsSelected.has(stops.agency.agency_id + '/' + stop.stop_id)"
                             (click)="this.onStopClick(stops.agency.agency_id, stop.stop_id)">
                         </app-stop>
                     </cdk-virtual-scroll-viewport>
@@ -89,7 +89,7 @@
                         *cdkVirtualFor="let stop of routeStops.stops; trackBy: this.trackByStop"
                         [stop]="stop"
                         [agencyId]="routeStops.route.agency_id"
-                        [selected]="this.stopIdSelected === (routeStops.route.agency_id + '/' + stop.stop_id)"
+                        [selected]="this.stopIdsSelected.has(routeStops.route.agency_id + '/' + stop.stop_id)"
                         (click)="this.onStopClick(routeStops.route.agency_id, stop.stop_id)">
                     </app-stop>
                 </cdk-virtual-scroll-viewport>
