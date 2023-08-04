@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import L from 'leaflet';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { ShapeDto } from '@app/utils/dtos';
-import { DEFAULT_ROUTE_COLOR } from '@app/utils/constants';
+import { DEFAULT_SHAPE_COLOR } from '@app/utils/constants';
 import { RouteId } from '@app/utils/component-interface';
 import { GeoJsonObject } from 'geojson';
 
@@ -108,6 +108,6 @@ export class TripShapeService {
 
     private async getShapeColor(agencyId: string, routeId: string): Promise<string> {
         const route = await this.staticDataService.getRouteById(agencyId, routeId);
-        return route?.route_color ? `#${route.route_color}` : DEFAULT_ROUTE_COLOR;
+        return route?.route_color ? `#${route.route_color}` : DEFAULT_SHAPE_COLOR;
     }
 }

@@ -89,7 +89,6 @@ export class MainPageComponent implements AfterContentChecked {
 
     addStopId(stopId: StopId) {
         this.selections.stops = this.selections.stops.concat([stopId]);
-        console.log(this.selections.stops);
     }
 
     removeStopId(routeId: StopId) {

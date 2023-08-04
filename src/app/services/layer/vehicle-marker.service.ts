@@ -9,12 +9,9 @@ import { RouteType } from '@app/utils/enums';
 import { AGENCY_TO_STYLE } from '@app/utils/styles';
 import { 
     BASE_NUMBER_HEXADECIMAL,
-    DEFAULT_ANCHOR_SHIFT,
     DEFAULT_BACKGROUND_COLOR,
-    DEFAULT_CLUSTER_ICON_SIZE,
     DEFAULT_ICON_COLOR,
-    DEFAULT_ICON_SIZE,
-    DEFAULT_ROUTE_COLOR,
+    DEFAULT_SHAPE_COLOR,
     DISABLE_CLUSTER_ZOOM,
     FIRST_CLUSTER_ALPHA,
     FIRST_CLUSTER_MAX_CHILD_COUNT,
@@ -28,7 +25,10 @@ import {
     SECOND_CLUSTER_ALPHA,
     SECOND_CLUSTER_MAX_CHILD_COUNT,
     THIRD_CLUSTER_ALPHA,
-    THIRD_CLUSTER_MAX_CHILD_COUNT
+    THIRD_CLUSTER_MAX_CHILD_COUNT,
+    VEHICLE_ANCHOR_SHIFT,
+    VEHICLE_CLUSTER_ICON_SIZE,
+    VEHICLE_ICON_SIZE,
 } from '@app/utils/constants';
 import { MapRenderingOptions, VehicleId } from '@app/utils/component-interface';
 
@@ -192,7 +192,7 @@ export class VehicleMarkerService {
                             background-color:${color + alpha};">
                             ${childCount}
                         </div>`,
-                    iconSize: new L.Point(DEFAULT_CLUSTER_ICON_SIZE, DEFAULT_CLUSTER_ICON_SIZE),
+                    iconSize: new L.Point(VEHICLE_CLUSTER_ICON_SIZE, VEHICLE_CLUSTER_ICON_SIZE),
                 });
             },
         });
@@ -252,8 +252,8 @@ export class VehicleMarkerService {
                     wasSeenLongAgo ? OLD_VEHICLE_BACKGROUND_COLOR : backgroundColor,
                 )
             ),
-            iconSize: [DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE],
-            iconAnchor: [DEFAULT_ANCHOR_SHIFT, DEFAULT_ANCHOR_SHIFT],
+            iconSize: [VEHICLE_ICON_SIZE, VEHICLE_ICON_SIZE],
+            iconAnchor: [VEHICLE_ANCHOR_SHIFT, VEHICLE_ANCHOR_SHIFT],
         });
     }
 
@@ -309,17 +309,17 @@ export class VehicleMarkerService {
                     iconSVG,
                     wasSeenLongAgo ? OLD_VEHICLE_BACKGROUND_COLOR : backgroundColor,
                 ),
-            iconSize: [DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE],
-            iconAnchor: [DEFAULT_ANCHOR_SHIFT, DEFAULT_ANCHOR_SHIFT],
+            iconSize: [VEHICLE_ICON_SIZE, VEHICLE_ICON_SIZE],
+            iconAnchor: [VEHICLE_ANCHOR_SHIFT, VEHICLE_ANCHOR_SHIFT],
         });
     }
 
 
     private async getRouteColor(agencyId: string, routeId?: string | null) {
-        if (!routeId) return DEFAULT_ROUTE_COLOR;
+        if (!routeId) return DEFAULT_SHAPE_COLOR;
         const route = await this.stDataService.getRouteById(agencyId, routeId);
 
-        return route?.route_color ? `#${route.route_color}` : DEFAULT_ROUTE_COLOR;
+        return route?.route_color ? `#${route.route_color}` : DEFAULT_SHAPE_COLOR;
     }
 
     private wasSeenLongAgo(timestamp?: number | null): boolean {
@@ -328,7 +328,7 @@ export class VehicleMarkerService {
     }
 
     private getIconColor(agencyId: string): string {
-        const color = AGENCY_TO_STYLE.get(agencyId.toLowerCase())?.vehicleIconColor;
+        const color = AGENCY_TO_STYLE.get(agencyId.toLowerCase())?.iconColor;
         return color ? color : DEFAULT_ICON_COLOR;
     }
 

@@ -3,7 +3,7 @@ import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
 import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
-import { MapRenderingOptions, RouteId, VehicleId } from '@app/utils/component-interface';
+import { MapRenderingOptions, RouteId, StopId, VehicleId } from '@app/utils/component-interface';
 import { StopMarkerService } from '@app/services/layer/stop-marker.service';
 
 @Component({
@@ -45,6 +45,10 @@ export class MapComponent implements OnInit {
         this.updateRoutes(routeIds);
     };
 
+    @Input() set stops(stopIds: StopId[]) {
+        this.updateStops(stopIds);
+    };
+
     @Input() set vehicle(value: VehicleId | null | undefined) {
         if (!value) this.tripShapeService.clearTripShapeLayer();
     }
@@ -53,6 +57,7 @@ export class MapComponent implements OnInit {
 
     private map!: L.Map;
     private stopsLayer?: L.LayerGroup;
+    private tripStopsLayer?: L.LayerGroup;
 
     private agencyIds: string[] = [];
     private routeIds = new Set<string>();
@@ -92,7 +97,10 @@ export class MapComponent implements OnInit {
         this.setBaseLayerControl();
         this.setMapPanes();
 
-        this.map.on('zoomend', () => this.addLayerIfHigherZoomLevel(this.stopsLayer, 12));
+        this.map.on('zoomend', () => {
+            this.addLayerIfHigherZoomLevel(this.stopsLayer, 12);
+            this.addLayerIfHigherZoomLevel(this.tripStopsLayer, 12);
+        });
     }
 
 
@@ -123,7 +131,7 @@ export class MapComponent implements OnInit {
 
 
     private async addTripStops(agencyId: string, tripId: string, color: string): Promise<void> {
-        this.stopsLayer = (await this.stopMarkerService.createTripStopsLayer(agencyId, tripId, color)).addTo(this.map);
+        this.tripStopsLayer = (await this.stopMarkerService.createTripStopsLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
     private async addLayerIfHigherZoomLevel(layer: L.Layer | undefined, comparisonZoomLevel: number) {
@@ -135,27 +143,19 @@ export class MapComponent implements OnInit {
     }
 
 
-    private updateRoutes(routeIds: RouteId[]) {
+    private updateRoutes(routeIds: RouteId[]): void {
         if (!routeIds.length) {
-            this.tripShapeService.clearTripShapeLayer();
             this.tripShapeService.clearRouteShapeLayers();
             this.routeIds.clear();
         } else if (routeIds.length > this.routeIds.size) {
-            this.tripShapeService.clearTripShapeLayer();
             this.addRouteShapes(routeIds);
-            routeIds.forEach((routeId) => {
-                this.routeIds.add(`${routeId.agencyId}/${routeId.routeId}`);
-            })
         } else if (routeIds.length < this.routeIds.size) {
-            this.tripShapeService.clearTripShapeLayer();
             this.removeRouteShapes(routeIds);
-            routeIds.forEach((routeId) => {
-                this.routeIds.delete(`${routeId.agencyId}/${routeId.routeId}`);
-            })
         }
 
         this.updateVehicles();
         this.stopsLayer = undefined;
+        this.tripStopsLayer = undefined;
         this.stopMarkerService.clearTripStopsLayer();
         this.tripShapeService.clearTripShapeLayer();
     }
@@ -164,12 +164,23 @@ export class MapComponent implements OnInit {
         (await this.tripShapeService.createTripShapeLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
-    private async addRouteShapes(routeIds: RouteId[]) {
+    private async addRouteShapes(routeIds: RouteId[]): Promise<void> {
+        routeIds.forEach((routeId) => {
+            this.routeIds.add(`${routeId.agencyId}/${routeId.routeId}`);
+        });
         (await this.tripShapeService.addRouteShapeLayer(routeIds)).addTo(this.map);
     }
 
-    private async removeRouteShapes(routeIds: RouteId[]) {
+    private async removeRouteShapes(routeIds: RouteId[]): Promise<void> {
+        routeIds.forEach((routeId) => {
+            this.routeIds.delete(`${routeId.agencyId}/${routeId.routeId}`);
+        });
         await this.tripShapeService.removeRouteShapeLayer(routeIds);
+    }
+
+
+    private async updateStops(stopIds: StopId[]) {
+        this.stopsLayer = (await this.stopMarkerService.createStopsLayer(stopIds)).addTo(this.map);
     }
 
 
