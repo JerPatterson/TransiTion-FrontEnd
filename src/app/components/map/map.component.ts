@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
-import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM, SHOW_STOP_ABOVE_ZOOM, STOP_CENTER_ZOOM } from '@app/utils/constants';
+import { DEFAULT_ZOOM, LOCATION_CENTER_ZOOM, MAX_ZOOM, MIN_ZOOM, SHOW_STOP_ABOVE_ZOOM } from '@app/utils/constants';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 import { MapRenderingOptions, RouteId, StopId, VehicleId } from '@app/utils/component-interface';
 import { StopMarkerService } from '@app/services/layer/stop-marker.service';
@@ -76,8 +76,8 @@ export class MapComponent implements OnInit {
         this.newStopSelected.emit(stopId);
     };
 
-    private readonly centerMapOnStopAdded = (lat: number, lon: number) => {
-        this.map.setView([lat, lon], STOP_CENTER_ZOOM);
+    private readonly centerMapOnLocation = (lat: number, lon: number) => {
+        this.map.setView([lat, lon], LOCATION_CENTER_ZOOM);
     };
 
     private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
@@ -165,9 +165,7 @@ export class MapComponent implements OnInit {
         }
 
         this.updateVehicles();
-        this.stopsLayer = undefined;
         this.tripStopsLayer = undefined;
-        this.stopMarkerService.clearStopsLayer();
         this.stopMarkerService.clearTripStopsLayer();
         this.tripShapeService.clearTripShapeLayer();
     }
@@ -207,7 +205,9 @@ export class MapComponent implements OnInit {
         }
 
         this.stopsLayer = (await this.stopMarkerService.createStopsLayer(
-            stopIds, this.emitStopSelected, centerTheMap ? this.centerMapOnStopAdded : undefined
+            stopIds,
+            this.routeIds.size ? undefined : this.emitStopSelected,
+            centerTheMap ? this.centerMapOnLocation : undefined
         )).addTo(this.map);
     }
 

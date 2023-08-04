@@ -69,7 +69,7 @@ export class TripShapeService {
     private async buildTripShape(shapePts: ShapeDto[], color: string, renderer?: L.Renderer): Promise<L.GeoJSON> {
         const coords = shapePts.map(shape => [shape.shape_pt_lon, shape.shape_pt_lat]);
         const content = { type: 'LineString', coordinates: coords } as GeoJsonObject;
-        const options = { style: { color, opacity: 1, weight: 8, renderer } }
+        const options = { interactive: false, style: { color, opacity: 1, weight: 8, renderer } }
         return new L.GeoJSON(content, options);
     }
 
@@ -88,7 +88,7 @@ export class TripShapeService {
 
     async buildTripShapesLayer(routeIds: RouteId[]): Promise<L.GeoJSON> {
         const shapeIds = new Set<string>();
-        const shapeLayer = L.geoJSON();
+        const shapeLayer = L.geoJSON([], { interactive: false });
         const canvasRenderer = L.canvas({ pane: 'routeshapes' });
 
         for (let routeId of routeIds) {

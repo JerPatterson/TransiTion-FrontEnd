@@ -17,7 +17,7 @@ export class StopMarkerService {
 
     async createStopsLayer(
         stopIds: StopId[],
-        clickHandler: (s: StopId) => void,
+        clickHandler?: (s: StopId) => void,
         centerMapOnStopAdded?: (lat: number, lon: number) => void,
     ): Promise<L.LayerGroup> {
         this.clearStopsLayer();
@@ -50,7 +50,7 @@ export class StopMarkerService {
 
     private async buildStopsLayer(
         stopIds: StopId[],
-        clickHandler: (s: StopId) => void,
+        clickHandler?: (s: StopId) => void,
         centerMapOnStopAdded?: (lat: number, lon: number) => void,
     ): Promise<L.LayerGroup> {
         if (centerMapOnStopAdded) {
@@ -85,14 +85,19 @@ export class StopMarkerService {
     private async buildStopMarker(
         agencyId: string,
         stop: StopDto,
-        clickHandler: (s: StopId) => void,
+        clickHandler?: (s: StopId) => void,
     ) : Promise<L.Marker> {
         const marker = L.marker(
                 [stop.stop_lat, stop.stop_lon], 
-                { icon: await this.buildStopIconCanvas(agencyId, stop) },
+                {
+                    icon: await this.buildStopIconCanvas(agencyId, stop),
+                    interactive: clickHandler ? true : false,
+                },
             ).addEventListener(
                 'click', 
-                () => clickHandler({ agencyId, stopId: stop.stop_id }),
+                () => {
+                    if (clickHandler) clickHandler({ agencyId, stopId: stop.stop_id });
+                },
             );
     
         return marker;

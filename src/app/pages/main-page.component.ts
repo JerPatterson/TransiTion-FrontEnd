@@ -78,10 +78,12 @@ export class MainPageComponent implements AfterContentChecked {
     }
 
     addRouteId(routeId: RouteId) {
+        this.selections.stops = [];
         this.selections.routes = this.selections.routes.concat([routeId]);
     }
 
     removeRouteId(routeId: RouteId) {
+        this.selections.stops = [];
         this.selections.routes = this.selections.routes
             .filter((value) => value.agencyId !== routeId.agencyId
                 || value.routeId !== routeId.routeId);
