@@ -61,6 +61,7 @@ export class MapComponent implements OnInit {
 
     private agencyIds: string[] = [];
     private routeIds = new Set<string>();
+    private stopIds = new Set<string>();
 
     private options: MapRenderingOptions = {
         darkModeEnable: false,
@@ -156,6 +157,7 @@ export class MapComponent implements OnInit {
         this.updateVehicles();
         this.stopsLayer = undefined;
         this.tripStopsLayer = undefined;
+        this.stopMarkerService.clearStopsLayer();
         this.stopMarkerService.clearTripStopsLayer();
         this.tripShapeService.clearTripShapeLayer();
     }
@@ -180,6 +182,18 @@ export class MapComponent implements OnInit {
 
 
     private async updateStops(stopIds: StopId[]) {
+        if (!stopIds.length) {
+            this.stopIds.clear();
+        } else if (stopIds.length > this.stopIds.size) {
+            stopIds.forEach((stopId) => {
+                this.stopIds.add(`${stopId.agencyId}/${stopId.stopId}`);
+            });
+        } else if (stopIds.length < this.stopIds.size) {
+            this.stopIds = new Set(stopIds.map((stopId) => 
+                `${stopId.agencyId}/${stopId.stopId}`)
+            );
+        }
+
         this.stopsLayer = (await this.stopMarkerService.createStopsLayer(stopIds)).addTo(this.map);
     }
 
