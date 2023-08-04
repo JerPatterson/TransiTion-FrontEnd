@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
-import { MAX_ZOOM, MIN_ZOOM } from '@app/utils/constants';
+import { DEFAULT_ZOOM, MAX_ZOOM, MIN_ZOOM, SHOW_STOP_ABOVE_ZOOM, STOP_CENTER_ZOOM } from '@app/utils/constants';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 import { MapRenderingOptions, RouteId, StopId, VehicleId } from '@app/utils/component-interface';
 import { StopMarkerService } from '@app/services/layer/stop-marker.service';
@@ -14,7 +14,6 @@ import { StopMarkerService } from '@app/services/layer/stop-marker.service';
 export class MapComponent implements OnInit {
     @Input() lat: number = 45.6;
     @Input() lon: number = -73.75;
-    @Input() zoom: number = 12;
 
     @Input() set darkModeEnable(value: boolean) {
         this.options.darkModeEnable = value;
@@ -54,6 +53,7 @@ export class MapComponent implements OnInit {
     }
 
     @Output() newVehicleSelected = new EventEmitter<VehicleId>();
+    @Output() newStopSelected = new EventEmitter<StopId>();
 
     private map!: L.Map;
     private stopsLayer?: L.LayerGroup;
@@ -68,6 +68,16 @@ export class MapComponent implements OnInit {
         showOldVehicles: false,
         useVehicleClusters: true,
         mergeAllVehicleClusters: false,
+    };
+
+
+    private readonly emitStopSelected = (stopId: StopId) => {
+        console.log(stopId.stopId);
+        this.newStopSelected.emit(stopId);
+    };
+
+    private readonly centerMapOnStopAdded = (lat: number, lon: number) => {
+        this.map.setView([lat, lon], STOP_CENTER_ZOOM);
     };
 
     private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
@@ -92,15 +102,15 @@ export class MapComponent implements OnInit {
             maxZoom: MAX_ZOOM,
             zoomControl: false,
             preferCanvas: true,
-        }).setView([this.lat, this.lon], this.zoom);
+        }).setView([this.lat, this.lon], DEFAULT_ZOOM);
 
         this.map.invalidateSize({ animate: true });
         this.setBaseLayerControl();
         this.setMapPanes();
 
         this.map.on('zoomend', () => {
-            this.addLayerIfHigherZoomLevel(this.stopsLayer, 12);
-            this.addLayerIfHigherZoomLevel(this.tripStopsLayer, 12);
+            this.addLayerIfHigherZoomLevel(this.stopsLayer, SHOW_STOP_ABOVE_ZOOM);
+            this.addLayerIfHigherZoomLevel(this.tripStopsLayer, SHOW_STOP_ABOVE_ZOOM);
         });
     }
 
@@ -182,9 +192,11 @@ export class MapComponent implements OnInit {
 
 
     private async updateStops(stopIds: StopId[]) {
+        let centerTheMap = false;
         if (!stopIds.length) {
             this.stopIds.clear();
         } else if (stopIds.length > this.stopIds.size) {
+            centerTheMap = true;
             stopIds.forEach((stopId) => {
                 this.stopIds.add(`${stopId.agencyId}/${stopId.stopId}`);
             });
@@ -194,7 +206,9 @@ export class MapComponent implements OnInit {
             );
         }
 
-        this.stopsLayer = (await this.stopMarkerService.createStopsLayer(stopIds)).addTo(this.map);
+        this.stopsLayer = (await this.stopMarkerService.createStopsLayer(
+            stopIds, this.emitStopSelected, centerTheMap ? this.centerMapOnStopAdded : undefined
+        )).addTo(this.map);
     }
 
 

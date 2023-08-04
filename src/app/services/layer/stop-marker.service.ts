@@ -15,9 +15,15 @@ export class StopMarkerService {
     
     constructor(private staticDataService: StaticDataService) {}
 
-    async createStopsLayer(stopIds: StopId[]): Promise<L.LayerGroup> {
+    async createStopsLayer(
+        stopIds: StopId[],
+        clickHandler: (s: StopId) => void,
+        centerMapOnStopAdded?: (lat: number, lon: number) => void,
+    ): Promise<L.LayerGroup> {
         this.clearStopsLayer();
-        this.stopsLayer = await this.buildStopsLayer(stopIds);
+        this.stopsLayer = await this.buildStopsLayer(
+            stopIds, clickHandler, centerMapOnStopAdded
+        );
 
         return this.stopsLayer;
     }
@@ -42,7 +48,20 @@ export class StopMarkerService {
     }
 
 
-    private async buildStopsLayer(stopIds: StopId[]): Promise<L.LayerGroup> {
+    private async buildStopsLayer(
+        stopIds: StopId[],
+        clickHandler: (s: StopId) => void,
+        centerMapOnStopAdded?: (lat: number, lon: number) => void,
+    ): Promise<L.LayerGroup> {
+        if (centerMapOnStopAdded) {
+            const lastStopId = stopIds[stopIds.length - 1];
+            const stop = await this.staticDataService.getStopById(
+                lastStopId.agencyId, lastStopId.stopId
+            );
+
+            centerMapOnStopAdded(stop.stop_lat, stop.stop_lon);
+        }
+
         let stopMarkers: L.Marker[] = [];
         let uniqueAgencyStopIds: string[] = [];
         stopIds = stopIds.sort((a, b) => a.agencyId.localeCompare(b.agencyId));
@@ -51,7 +70,10 @@ export class StopMarkerService {
             if ((i + 1) === stopIds.length || stopId.agencyId !== stopIds[i + 1].agencyId) {
                 stopMarkers = stopMarkers.concat(await Promise.all(
                     (await this.staticDataService.getStopByIds(stopId.agencyId, uniqueAgencyStopIds))
-                        .map(async (stop) => await this.buildStopMarker(stopId.agencyId, stop))
+                        .map(async (stop) => await this.buildStopMarker(
+                                stopId.agencyId, stop, clickHandler
+                            )
+                        )
                 ));
                 uniqueAgencyStopIds = [];
             }
@@ -60,15 +82,17 @@ export class StopMarkerService {
         return L.layerGroup(stopMarkers);
     }
 
-    private async buildStopMarker(agencyId: string, stop: StopDto) : Promise<L.Marker> {
+    private async buildStopMarker(
+        agencyId: string,
+        stop: StopDto,
+        clickHandler: (s: StopId) => void,
+    ) : Promise<L.Marker> {
         const marker = L.marker(
                 [stop.stop_lat, stop.stop_lon], 
                 { icon: await this.buildStopIconCanvas(agencyId, stop) },
             ).addEventListener(
                 'click', 
-                async () => {
-                    console.log(stop.stop_id);
-                },
+                () => clickHandler({ agencyId, stopId: stop.stop_id }),
             );
     
         return marker;
