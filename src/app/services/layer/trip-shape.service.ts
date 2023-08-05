@@ -63,10 +63,10 @@ export class TripShapeService {
         const trip = await this.staticDataService.getTripById(agencyId, tripId);
         const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
         const renderer = L.canvas({ pane: 'tripshape' });
-        return L.layerGroup([await this.buildTripShape(shapePts, color, renderer)]);
+        return L.layerGroup([this.buildTripShape(shapePts, color, renderer)]);
     }
 
-    private async buildTripShape(shapePts: ShapeDto[], color: string, renderer?: L.Renderer): Promise<L.GeoJSON> {
+    private buildTripShape(shapePts: ShapeDto[], color: string, renderer?: L.Renderer): L.GeoJSON {
         const coords = shapePts.map(shape => [shape.shape_pt_lon, shape.shape_pt_lat]);
         const content = { type: 'LineString', coordinates: coords } as GeoJsonObject;
         const options = { interactive: false, style: { color, opacity: 1, weight: 8, renderer } }
@@ -74,12 +74,12 @@ export class TripShapeService {
     }
 
     private async buildRouteShapeLayer(routeId: RouteId): Promise<L.GeoJSON> {
-        const tripLayer = (await this.buildTripShapesLayer([routeId]));
+        const tripLayer = await this.buildTripShapesLayer([routeId]);
         this.routeToRouteShapeLayer.set(`${routeId.agencyId}/${routeId.routeId}`, tripLayer);
         return tripLayer;
     }
 
-    private async deleteRouteShapeLayer(route: string): Promise<void> {
+    private deleteRouteShapeLayer(route: string): void {
         const tripsLayer = this.routeToRouteShapeLayer.get(route);
         if (!tripsLayer) return;
         tripsLayer.remove();
@@ -98,7 +98,7 @@ export class TripShapeService {
                     shapeIds.add(trip.shape_id);
                     const shapeColor = await this.getShapeColor(routeId.agencyId, routeId.routeId);
                     const shapePts = await this.staticDataService.getShapeById(routeId.agencyId, trip.shape_id);
-                    shapeLayer.addLayer(await this.buildTripShape(shapePts, shapeColor, canvasRenderer));
+                    shapeLayer.addLayer(this.buildTripShape(shapePts, shapeColor, canvasRenderer));
                 }
             }
         }

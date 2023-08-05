@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
-import { DEFAULT_ZOOM, LOCATION_CENTER_ZOOM, MAX_ZOOM, MIN_ZOOM, SHOW_STOP_ABOVE_ZOOM } from '@app/utils/constants';
+import { DEFAULT_ZOOM, LOCATION_CENTER_ZOOM, MAX_ZOOM, MIN_ZOOM, PARAM_SEPARATOR, SHOW_STOP_ABOVE_ZOOM } from '@app/utils/constants';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 import { MapRenderingOptions, RouteId, StopId, VehicleId } from '@app/utils/component-interface';
 import { StopMarkerService } from '@app/services/layer/stop-marker.service';
@@ -182,10 +182,18 @@ export class MapComponent implements OnInit {
     }
 
     private async removeRouteShapes(routeIds: RouteId[]): Promise<void> {
-        routeIds.forEach((routeId) => {
-            this.routeIds.delete(`${routeId.agencyId}/${routeId.routeId}`);
-        });
-        await this.tripShapeService.removeRouteShapeLayer(routeIds);
+        const routes = new Set(routeIds
+            .map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
+        const routesToDelete = [...this.routeIds].filter((route) => !routes.has(route));
+        routesToDelete.forEach((route) => this.routeIds.delete(route));
+        await this.tripShapeService.removeRouteShapeLayer(
+            [...this.routeIds].map((route) => {
+                return {
+                    agencyId: route.split(PARAM_SEPARATOR)[0],
+                    routeId: route.split(PARAM_SEPARATOR)[1],
+                }
+            })
+        );
     }
 
 
