@@ -13,10 +13,11 @@ import { RouteComponent } from './components/list-elements/route/route.component
 import { StopComponent } from './components/list-elements/stop/stop.component';
 import { AgencyComponent } from './components/list-elements/agency/agency.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
-import { VehicleInfoComponent } from './components/info-elements/vehicle-info.component';
+import { VehicleInfoComponent } from './components/info-elements/vehicle-info/vehicle-info.component';
 import { RouteIdentifierComponent } from './components/elements/route-identifier/route-identifier.component';
 import { RouteTypeComponent } from './components/elements/route-type/route-type.component';
 import { TripDirectionComponent } from './components/elements/trip-direction/trip-direction.component';
+import { StopInfoComponent } from './components/info-elements/stop-info/stop-info.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { TripDirectionComponent } from './components/elements/trip-direction/tri
     RouteIdentifierComponent,
     RouteTypeComponent,
     TripDirectionComponent,
+    StopInfoComponent,
   ],
   imports: [
     AppRoutingModule,
