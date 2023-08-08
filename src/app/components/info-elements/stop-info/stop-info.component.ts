@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopId } from '@app/utils/component-interface';
-import { StopDto, TimeDto } from '@app/utils/dtos';
+import { RouteDto, StopDto, TimeDto } from '@app/utils/dtos';
 import { WheelchairBoardingType } from '@app/utils/enums';
 import { StopAttributes } from '@app/utils/info.components';
 import { AGENCY_TO_STYLE } from '@app/utils/styles';
@@ -16,6 +16,8 @@ export class StopInfoComponent {
 
     stop?: StopDto;
     attributes: StopAttributes = {} as StopAttributes;
+
+    routeByRouteId = new Map<string, RouteDto>();
 
     mapIconHref = './assets/icons/map.svg#map';
     routeIconHref = './assets/icons/route.svg#route';
@@ -53,7 +55,9 @@ export class StopInfoComponent {
         if (!this.stop) return;
         this.attributes.routes = await Promise.all(
             this.stop.route_ids.sort().map(async (routeId) => {
-                return this.stDataService.getRouteById(this.stopId.agencyId, routeId);
+                const route = await this.stDataService.getRouteById(this.stopId.agencyId, routeId);
+                if (route) this.routeByRouteId.set(routeId, route);
+                return route;
             })
         );
     }
