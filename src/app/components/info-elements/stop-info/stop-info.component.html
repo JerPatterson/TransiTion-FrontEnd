@@ -1,1 +1,83 @@
-<p>stop-info works!</p>
+<div class="stop-container">
+    <div class="stop-header">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 100 100"
+            [ngStyle]="{ color: this.attributes.style?.iconColor }">
+            <g [attr.fill]="this.attributes.style?.backgroundColor">
+                <circle cx="50" cy="50" r="50"/>
+            </g>
+            <use [attr.xlink:href]="this.attributes.iconLink" [attr.href]="this.attributes.iconLink" />
+        </svg>
+        <div>
+            <p class="stop-identifier">
+                {{ this.stop?.stop_name }}
+            </p>
+            <p class="stop-code">
+                {{ this.stop?.stop_code }}
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="stop-info">
+        <svg [ngStyle]="{ color: this.attributes.style?.backgroundColor }">
+            <use [attr.xlink:href]='this.routeIconHref' [attr.href]="this.routeIconHref"></use>
+        </svg>
+        <div class="stop-route-container">
+            <div
+                class="route-identifier"
+                *ngFor="let route of this.attributes.routes">
+                <app-route-identifier
+                    *ngIf="route"
+                    [route]="route"
+                    [showAgency]="false">
+                </app-route-identifier>
+            </div>
+        </div>
+    </div>
+
+    <hr *ngIf="this.stop?.route_ids">
+
+    <div class="stop-info-container">
+        <div class="stop-info">
+            <svg [ngStyle]="{ color: this.attributes.style?.backgroundColor }">
+                <use [attr.xlink:href]='this.mapIconHref' [attr.href]="this.mapIconHref"></use>
+            </svg>
+            <div>
+                <p class="stop-info-title">         
+                    Coordonées géographiques
+                </p>
+                <p class="stop-info-value">
+                    {{ this.stop?.stop_lat }}, {{ this.stop?.stop_lon }}
+                </p>
+            </div>
+        </div>
+
+        <div class="stop-info">
+            <svg [ngStyle]="{ color: this.attributes.style?.backgroundColor }">
+                <use [attr.xlink:href]='this.wheelchairIconHref' [attr.href]="this.wheelchairIconHref"></use>
+            </svg>
+            <div>
+                <p class="stop-info-title">         
+                    Accessibilité
+                </p>
+                <p class="stop-info-value">
+                    {{ this.attributes.wheelchairAccessibleString }}
+                </p>
+            </div>
+        </div>
+
+        <hr>
+
+        <div>
+            <cdk-virtual-scroll-viewport class="stop-viewport" [itemSize]="80">
+                <div *cdkVirtualFor="let time of this.attributes.times; trackBy: this.trackByTime">
+                    {{ time.route_id }} {{ time.arrival_time }}
+                </div>
+            </cdk-virtual-scroll-viewport>
+        </div>
+    </div>
+</div>

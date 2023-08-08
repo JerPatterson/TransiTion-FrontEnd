@@ -137,7 +137,7 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
 
     private setBearingValue(): void {
         this.attributes.bearing = -1;
-        if (!this.vehicle?.position?.bearing) return;
+        if (!this.vehicle?.position?.bearing ) return;
         if (this.vehicle?.position?.bearing >= 0)
             this.attributes.bearing = this.vehicle?.position?.bearing;
     }

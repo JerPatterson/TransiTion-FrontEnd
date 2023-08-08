@@ -12,9 +12,10 @@ export class StopComponent implements OnChanges {
     @Input() agencyId!: string;
     @Input() selected: boolean = false;
 
+    routes: (RouteDto | undefined)[] = [];
+
     stopIconHref!: string;
     wheelchairIconHref = './assets/icons/wheelchair.svg#wheelchair';
-    routes!: (RouteDto | undefined)[];
 
     constructor(private staticDataService: StaticDataService) {}
 

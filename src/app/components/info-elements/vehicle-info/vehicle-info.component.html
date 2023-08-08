@@ -4,7 +4,7 @@
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 70 70"
-            [ngStyle]="{color: this.attributes.style?.iconColor}">
+            [ngStyle]="{ color: this.attributes.style?.iconColor }">
             <g
                 [attr.fill]="this.attributes.style?.backgroundColor"
                 [attr.transform]="'rotate(' + (this.attributes.bearing - 180) + ' 35 35)'">

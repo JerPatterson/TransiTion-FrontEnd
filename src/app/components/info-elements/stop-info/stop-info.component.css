@@ -1,0 +1,91 @@
+.stop-container {
+    position: relative;
+    z-index: 2;
+    max-width: 32vw;
+    max-height: 70vh;
+    overflow-y: scroll;
+    margin: 0px;
+    padding: 0px;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
+    scrollbar-width: none;
+    margin: 2vh;
+    border: 2px solid black
+}
+
+.stop-container::-webkit-scrollbar {
+    width: 0px;
+}
+
+.stop-header {
+    display: flex;
+    flex-direction: row;
+    margin-left: 0.3vw;
+}
+
+.stop-header > svg {
+    max-width: 10vh;
+    max-height: 10vh;
+    margin-right: 2vh;
+}
+
+.stop-identifier {
+    position: relative;
+    margin-top: 1vh;
+    margin-bottom: 0.2vh;
+    font-size: 4.5vh;
+    font-weight: bold;
+}
+
+.stop-code {
+    margin: 0px;
+}
+
+.stop-route-container {
+    display: flex;
+    flex-direction: row;
+    margin-top: 0.5vh;
+    padding: 0vh;
+}
+
+.route-identifier {
+    height: fit-content;
+    margin-left: 0.8vh;
+    font-size: 3.5vh;
+}
+
+.stop-info {
+    display: flex;
+    flex-direction: row;
+    margin: 1.5vh;
+    min-height: 6vh;
+}
+
+.stop-info > svg,
+.stop-routes > svg {
+    margin-right: 3vh;
+    max-width: 5vh;
+    max-height: 5vh;
+}
+
+.stop-info-title {
+    margin: 0px;
+    font-size: 2vh;
+    font-weight: 500;
+    color: #849096;
+}
+
+.stop-info-value {
+    margin: 0px;
+    font-size: 2.5vh;
+}
+
+.stop-viewport {
+    height: 28vh;
+    width: 31vw;
+    scrollbar-width: 0px;
+}
+
+.stop-viewport::-webkit-scrollbar {
+    width: 0px;
+}

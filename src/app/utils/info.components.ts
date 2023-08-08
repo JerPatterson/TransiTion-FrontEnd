@@ -1,4 +1,4 @@
-import { RouteDto, TripDto } from "./dtos";
+import { RouteDto, TimeDto, TripDto } from "./dtos";
 import { AgencyStyle } from "./styles";
 
 export interface VehicleAttributes {
@@ -14,4 +14,13 @@ export interface VehicleAttributes {
     stopStatusString: string;
     congestionLevelString: string;
     scheduleRelationshipString: string;
+}
+
+export interface StopAttributes {
+    times: TimeDto[];
+    routes?: (RouteDto | undefined)[];
+    style?: AgencyStyle;
+
+    iconLink: string;
+    wheelchairAccessibleString: string;
 }
