@@ -9,8 +9,6 @@
     padding-top: 1vh;
     padding-bottom: 1vh;
     scrollbar-width: none;
-    margin: 2vh;
-    border: 2px solid black
 }
 
 .stop-container::-webkit-scrollbar {
@@ -50,7 +48,7 @@
 
 .route-identifier {
     height: fit-content;
-    margin-right: 2.5vh;
+    margin-right: 1vh;
     font-size: 3.5vh;
 }
 

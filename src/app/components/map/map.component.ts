@@ -72,7 +72,6 @@ export class MapComponent implements OnInit {
 
 
     private readonly emitStopSelected = (stopId: StopId) => {
-        console.log(stopId.stopId);
         this.newStopSelected.emit(stopId);
     };
 

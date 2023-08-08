@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopId } from '@app/utils/component-interface';
 import { RouteDto, StopDto, TimeDto } from '@app/utils/dtos';
@@ -11,8 +11,8 @@ import { AGENCY_TO_STYLE } from '@app/utils/styles';
     templateUrl: './stop-info.component.html',
     styleUrls: ['./stop-info.component.css']
 })
-export class StopInfoComponent {
-    @Input() stopId: StopId = { agencyId: 'lrrs', stopId: '76050' }; // TODO TEMP
+export class StopInfoComponent implements OnChanges {
+    @Input() stopId!: StopId;
 
     stop?: StopDto;
     attributes: StopAttributes = {} as StopAttributes;
@@ -28,10 +28,8 @@ export class StopInfoComponent {
 
     trackByTime = (_: number, time: TimeDto) => time.trip_id;
 
-    ngOnInit() {
+    ngOnChanges() {
         this.setStopAttributes();
-        this.attributes.style = AGENCY_TO_STYLE.get(this.stopId.agencyId);
-        this.attributes.iconLink = this.getIconLinkFromShelterType(this.stop?.stop_shelter)
     }
     
     async setStopAttributes() {
@@ -40,6 +38,9 @@ export class StopInfoComponent {
         this.setRoutesValue();
         this.setTimesValue();
         this.setWheelchairAccessibleValue();
+
+        this.attributes.style = AGENCY_TO_STYLE.get(this.stopId.agencyId);
+        this.attributes.iconLink = this.getIconLinkFromShelterType(this.stop?.stop_shelter);
     }
 
     private async setStop() {

@@ -13,8 +13,9 @@ export interface MapSelectionOptions {
 export interface MapSelectionIdentifiers {
     agencies: string[];
     routes: RouteId[],
-    vehicle?: VehicleId;
     stops: StopId[];
+    stop?: StopId;
+    vehicle?: VehicleId;
 }
 
 export enum MapComponentDisplayed {
@@ -23,6 +24,7 @@ export enum MapComponentDisplayed {
     RouteList,
     StopList,
     VehicleList,
+    StopInfo,
     VehicleInfo,
 }
 

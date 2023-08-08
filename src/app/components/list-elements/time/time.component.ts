@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { ONE_HOUR_IN_MIN } from '@app/utils/constants';
+import { HOUR_IN_DAY, ONE_HOUR_IN_MIN } from '@app/utils/constants';
 import { RouteDto, TimeDto } from '@app/utils/dtos';
 
 @Component({
@@ -23,15 +23,15 @@ export class TimeComponent implements OnChanges {
 
     private setArrivalTimeValue(): void {
         this.timeString = `
-            ${this.time.arrival_time.slice(0, 2)}h 
+            ${Number(this.time.arrival_time.slice(0, 2)) % HOUR_IN_DAY}h 
             ${this.time.arrival_time.slice(3, 5)}`
     }
 
     private setIsInThePastValue(): void {
         const now = new Date(Date.now());
-        const hours = this.time.arrival_time.slice(0, 2); 
-        const minutes = this.time.arrival_time.slice(3, 5);
-        const arrivalTimeInMinutes = Number(hours) * ONE_HOUR_IN_MIN + Number(minutes);
+        const hours = Number(this.time.arrival_time.slice(0, 2)); 
+        const minutes = Number(this.time.arrival_time.slice(3, 5));
+        const arrivalTimeInMinutes = hours * ONE_HOUR_IN_MIN + minutes;
         const nowTimeInMinutes = now.getHours() * ONE_HOUR_IN_MIN + now.getMinutes();
         
         this.isInThePast = nowTimeInMinutes > arrivalTimeInMinutes;

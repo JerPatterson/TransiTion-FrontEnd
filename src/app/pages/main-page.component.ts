@@ -22,8 +22,9 @@ export class MainPageComponent implements AfterContentChecked {
     selections: MapSelectionIdentifiers = {
         agencies: [],
         routes: [],
-        vehicle: undefined,
         stops: [],
+        stop: undefined,
+        vehicle: undefined,
     }
 
     componentDisplayed = MapComponentDisplayed.None;
@@ -97,6 +98,11 @@ export class MainPageComponent implements AfterContentChecked {
         this.selections.stops = this.selections.stops
             .filter((value) => value.agencyId !== routeId.agencyId
                 || value.stopId !== routeId.stopId);
+    }
+
+    addStopSelected(stop: StopId) {
+        this.componentDisplayed = MapComponentDisplayed.StopInfo;
+        this.selections.stop = stop;
     }
 
     addVehicleSlected(vehicle: VehicleId) {

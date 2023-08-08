@@ -4,8 +4,13 @@
 </app-toolbar>
 
 <div class="list-container">
+    <app-stop-info
+        *ngIf="this.componentDisplayed === 5 && this.selections.stop"
+        [stopId]="this.selections.stop">
+    </app-stop-info>
+
     <app-vehicle-info
-        *ngIf="this.componentDisplayed === 5 && this.selections.vehicle"
+        *ngIf="this.componentDisplayed === 6 && this.selections.vehicle"
         [vehicleId]="this.selections.vehicle">
     </app-vehicle-info>
 
@@ -100,5 +105,6 @@
     [showOldVehicles]="this.options.showOldVehicles"
     [useVehicleClusters]="this.options.useVehicleClusters"
     [mergeAllVehicleClusters]="this.options.mergeAllVehicleClusters"
+    (newStopSelected)="this.addStopSelected($event)"
     (newVehicleSelected)="this.addVehicleSlected($event)">
 </app-map>
