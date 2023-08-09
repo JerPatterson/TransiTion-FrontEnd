@@ -1,14 +1,19 @@
 <div class="stop-container">
     <div class="stop-header">
         <svg
+            version="1.0"
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid meet"
             [ngStyle]="{ color: this.attributes.style?.iconColor }">
             <g [attr.fill]="this.attributes.style?.backgroundColor">
-                <circle cx="50" cy="50" r="50"/>
+                <circle cx="50" cy="50" r="50" />
             </g>
-            <use [attr.xlink:href]="this.attributes.iconLink" [attr.href]="this.attributes.iconLink" />
+            <use
+                height="66" x="0" y="17" 
+                [attr.xlink:href]="this.attributes.iconLink"
+                [attr.href]="this.attributes.iconLink" />
         </svg>
         <div>
             <p class="stop-identifier">
@@ -24,7 +29,7 @@
 
     <div class="stop-info">
         <svg [ngStyle]="{ color: this.attributes.style?.backgroundColor }">
-            <use [attr.xlink:href]='this.routeIconHref' [attr.href]="this.routeIconHref"></use>
+            <use [attr.xlink:href]='this.routeIconHref' [attr.href]="this.routeIconHref" />
         </svg>
         <div class="stop-route-container">
             <div

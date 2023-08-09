@@ -190,7 +190,7 @@ export class StopMarkerService {
                 return `
                     <svg
                         version="1.0"
-                        height="32" x="0" y="22"
+                        height="28" x="0" y="25"
                         xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         viewBox="0 0 560.000000 446.000000"

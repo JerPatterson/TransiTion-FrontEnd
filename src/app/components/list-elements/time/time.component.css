@@ -8,12 +8,11 @@
 .route-identifier {
     height: fit-content;
     margin-left: 0.8vh;
-    margin-right: 2.5vh;
+    margin-right: 1vh;
     font-size: 3.5vh;
 }
 
 .time-value {
-    margin-left: 1vh;
     font-size: 3.5vh;
     font-weight: bold;
 }
