@@ -38,6 +38,7 @@ export class MapComponent implements OnInit {
     @Input() set agencies(values: string[]) {
         this.agencyIds = values;
         this.updateVehicles();
+        if (!this.stopIds.size) this.updateStops([]);
     };
 
     @Input() set routes(routeIds: RouteId[]) {
@@ -141,6 +142,8 @@ export class MapComponent implements OnInit {
 
 
     private async addTripStops(agencyId: string, tripId: string, color: string): Promise<void> {
+        this.stopsLayer = undefined;
+        await this.stopMarkerService.clearStopsLayer();
         this.tripStopsLayer = (await this.stopMarkerService.createTripStopsLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
@@ -197,10 +200,23 @@ export class MapComponent implements OnInit {
 
 
     private async updateStops(stopIds: StopId[]) {
-        let centerTheMap = false;
         if (!stopIds.length) {
-            this.stopIds.clear();
-        } else if (stopIds.length > this.stopIds.size) {
+            await this.addAllStops();
+        } else {
+            await this.addSelectedStops(stopIds);
+        }
+    }
+
+    private async addAllStops(): Promise<void> {
+        this.stopIds.clear();
+        this.stopsLayer = (await this.stopMarkerService.createAllStopsLayer(
+            this.agencyIds, this.emitStopSelected
+        )).addTo(this.map);
+    }
+
+    private async addSelectedStops(stopIds: StopId[]) {
+        let centerTheMap = false;
+        if (stopIds.length > this.stopIds.size) {
             centerTheMap = true;
             stopIds.forEach((stopId) => {
                 this.stopIds.add(`${stopId.agencyId}/${stopId.stopId}`);
@@ -212,8 +228,8 @@ export class MapComponent implements OnInit {
         }
 
         this.stopsLayer = (await this.stopMarkerService.createStopsLayer(
-            stopIds,
-            this.routeIds.size ? undefined : this.emitStopSelected,
+            stopIds, 
+            this.emitStopSelected,
             centerTheMap ? this.centerMapOnLocation : undefined
         )).addTo(this.map);
     }
