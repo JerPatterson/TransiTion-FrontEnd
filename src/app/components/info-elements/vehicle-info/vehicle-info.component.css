@@ -33,6 +33,25 @@
     margin-bottom: 0.2vh;
     font-size: 4.5vh;
     font-weight: bold;
+    max-width: 22vw;
+    overflow-x: hidden;
+}
+
+.close-container-button {
+    position: absolute;
+    right: 0.5vw;
+    width: 5vh;
+    height: 5vh;
+    font-size: 4vh;
+    font-weight: bold;
+    line-height: 85%;
+    border: 0px;
+    border-radius: 100%;
+    background-color: #dbe2e6;
+}
+
+.close-container-button:hover {
+    background-color: #c1cacf;
 }
 
 .vehicle-last-update {

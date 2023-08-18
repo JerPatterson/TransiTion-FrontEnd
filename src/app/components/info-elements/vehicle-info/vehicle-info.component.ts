@@ -1,4 +1,4 @@
-import { OnChanges, Component, Input, OnDestroy } from '@angular/core';
+import { OnChanges, Component, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { RealtimeDataService } from '@app/services/realtime/realtime-data.service';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { VehicleId } from '@app/utils/component-interface';
@@ -16,6 +16,7 @@ import GtfsRealtimeBindings from 'gtfs-realtime-bindings';
 })
 export class VehicleInfoComponent implements OnChanges, OnDestroy {
     @Input() vehicleId!: VehicleId;
+    @Output() hide = new EventEmitter();
 
     attributes: VehicleAttributes = {} as VehicleAttributes;
     vehicle?: GtfsRealtimeBindings.transit_realtime.IVehiclePosition;
@@ -49,6 +50,11 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.clearTimers()
+    }
+
+    handleHideClick() {
+        this.hide.emit();
+        this.clearTimers();
     }
 
     private clearTimers(): void {

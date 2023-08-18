@@ -53,7 +53,10 @@ export class MapComponent implements OnInit {
     };
 
     @Input() set vehicle(value: VehicleId | null | undefined) {
-        if (!value) this.tripShapeService.clearTripShapeLayer();
+        if (!value) {
+            this.stopMarkerService.clearTripStopsLayer();
+            this.tripShapeService.clearTripShapeLayer();
+        }
     }
 
     @Output() newVehicleSelected = new EventEmitter<VehicleId>();

@@ -18,20 +18,14 @@
             </use>
         </svg>
         <div>
-            <p 
-                class="vehicle-identifier"
-                *ngIf="this.vehicleId.vehicleId.includes('zenbus')">
-                Inconnu
-            </p>
-            <p 
-                class="vehicle-identifier"
-                *ngIf="!this.vehicleId.vehicleId.includes('zenbus')">
+            <p class="vehicle-identifier">
                 {{ this.vehicleId.vehicleId }}
             </p>
             <p class="vehicle-last-update">
                 Il y a {{ this.attributes.lastSeenString }}
             </p>
         </div>
+        <button class="close-container-button" (click)="this.handleHideClick()">x</button>
     </div>
 
     <hr>

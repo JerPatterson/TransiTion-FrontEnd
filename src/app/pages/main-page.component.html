@@ -11,7 +11,8 @@
 
     <app-vehicle-info
         *ngIf="this.componentDisplayed === 6 && this.selections.vehicle"
-        [vehicleId]="this.selections.vehicle">
+        [vehicleId]="this.selections.vehicle"
+        (hide)="this.hideVehicleInfoComponent()">
     </app-vehicle-info>
 
     <app-agency-list
