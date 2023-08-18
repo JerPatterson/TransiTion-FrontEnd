@@ -37,7 +37,7 @@
     overflow-x: hidden;
 }
 
-.close-container-button {
+.hide-container-button {
     position: absolute;
     right: 0.5vw;
     width: 5vh;
@@ -50,7 +50,8 @@
     background-color: #dbe2e6;
 }
 
-.close-container-button:hover {
+.hide-container-button:hover {
+    cursor: pointer;
     background-color: #c1cacf;
 }
 
