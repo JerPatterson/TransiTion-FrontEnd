@@ -105,6 +105,11 @@ export class MainPageComponent implements AfterContentChecked {
         this.selections.stop = stop;
     }
 
+    hideStopInfoComponent() {
+        this.componentDisplayed = MapComponentDisplayed.None;
+        this.selections.stop = undefined;
+    }
+
     addVehicleSlected(vehicle: VehicleId) {
         this.componentDisplayed = MapComponentDisplayed.VehicleInfo;
         this.selections.vehicle = vehicle;

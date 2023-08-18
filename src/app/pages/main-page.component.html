@@ -6,7 +6,8 @@
 <div class="list-container">
     <app-stop-info
         *ngIf="this.componentDisplayed === 5 && this.selections.stop"
-        [stopId]="this.selections.stop">
+        [stopId]="this.selections.stop"
+        (hide)="this.hideStopInfoComponent()">
     </app-stop-info>
 
     <app-vehicle-info

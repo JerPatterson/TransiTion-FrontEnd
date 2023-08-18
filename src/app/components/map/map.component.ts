@@ -38,13 +38,13 @@ export class MapComponent implements OnInit {
     @Input() set agencies(values: string[]) {
         this.agencyIds = values;
         this.updateVehicles().then(() => {
-            if (!this.stopIds.size) this.updateStops([]);
+            if (!this.stopIds.size) this.updateStops();
         });
     };
 
     @Input() set routes(routeIds: RouteId[]) {
         this.updateRoutes(routeIds).then(() => {
-            if (!this.stopIds.size) this.updateStops([]);
+            if (!this.stopIds.size) this.updateStops();
         });
     };
 
@@ -56,6 +56,7 @@ export class MapComponent implements OnInit {
         if (!value) {
             this.stopMarkerService.clearTripStopsLayer();
             this.tripShapeService.clearTripShapeLayer();
+            if (!this.stopIds.size) this.updateStops();
         }
     }
 
@@ -205,7 +206,7 @@ export class MapComponent implements OnInit {
     }
 
 
-    private async updateStops(stopIds: StopId[]) {
+    private async updateStops(stopIds: StopId[] = []) {
         if (!stopIds.length && !this.routeIds.size) {
             await this.addAllStops();
         } else if (!stopIds.length && this.routeIds.size) {

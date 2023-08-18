@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopId } from '@app/utils/component-interface';
 import { RouteDto, StopDto, TimeDto } from '@app/utils/dtos';
@@ -13,6 +13,7 @@ import { AGENCY_TO_STYLE } from '@app/utils/styles';
 })
 export class StopInfoComponent implements OnChanges {
     @Input() stopId!: StopId;
+    @Output() hide = new EventEmitter();
 
     stop?: StopDto;
     attributes: StopAttributes = {} as StopAttributes;
@@ -41,6 +42,10 @@ export class StopInfoComponent implements OnChanges {
 
         this.attributes.style = AGENCY_TO_STYLE.get(this.stopId.agencyId);
         this.attributes.iconLink = this.getIconLinkFromShelterType(this.stop?.stop_shelter);
+    }
+
+    handleHideClick() {
+        this.hide.emit();
     }
 
     private async setStop() {
