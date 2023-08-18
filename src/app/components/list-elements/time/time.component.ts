@@ -15,10 +15,12 @@ export class TimeComponent implements OnChanges {
 
     timeString!: string;
     isInThePast!: boolean;
+    headsignString!: string;
 
     ngOnChanges() {
         this.setArrivalTimeValue();
         this.setIsInThePastValue();
+        this.setHeadsignValue();
     }
 
     private setArrivalTimeValue(): void {
@@ -35,5 +37,20 @@ export class TimeComponent implements OnChanges {
         const nowTimeInMinutes = now.getHours() * ONE_HOUR_IN_MIN + now.getMinutes();
         
         this.isInThePast = nowTimeInMinutes > arrivalTimeInMinutes;
+    }
+
+    private setHeadsignValue(): void {
+        switch(Number(this.time.pickup_type)) {
+            case 1:
+                this.headsignString = 'Descente Seulement';
+                break;
+            case 2:
+                this.headsignString = 'Réservation requise';
+                break;
+            default:
+                this.headsignString = this.time.stop_headsign ? 
+                    this.time.stop_headsign : this.time.trip_headsign as string;
+                break
+        }
     }
 }

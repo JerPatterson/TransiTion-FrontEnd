@@ -17,6 +17,11 @@
     font-weight: bold;
 }
 
+.time_headsign {
+    margin-top: 0.8vh;
+    margin-left: 0.8vh;
+}
+
 .old {
     opacity: 0.3;
 }

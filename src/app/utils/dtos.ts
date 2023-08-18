@@ -79,6 +79,7 @@ export interface TimeDto {
   stop_id: string;
   stop_sequence: number;
   stop_headsign?: string;
+  trip_headsign?: string;
   pickup_type?: number;
   drop_off_type?: number;
   continuous_pickup?: number;
