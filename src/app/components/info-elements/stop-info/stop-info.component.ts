@@ -59,13 +59,17 @@ export class StopInfoComponent implements OnChanges {
     private async setRoutesValue() {
         this.attributes.routes = [];
         if (!this.stop) return;
-        this.attributes.routes = await Promise.all(
-            this.stop.route_ids.sort().map(async (routeId) => {
+        this.attributes.routes = (await Promise.all(
+            this.stop.route_ids.map(async (routeId) => {
                 const route = await this.stDataService.getRouteById(this.stopId.agencyId, routeId);
                 if (route) this.routeByRouteId.set(routeId, route);
-                return route;
-            })
-        );
+                return route as RouteDto;
+            }))).sort((a, b) => {
+                const aNumber = a.route_short_name.match(/\d+/)?.[0];
+                const bNumber = b.route_short_name.match(/\d+/)?.[0];
+                return aNumber && bNumber ?
+                    parseInt(aNumber, 10) - parseInt(bNumber, 10) : 0;
+            });
     }
 
     private async setTimesValue() {

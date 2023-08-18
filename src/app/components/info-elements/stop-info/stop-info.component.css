@@ -63,11 +63,29 @@
     flex-direction: row;
     margin-top: 0.5vh;
     padding: 0vh;
+    overflow-x: scroll;
+    scrollbar-width: 4px;
+    scrollbar-color: #c1c1c1 transparent;
+}
+
+.stop-route-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.stop-route-container::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.stop-route-container::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #c1c1c1;
 }
 
 .route-identifier {
     height: fit-content;
     margin-right: 1vh;
+    margin-bottom: 4px;
     font-size: 3.5vh;
 }
 

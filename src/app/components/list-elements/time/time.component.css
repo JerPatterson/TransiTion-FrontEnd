@@ -13,13 +13,23 @@
 }
 
 .time-value {
+    min-width: fit-content;
     font-size: 3.5vh;
     font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.time_headsign-container {
+    display: table;
+    margin-left: 1.2vh;
+    margin-top: -0.2vh;
+    overflow: hidden;
 }
 
 .time_headsign {
-    margin-top: 0.8vh;
-    margin-left: 0.8vh;
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .old {

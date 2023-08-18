@@ -61,8 +61,8 @@ export class RouteListComponent {
                     agency: await this.staticDataService.getAgencyById(agencyId),
                     routes: (await this.getUniqueRoutesByShortName(agencyId))
                         .sort((a, b) => {
-                            const aNumber = a.route_id.match(/\d+/)?.[0];
-                            const bNumber = b.route_id.match(/\d+/)?.[0];
+                            const aNumber = a.route_short_name.match(/\d+/)?.[0];
+                            const bNumber = b.route_short_name.match(/\d+/)?.[0];
                             return aNumber && bNumber ? 
                                 parseInt(aNumber, 10) - parseInt(bNumber, 10) : 0;
                         }),
