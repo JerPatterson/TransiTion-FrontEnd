@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { Component, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopId } from '@app/utils/component-interface';
+import { HOUR_IN_DAY, ONE_HOUR_IN_MIN } from '@app/utils/constants';
 import { RouteDto, StopDto, TimeDto } from '@app/utils/dtos';
 import { WheelchairBoardingType } from '@app/utils/enums';
 import { StopAttributes } from '@app/utils/info.components';
@@ -14,6 +16,8 @@ import { AGENCY_TO_STYLE } from '@app/utils/styles';
 export class StopInfoComponent implements OnChanges {
     @Input() stopId!: StopId;
     @Output() hide = new EventEmitter();
+
+    @ViewChild(CdkVirtualScrollViewport) cdkVirtualScrollViewport!: CdkVirtualScrollViewport;
 
     stop?: StopDto;
     attributes: StopAttributes = {} as StopAttributes;
@@ -48,6 +52,7 @@ export class StopInfoComponent implements OnChanges {
         this.hide.emit();
     }
 
+
     private async setStop() {
         if (!this.stopId) return;
         this.stop = await this.stDataService.getStopById(
@@ -77,6 +82,31 @@ export class StopInfoComponent implements OnChanges {
         if (!this.stop) return;
         this.attributes.times = await this.stDataService.getTimesFromStop(
             this.stopId.agencyId, this.stopId.stopId);
+        this.setTimeStartIndex();
+    }
+
+    private setTimeStartIndex() {
+        let startIndex = 0;
+        let timeDifference = HOUR_IN_DAY * ONE_HOUR_IN_MIN;
+        const now = new Date(Date.now());
+        this.attributes.times.find((time, index) => {
+            const newTimeDifference = this.getMinutesBetween(now, time.arrival_time);
+            if (timeDifference < newTimeDifference) {
+                startIndex = index;
+                return true;
+            } else {
+                timeDifference = newTimeDifference;
+                return false;
+            }
+        });
+
+        setTimeout(() => this.cdkVirtualScrollViewport.scrollToIndex(startIndex));
+    }
+
+    private getMinutesBetween(now: Date, time: string): number {
+        const hours = Number(time.split(':')[0]);
+        const minutes = Number(time.split(':')[1]);
+        return Math.abs(Math.abs(hours - now.getHours()) * ONE_HOUR_IN_MIN - minutes + now.getMinutes());
     }
 
     private setWheelchairAccessibleValue() {
