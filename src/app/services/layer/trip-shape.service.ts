@@ -23,9 +23,9 @@ export class TripShapeService {
         return this.tripLayer;
     }
 
-    async clearTripShapeLayer(): Promise<void> {
-        this.tripLayer?.remove();
-        this.tripLayer = L.layerGroup();
+    clearTripShapeLayer(): void {
+        this.tripLayer.remove();
+        this.tripLayer.clearLayers();
     }
 
 

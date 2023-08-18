@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import L from 'leaflet';
 import { VehicleMarkerService } from '@app/services/layer/vehicle-marker.service';
-import { DEFAULT_ZOOM, LOCATION_CENTER_ZOOM, MAX_ZOOM, MIN_ZOOM, PARAM_SEPARATOR, SHOW_STOP_ABOVE_ZOOM } from '@app/utils/constants';
+import { DEFAULT_ZOOM, LOCATION_CENTER_ZOOM, MAX_ZOOM, MIN_ZOOM, ONE_SEC_IN_MS, PARAM_SEPARATOR, SHOW_STOP_ABOVE_ZOOM } from '@app/utils/constants';
 import { TripShapeService } from '@app/services/layer/trip-shape.service';
 import { MapRenderingOptions, RouteId, StopId, VehicleId } from '@app/utils/component-interface';
 import { StopMarkerService } from '@app/services/layer/stop-marker.service';
@@ -97,6 +97,7 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
+        setInterval(() => this.updateVehicles(), 30 * ONE_SEC_IN_MS);
     }
     
     private initMap(): void {
@@ -104,7 +105,6 @@ export class MapComponent implements OnInit {
             minZoom: MIN_ZOOM,
             maxZoom: MAX_ZOOM,
             zoomControl: false,
-            preferCanvas: true,
         }).setView([this.lat, this.lon], DEFAULT_ZOOM);
 
         this.map.invalidateSize({ animate: true });
@@ -119,7 +119,6 @@ export class MapComponent implements OnInit {
 
 
     private async updateVehicles(): Promise<void> {
-        await this.vehicleMarkerService.clearVehiclesLayer();
         if (!this.routeIds.size) {
             await this.addAllVehicles();
         } else {
@@ -146,15 +145,16 @@ export class MapComponent implements OnInit {
 
     private async addTripStops(agencyId: string, tripId: string, color: string): Promise<void> {
         this.stopsLayer = undefined;
-        await this.stopMarkerService.clearStopsLayer();
+        this.stopMarkerService.clearStopsLayer();
         this.tripStopsLayer = (await this.stopMarkerService.createTripStopsLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
-    private async addLayerIfHigherZoomLevel(layer: L.Layer | undefined, comparisonZoomLevel: number) {
-        if (this.map.getZoom() > comparisonZoomLevel) {
-            layer?.addTo(this.map);
-        } else if (layer && this.map.hasLayer(layer)) {
-            layer?.remove();
+    private async addLayerIfHigherZoomLevel(layer: L.LayerGroup | undefined, comparisonZoomLevel: number) {
+        if (!layer) return;
+        if (!this.map.hasLayer(layer) && this.map.getZoom() > comparisonZoomLevel) {
+            this.map.addLayer(layer);
+        } else if (this.map.hasLayer(layer) && this.map.getZoom() <= comparisonZoomLevel) {
+            this.map.removeLayer(layer);
         }
     }
 
@@ -171,8 +171,8 @@ export class MapComponent implements OnInit {
 
         await this.updateVehicles()
         this.tripStopsLayer = undefined;
-        await this.stopMarkerService.clearTripStopsLayer();
-        await this.tripShapeService.clearTripShapeLayer();
+        this.stopMarkerService.clearTripStopsLayer();
+        this.tripShapeService.clearTripShapeLayer();
     }
 
     private async addTripShape(agencyId: string, tripId: string, color: string): Promise<void> {
@@ -213,23 +213,26 @@ export class MapComponent implements OnInit {
     }
 
     private async addAllStops(): Promise<void> {
+        if (this.stopsLayer) this.map.removeLayer(this.stopsLayer);
         this.stopsLayer = (await this.stopMarkerService.createAllStopsLayer(
             this.agencyIds,
             this.emitStopSelected,
-        )).addTo(this.map);
+        ));
     }
 
     private async addAllStopsFromRoutes(): Promise<void> {
+        if (this.stopsLayer) this.map.removeLayer(this.stopsLayer);
         const routeIds = [...this.routeIds].map((routeId) => { 
             return { 
                 agencyId: routeId.split(PARAM_SEPARATOR)[0],
                 routeId: routeId.split(PARAM_SEPARATOR)[1],
             }
         });
+
         this.stopsLayer = (await this.stopMarkerService.createAllRouteStopsLayer(
             routeIds,
             this.emitStopSelected,
-        )).addTo(this.map);
+        ));
     }
 
 
@@ -271,11 +274,8 @@ export class MapComponent implements OnInit {
     }
 
     private setMapPanes() {
-        this.map.createPane('vehiclemarker');
-        (this.map.getPane('vehiclemarker') as HTMLElement).style.zIndex = '399';
-
-        this.map.createPane('stopmarker');
-        (this.map.getPane('stopmarker') as HTMLElement).style.zIndex = '398';
+        this.map.createPane('marker');
+        (this.map.getPane('marker') as HTMLElement).style.zIndex = '398';
 
         this.map.createPane('tripshape');
         (this.map.getPane('tripshape') as HTMLElement).style.zIndex = '397';

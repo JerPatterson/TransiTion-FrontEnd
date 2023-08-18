@@ -31,7 +31,7 @@ export const MIN_ZOOM = 8;
 export const MAX_ZOOM = 18;
 export const DEFAULT_ZOOM = 12;
 export const LOCATION_CENTER_ZOOM = 15;
-export const SHOW_STOP_ABOVE_ZOOM = 12
+export const SHOW_STOP_ABOVE_ZOOM = 13;
 export const DISABLE_CLUSTER_ZOOM = 15;
 
 export const METERS_IN_KM = 1000;

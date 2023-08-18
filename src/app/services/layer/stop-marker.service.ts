@@ -20,7 +20,7 @@ export class StopMarkerService {
         agencyIds: string[],
         clickHandler?: (s: StopId) => void,
     ): Promise<L.LayerGroup> {
-        await this.clearStopsLayer();
+        this.clearStopsLayer();
         this.stopsLayer.addLayer(await this.buildAllStopsLayer(
             agencyIds, clickHandler
         ));
@@ -32,7 +32,7 @@ export class StopMarkerService {
         routeIds: RouteId[],
         clickHandler?: (s: StopId) => void,
     ): Promise<L.LayerGroup> {
-        await this.clearStopsLayer();
+        this.clearStopsLayer();
         this.stopsLayer.addLayer(await this.buildRouteStopsLayer(
             routeIds, clickHandler
         ));
@@ -45,7 +45,7 @@ export class StopMarkerService {
         clickHandler?: (s: StopId) => void,
         centerMapFunction?: (lat: number, lon: number) => void,
     ): Promise<L.LayerGroup> {
-        await this.clearStopsLayer();
+        this.clearStopsLayer();
         this.stopsLayer.addLayer(await this.buildStopsLayer(
             stopIds, clickHandler, centerMapFunction
         ));
@@ -53,14 +53,14 @@ export class StopMarkerService {
         return this.stopsLayer;
     }
 
-    async clearStopsLayer(): Promise<void> {
+    clearStopsLayer(): void {
         this.stopsLayer.remove();
         this.stopsLayer.clearLayers();
     }
 
 
     async createTripStopsLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
-        await this.clearTripStopsLayer();
+        this.clearTripStopsLayer();
         this.tripStopsLayer = await this.buildTripStopsLayer(
             agencyId, tripId, color
         );
@@ -68,7 +68,7 @@ export class StopMarkerService {
         return this.tripStopsLayer;
     }
 
-    async clearTripStopsLayer(): Promise<void> {
+    clearTripStopsLayer(): void {
         this.tripStopsLayer.remove();
         this.tripStopsLayer.clearLayers();
     }
@@ -212,7 +212,7 @@ export class StopMarkerService {
                     fillOpacity: 1,
                     fillColor: "#ffffff",
                     interactive: interactive,
-                    pane: 'stopmarker',
+                    pane: 'marker',
                 },
             ).addEventListener('click', listenerFunction);
     }
@@ -229,7 +229,7 @@ export class StopMarkerService {
 
         return L.marker(
                 [stop.stop_lat, stop.stop_lon], 
-                { icon, interactive, pane: 'stopmarker' },
+                { icon, interactive, pane: 'marker' },
             ).addEventListener('click', listenerFunction);
     }
 
@@ -240,7 +240,7 @@ export class StopMarkerService {
             fillOpacity: 1,
             fillColor: "#ffffff",
             interactive: true,
-            pane: 'stopmarker',
+            pane: 'marker',
         });
 
         return marker.bindPopup(`${stop.stop_name} [${stop.stop_code}]`);

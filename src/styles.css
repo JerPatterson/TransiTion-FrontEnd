@@ -7,6 +7,10 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+.leaflet-markers-canvas-layer {
+    pointer-events: none;
+}
+
 .marker-cluster div {
     width: 30px;
     height: 30px;

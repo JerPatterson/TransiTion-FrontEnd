@@ -49,6 +49,7 @@ export class VehicleMarkerService {
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<L.LayerGroup> {
+        this.clearVehiclesLayer();
         const vehiclesLayer = L.layerGroup();
         if (options.mergeAllVehicleClusters) {
             vehiclesLayer.addLayer(await this.buildVehiclesLayer(agencyIds, options, clickHandler));
@@ -67,6 +68,7 @@ export class VehicleMarkerService {
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<L.LayerGroup> {
+        this.clearVehiclesLayer();
         const vehiclesLayer = L.layerGroup();
         if (!routeIds.length) return vehiclesLayer;
         const routesIdsSorted = routeIds.sort((a, b) => a.localeCompare(b));
@@ -91,8 +93,11 @@ export class VehicleMarkerService {
         return vehiclesLayer;
     }
 
-    async clearVehiclesLayer(): Promise<void> {
-        this.vehicleLayers.forEach((layer) => layer.remove());
+    clearVehiclesLayer(): void {
+        this.vehicleLayers.forEach((layer) => {
+            layer.remove();
+            layer.clearLayers();
+        });
         this.vehicleLayers = [];
     }
 
@@ -125,7 +130,7 @@ export class VehicleMarkerService {
                     if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'vehiclemarker' });
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'clickableMarker' });
             layerGroup.on('remove', () => this.markersCanvas.clear());
         }
 
@@ -166,7 +171,7 @@ export class VehicleMarkerService {
                     if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'vehiclemarker' });
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
             layerGroup.on('remove', () => this.markersCanvas.clear());
         }
 
