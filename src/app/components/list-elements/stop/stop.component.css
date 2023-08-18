@@ -1,6 +1,7 @@
 .stop-container {
     display: flex;
     flex-direction: row;
+    max-width: 30vw;
 }
 
 .stop-container:hover {
@@ -44,21 +45,31 @@
 .stop-feature-container {
     display: flex;
     flex-direction: row;
+    max-width: 24.5vw;
     margin-top: 0.5vh;
-    padding: 0vh;
-}
-
-.flex-row {
-    display: flex;
-    flex-direction: row;
-    width: 26vw;
-    margin: 0px;
-    padding: 0px;
+    padding-bottom: 4px;
+    overflow-x: scroll;
+    scrollbar-width: 4px;
+    scrollbar-color: #c1c1c1 transparent;
 }
 
 .stop-feature {
     max-width: 3vh;
     max-height: 3vh;
+}
+
+.stop-feature-container::-webkit-scrollbar {
+    height: 4px;
+}
+
+.stop-feature-container::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.stop-feature-container::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #c1c1c1;
 }
 
 .route-identifier {

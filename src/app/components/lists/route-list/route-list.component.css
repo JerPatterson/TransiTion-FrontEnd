@@ -62,9 +62,20 @@
     max-height: 38vh;
     max-width: 31vw;
     overflow-y: scroll;
-    scrollbar-width: 0px;
+    scrollbar-width: 10px;
+    scrollbar-color: #c1c1c1 transparent;
 }
 
 .route-viewport::-webkit-scrollbar {
-    width: 0px;
+    width: 10px;
+}
+
+.route-viewport::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.route-viewport::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #c1c1c1;
 }

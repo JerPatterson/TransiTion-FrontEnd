@@ -61,9 +61,20 @@
 .stop-viewport {
     height: 38vh;
     width: 31vw;
-    scrollbar-width: 0px;
+    scrollbar-width: 10px;
+    scrollbar-color: #c1c1c1 transparent;
 }
 
 .stop-viewport::-webkit-scrollbar {
-    width: 0px;
+    width: 10px;
+}
+
+.stop-viewport::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: transparent;
+}
+
+.stop-viewport::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #c1c1c1;
 }
