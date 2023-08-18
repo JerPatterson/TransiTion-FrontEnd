@@ -32,7 +32,7 @@
         <svg [ngStyle]="{ color: this.attributes.style?.backgroundColor }">
             <use [attr.xlink:href]='this.routeIconHref' [attr.href]="this.routeIconHref" />
         </svg>
-        <div class="stop-route-container">
+        <div #horizontalScroll class="stop-route-container">
             <div
                 class="route-identifier"
                 *ngFor="let route of this.attributes.routes">

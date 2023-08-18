@@ -1,5 +1,5 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { Component, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
 import { StaticDataService } from '@app/services/static/static-data.service';
 import { StopId } from '@app/utils/component-interface';
 import { HOUR_IN_DAY, ONE_HOUR_IN_MIN } from '@app/utils/constants';
@@ -13,10 +13,11 @@ import { AGENCY_TO_STYLE } from '@app/utils/styles';
     templateUrl: './stop-info.component.html',
     styleUrls: ['./stop-info.component.css']
 })
-export class StopInfoComponent implements OnChanges {
+export class StopInfoComponent implements OnInit, OnChanges {
     @Input() stopId!: StopId;
     @Output() hide = new EventEmitter();
 
+    @ViewChild('horizontalScroll', { static: true }) horizontalScrollContainer!: ElementRef;
     @ViewChild(CdkVirtualScrollViewport) cdkVirtualScrollViewport!: CdkVirtualScrollViewport;
 
     stop?: StopDto;
@@ -33,7 +34,14 @@ export class StopInfoComponent implements OnChanges {
 
     trackByTime = (_: number, time: TimeDto) => time.trip_id;
 
-    ngOnChanges() {
+    ngOnInit(): void {
+        this.horizontalScrollContainer.nativeElement.addEventListener('wheel', (ev: WheelEvent) => {
+            ev.preventDefault();
+            this.horizontalScrollContainer.nativeElement.scrollLeft += ev.deltaY;
+        });
+    }
+
+    ngOnChanges(): void {
         this.setStopAttributes();
     }
     
