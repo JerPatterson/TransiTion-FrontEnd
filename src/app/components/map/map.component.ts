@@ -56,6 +56,7 @@ export class MapComponent implements OnInit {
         if (!value) {
             this.stopMarkerService.clearTripStopsLayer();
             this.tripShapeService.clearTripShapeLayer();
+            console.log(this.stopIds);
             if (!this.stopIds.size) this.updateStops();
         }
     }
@@ -208,6 +209,7 @@ export class MapComponent implements OnInit {
 
     private async updateStops(stopIds: StopId[] = []) {
         if (!stopIds.length && !this.routeIds.size) {
+            this.stopIds.clear();
             await this.addAllStops();
         } else if (!stopIds.length && this.routeIds.size) {
             await this.addAllStopsFromRoutes();

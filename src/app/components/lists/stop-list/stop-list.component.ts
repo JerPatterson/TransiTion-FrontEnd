@@ -29,6 +29,7 @@ export class StopListComponent {
     };
 
     @Input() set routeIds(values: RouteId[]) {
+        console.log(values);
         this.setRouteStops(values);
         this.routeIdsToShow = new Set(
             values.map(value => `${value.agencyId}/${value.routeId}`)
@@ -93,24 +94,33 @@ export class StopListComponent {
     }
 
     private async setRouteStops(routeIds: RouteId[]): Promise<void> {
-        this.routeStops = this.routeStops.concat(await Promise.all(
-            routeIds
-                .filter((routeId) =>
-                    !this.knownRouteIds.has(`${routeId.agencyId}/${routeId.routeId}`)
-                ).sort((a, b) =>
-                    (`${a.agencyId}${a.routeId}`).localeCompare(`${b.agencyId}${b.routeId}`)
-                ).map(async (routeId) => {
-                    this.knownRouteIds.add(`${routeId.agencyId}/${routeId.routeId}`);
-                    const route = await this.staticDataService.getRouteById(routeId.agencyId, routeId.routeId) as RouteDto;
-                    const stops = (await this.staticDataService.getStopByIds(routeId.agencyId, route.stop_ids))
-                        .map((stop) => {
-                            return {
-                                ...stop,
-                                route_ids: stop.route_ids.filter((value) => value != routeId.routeId),
-                            }
-                        });
-                    return { route, stops };
-                })
-        ));
+        routeIds = routeIds.filter((routeId) =>
+            !this.knownRouteIds.has(`${routeId.agencyId}/${routeId.routeId}`)
+        );
+
+        const uniqueRouteShortName = new Map<string, AgencyRouteStopsElement>();
+        for (const routeId of routeIds) {
+            this.knownRouteIds.add(`${routeId.agencyId}/${routeId.routeId}`);
+            const route = await this.staticDataService.getRouteById(routeId.agencyId, routeId.routeId) as RouteDto;
+            const stops = (await this.staticDataService.getStopByIds(routeId.agencyId, route.stop_ids))
+                .map((stop) => {
+                    return {
+                        ...stop,
+                        route_ids: stop.route_ids.filter((value) => value != routeId.routeId),
+                    }
+                });
+            
+            const routeStops = uniqueRouteShortName.get(`${routeId.agencyId}/${route.route_short_name}`);
+            if (routeStops) {
+                routeStops.stops = routeStops.stops.concat(stops)
+                uniqueRouteShortName.set(`${routeId.agencyId}/${route.route_short_name}`, routeStops);
+            } else {
+                uniqueRouteShortName.set(`${routeId.agencyId}/${route.route_short_name}`, { route, stops });
+            }
+        }
+
+        uniqueRouteShortName.forEach((routeStops) => {
+            this.routeStops.push(routeStops);
+        });
     }
 }
