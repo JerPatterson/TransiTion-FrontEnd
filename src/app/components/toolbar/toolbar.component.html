@@ -6,7 +6,7 @@
         <svg class="tool">
             <use xlink:href='../assets/icons/agency.svg#agency' href="./assets/icons/agency.svg#agency"></use>
         </svg>
-        <p class="tool">Agences</p>
+        <p class="tool-name">Agences</p>
     </button>
     <button 
         class="tool"
@@ -15,7 +15,7 @@
         <svg class="tool">
             <use xlink:href='../assets/icons/route.svg#route' href="./assets/icons/route.svg#route"></use>
         </svg>
-        <p class="tool">Routes</p>
+        <p class="tool-name">Routes</p>
     </button>
     <button 
         class="tool"
@@ -24,7 +24,7 @@
         <svg class="tool">
             <use xlink:href='../assets/icons/stop-sign.svg#stop-sign' href="./assets/icons/stop-sign.svg#stop-sign"></use>
         </svg>
-        <p class="tool">Arrêts</p>
+        <p class="tool-name">Arrêts</p>
     </button>
     <button 
         class="tool"
@@ -33,6 +33,15 @@
         <svg class="tool">
             <use xlink:href='../assets/icons/bus.svg#bus' href="./assets/icons/bus.svg#bus"></use>
         </svg>
-        <p class="tool">Véhicules</p>
+        <p class="tool-name">Véhicules</p>
+    </button>
+    <button 
+        class="tool"
+        [ngClass]="this.componentDisplayed === 7 ? 'selected' : ''"
+        (click)="this.handleSettingsClick()">
+        <svg class="tool">
+            <use xlink:href='../assets/icons/settings.svg#settings' href="./assets/icons/settings.svg#settings"></use>
+        </svg>
+        <p class="tool-name">Paramètres</p>
     </button>
 </div>

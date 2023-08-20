@@ -214,6 +214,7 @@ export class MapComponent implements OnInit {
         } else {
             await this.addSelectedStops(stopIds);
         }
+        this.addLayerIfHigherZoomLevel(this.stopsLayer, SHOW_STOP_ABOVE_ZOOM);
     }
 
     private async addAllStops(): Promise<void> {

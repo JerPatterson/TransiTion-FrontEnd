@@ -16,6 +16,8 @@
         (hide)="this.hideVehicleInfoComponent()">
     </app-vehicle-info>
 
+    <app-settings *ngIf="this.componentDisplayed === 7" />
+
     <app-agency-list
         [ngClass]="this.componentDisplayed === 1 ? '' : 'hidden'"
         [selections]="this.selections.agencies"

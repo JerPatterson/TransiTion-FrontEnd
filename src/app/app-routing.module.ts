@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { MainPageComponent } from '@app/pages/main-page.component';
-import { StopInfoComponent } from './components/info-elements/stop-info/stop-info.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/main', pathMatch: 'full' },
     { path: 'main', component: MainPageComponent },
-    { path: 'stop', component: StopInfoComponent },
+    { path: 'setting', component: SettingsComponent },
     { path: '**', redirectTo: '/main' },
 ];
 

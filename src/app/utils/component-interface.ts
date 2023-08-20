@@ -26,6 +26,7 @@ export enum MapComponentDisplayed {
     VehicleList,
     StopInfo,
     VehicleInfo,
+    Settings,
 }
 
 export interface RouteId {

@@ -32,8 +32,13 @@ svg.tool {
     max-height: 6vh;
 }
 
-p.tool {
+p.tool-name {
     color: black;
     padding: 0px;
     margin: 0px;
+}
+
+.tool:last-child {
+    position: relative;
+    top: 40vh;
 }

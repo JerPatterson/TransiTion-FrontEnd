@@ -19,6 +19,7 @@ import { RouteTypeComponent } from './components/elements/route-type/route-type.
 import { TripDirectionComponent } from './components/elements/trip-direction/trip-direction.component';
 import { StopInfoComponent } from './components/info-elements/stop-info/stop-info.component';
 import { TimeComponent } from './components/list-elements/time/time.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { TimeComponent } from './components/list-elements/time/time.component';
     TripDirectionComponent,
     StopInfoComponent,
     TimeComponent,
+    SettingsComponent,
   ],
   imports: [
     AppRoutingModule,

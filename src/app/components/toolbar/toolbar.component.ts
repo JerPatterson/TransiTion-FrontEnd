@@ -34,6 +34,12 @@ export class ToolbarComponent {
         this.emitNewSelection();
     }
 
+    handleSettingsClick() {
+        this.componentDisplayed = (this.componentDisplayed !== MapComponentDisplayed.Settings) ?
+            MapComponentDisplayed.Settings : MapComponentDisplayed.None;
+        this.emitNewSelection();
+    }
+
     private emitNewSelection() {
         this.newComponentToDisplay.emit(this.componentDisplayed);
     }

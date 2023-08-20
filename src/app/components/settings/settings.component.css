@@ -1,0 +1,89 @@
+.settings-container {
+    position: relative;
+    z-index: 2;
+    max-width: 32vw;
+    max-height: 72vh;
+    overflow-y: scroll;
+    margin: 0px;
+    padding: 1vh 1.5vh;
+    scrollbar-width: none;
+}
+
+.settings-container::-webkit-scrollbar {
+    width: 0px;
+}
+
+.settings-section > div {
+    margin-bottom: 3vh;
+}
+
+.settings-section-title {
+    margin: 0px;
+    padding: 0px;
+}
+
+.option-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5vh;
+}
+
+.option-container > div {
+    display: table;
+}
+
+.option-icon {
+    max-width: 5vh;
+    max-height: 5vh;
+    margin-right: 1vh;
+}
+
+.option-name {
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 2.8vh;
+    max-width: 22vw;
+}
+
+.switch {
+    display: inline-block;
+    position: relative;
+    height: 4.5vh;
+    width: 8.2vh;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    background-color: #cccccc;
+    cursor: pointer;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    transition: .4s;
+    border-radius: 4.5vh;
+}
+
+.slider:before {
+    position: absolute;
+    left: 4px;
+    bottom: 4px;
+    transition: .4s;
+    height: 3.5vh;
+    width: 3.5vh;
+    content: "";
+    background-color: #ffffff;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #1a73e8;
+}
+
+input:checked + .slider:before {
+    transform: translateX(3.5vh);
+}
