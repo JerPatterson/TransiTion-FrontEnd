@@ -36,21 +36,8 @@ export class MainPageComponent implements AfterContentChecked {
         this.cdref.detectChanges();
     }
 
-    changeDarkModeEnableOption() {
-        this.options.darkModeEnable = !this.options.darkModeEnable;
-    }
-
-    changeShowOldVehiclesOption() {
-        this.options.showOldVehicles = !this.options.showOldVehicles;
-    }
-
-    changeUseVehicleClustersOption() {
-        this.options.mergeAllVehicleClusters = false;
-        this.options.useVehicleClusters = !this.options.useVehicleClusters;
-    }
-
-    changeMergeAllVehicleClustersOption() {
-        this.options.mergeAllVehicleClusters = !this.options.mergeAllVehicleClusters;
+    changeMapRenderingOptions(newRenderingOptions: MapRenderingOptions) {
+        this.options = newRenderingOptions;
     }
 
     changeSelectAllAgenciesOption() {

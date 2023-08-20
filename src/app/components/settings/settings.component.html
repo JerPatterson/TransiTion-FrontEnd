@@ -12,7 +12,9 @@
                 </p>
             </div>
             <label class="switch" for="location">
-                <input type="checkbox" id="location" />
+                <input
+                    type="checkbox" id="location" disabled
+                />
                 <div class="slider"></div>
             </label>
         </div>
@@ -27,7 +29,11 @@
                     </p>
                 </div>
                 <label class="switch" for="cluster">
-                    <input type="checkbox" id="cluster" />
+                    <input
+                        type="checkbox" id="cluster"
+                        [checked]="this.renderingOptions.useVehicleClusters"
+                        (change)="this.setUseVehicleClustersOption($event)"
+                    />
                     <div class="slider"></div>
                 </label>
             </div>
@@ -41,7 +47,11 @@
                     </p>
                 </div>
                 <label class="switch" for="merge">
-                    <input type="checkbox" id="merge" />
+                    <input
+                        type="checkbox" id="merge"
+                        [checked]="this.renderingOptions.mergeAllVehicleClusters"
+                        (change)="this.setMergeAllVehicleClustersOption($event)"
+                    />
                     <div class="slider"></div>
                 </label>
             </div>
@@ -56,7 +66,11 @@
                 </p>
             </div>
                 <label class="switch" for="clock">
-                    <input type="checkbox" id="clock" />
+                    <input
+                        type="checkbox" id="clock"
+                        [checked]="this.renderingOptions.showOldVehicles"
+                        (change)="this.setShowOldVehicleOption($event)"
+                    />
                     <div class="slider"></div>
                 </label>
         </div>

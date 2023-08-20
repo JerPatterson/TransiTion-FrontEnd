@@ -16,7 +16,12 @@
         (hide)="this.hideVehicleInfoComponent()">
     </app-vehicle-info>
 
-    <app-settings *ngIf="this.componentDisplayed === 7" />
+    <app-settings
+        *ngIf="this.componentDisplayed === 7" 
+        [renderingOptions]="this.options"
+        [selectOptions]="this.selectOptions"
+        (newRenderingOptions)="this.changeMapRenderingOptions($event)">
+    </app-settings>
 
     <app-agency-list
         [ngClass]="this.componentDisplayed === 1 ? '' : 'hidden'"
@@ -58,45 +63,6 @@
             class="option-name"
             *ngIf="!this.selectOptions.allAgencies">
             Tout sélectionner
-        </span>
-    </button>
-    <button
-        *ngIf="this.selections.agencies.length"
-        [ngClass]="!this.options.useVehicleClusters ? 'selected' : ''"
-        (click)="this.changeUseVehicleClustersOption()">
-        <svg class="option-icon">
-            <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
-        </svg>
-        <span 
-            class="option-name"
-            *ngIf="this.options.useVehicleClusters">
-            Garder les repères individuels
-        </span>
-    </button>
-    <button
-        *ngIf="this.selections.agencies.length"
-        [ngClass]="this.options.mergeAllVehicleClusters ? 'selected' : ''"
-        (click)="this.changeMergeAllVehicleClustersOption()">
-        <svg class="option-icon">
-            <use xlink:href='./assets/icons/merge-all.svg#merge-all' href="./assets/icons/merge-all.svg#merge-all"></use>
-        </svg>
-        <span 
-            class="option-name"
-            *ngIf="!this.options.mergeAllVehicleClusters">
-            Fusionner les repères
-        </span>
-    </button>
-    <button
-        *ngIf="this.selections.agencies.length"
-        [ngClass]="this.options.showOldVehicles ? 'selected' : ''"
-        (click)="this.changeShowOldVehiclesOption()">
-        <svg class="option-icon">
-            <use xlink:href='./assets/icons/clock.svg#clock' href="./assets/icons/clock.svg#clock"></use>
-        </svg>
-        <span 
-            class="option-name"
-            *ngIf="!this.options.showOldVehicles">
-            Afficher les véhicules inactifs
         </span>
     </button>
 </div>
