@@ -90,6 +90,14 @@
     font-size: 3.5vh;
 }
 
+.hide {
+    opacity: 0.3;
+}
+
+.clickable:hover {
+    cursor: pointer;
+}
+
 .stop-info {
     display: flex;
     flex-direction: row;

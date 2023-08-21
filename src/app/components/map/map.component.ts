@@ -56,7 +56,6 @@ export class MapComponent implements OnInit {
         if (!value) {
             this.stopMarkerService.clearTripStopsLayer();
             this.tripShapeService.clearTripShapeLayer();
-            console.log(this.stopIds);
             if (!this.stopIds.size) this.updateStops();
         }
     }
@@ -82,6 +81,7 @@ export class MapComponent implements OnInit {
 
     private readonly emitStopSelected = (stopId: StopId) => {
         this.newStopSelected.emit(stopId);
+        this.addTripsFromStop(stopId.agencyId, stopId.stopId);
     };
 
     private readonly centerMapOnLocation = (lat: number, lon: number) => {
@@ -212,6 +212,7 @@ export class MapComponent implements OnInit {
             this.stopIds.clear();
             await this.addAllStops();
         } else if (!stopIds.length && this.routeIds.size) {
+            this.stopIds.clear();
             await this.addAllStopsFromRoutes();
         } else {
             await this.addSelectedStops(stopIds);
@@ -261,6 +262,11 @@ export class MapComponent implements OnInit {
             this.emitStopSelected,
             centerTheMap ? this.centerMapOnLocation : undefined
         )).addTo(this.map);
+    }
+
+
+    private addTripsFromStop(agencyId: string, stopId: string) {
+        
     }
 
 

@@ -29,7 +29,6 @@ export class StopListComponent {
     };
 
     @Input() set routeIds(values: RouteId[]) {
-        console.log(values);
         this.setRouteStops(values);
         this.routeIdsToShow = new Set(
             values.map(value => `${value.agencyId}/${value.routeId}`)

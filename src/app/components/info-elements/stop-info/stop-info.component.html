@@ -38,8 +38,13 @@
                 *ngFor="let route of this.attributes.routes">
                 <app-route-identifier
                     *ngIf="route"
+                    [ngClass]="{
+                        hide: this.routeIdsToHide.has(route.route_id),
+                        clickable: this.routeByRouteId.size > 1,
+                    }"
                     [route]="route"
-                    [showAgency]="false">
+                    [showAgency]="false"
+                    (click)="this.handleRouteFilterClick(route.route_id)">
                 </app-route-identifier>
             </div>
         </div>
