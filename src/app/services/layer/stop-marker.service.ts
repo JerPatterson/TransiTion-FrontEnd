@@ -43,10 +43,17 @@ export class StopMarkerService {
     async createStopsLayer(
         stopIds: StopId[],
         clickHandler?: (s: StopId) => void,
+    ): Promise<L.LayerGroup> {
+        return this.stopsLayer.addLayer(await this.buildStopsLayer(stopIds, clickHandler));
+    }
+
+    async createStopsMarkerLayer(
+        stopIds: StopId[],
+        clickHandler?: (s: StopId) => void,
         centerMapFunction?: (lat: number, lon: number) => void,
     ): Promise<L.LayerGroup> {
         this.clearStopsLayer();
-        this.stopsLayer.addLayer(await this.buildStopsLayer(
+        this.stopsLayer.addLayer(await this.buildStopsMarkerLayer(
             stopIds, clickHandler, centerMapFunction
         ));
 
@@ -81,14 +88,14 @@ export class StopMarkerService {
         let stopMarkers: L.CircleMarker[] = [];
         for (const agencyId of agencyIds) {
             stopMarkers = stopMarkers.concat(
-                await this.buildStopCircleMarkers(agencyId, clickHandler)
+                await this.buildStopCircleMarkersFromAgency(agencyId, clickHandler)
             );
         }
 
         return L.layerGroup(stopMarkers);
     }
 
-    private async buildStopCircleMarkers(
+    private async buildStopCircleMarkersFromAgency(
         agencyId: string,
         clickHandler?: (s: StopId) => void,
     ): Promise<L.CircleMarker[]> {
@@ -151,6 +158,39 @@ export class StopMarkerService {
 
 
     private async buildStopsLayer(
+        stopIds: StopId[],
+        clickHandler?: (s: StopId) => void,
+    ): Promise<L.LayerGroup> {
+        let markers: L.CircleMarker[] = [];
+        let agencyStopIds: string[] = [];
+        stopIds = stopIds.sort((a, b) => a.agencyId.localeCompare(b.agencyId));
+        for (const [i, stopId] of stopIds.entries()) {
+            agencyStopIds.push(stopId.stopId);
+            if ((i + 1) === stopIds.length || stopId.agencyId !== stopIds[i + 1].agencyId) {
+                markers = markers.concat(
+                    await this.buildStopCircleMarkers(
+                        stopId.agencyId, agencyStopIds, clickHandler)
+                );
+                agencyStopIds = [];
+            }
+        }
+
+        return L.layerGroup(markers);
+    }
+
+    private async buildStopCircleMarkers(
+        agencyId: string,
+        stopIds: string[],
+        clickHandler?: (s: StopId) => void,
+    ) : Promise<L.CircleMarker[]> {
+        const stops = await this.staticDataService.getStopByIds(agencyId, stopIds)
+        return Promise.all(
+            stops.map((stop) => this.buildStopCircleMarker(agencyId, stop, clickHandler))
+        );
+    }
+
+
+    private async buildStopsMarkerLayer(
         stopIds: StopId[],
         clickHandler?: (s: StopId) => void,
         centerMapFunction?: (lat: number, lon: number) => void,

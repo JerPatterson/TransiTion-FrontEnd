@@ -36,6 +36,7 @@ export class TripShapeService {
         agencyId: string,
         stopId: string,
         filterVehicles: (tIds: string[]) => Promise<void>,
+        filterStops: (sIds: string[]) => Promise<void>,
     ): Promise<L.LayerGroup> {
         this.clearTripShapeLayer();
         this.clearStopShapeLayer();
@@ -53,9 +54,12 @@ export class TripShapeService {
         });
 
         this.stopShapeLayer = L.layerGroup(
-            await this.buildStopShapes(agencyId, [...uniqueShapeIds]));
+            await this.buildStopShapes(agencyId, [...uniqueShapeIds])
+        );
         this.stopShapeRemainingLayer = L.layerGroup(
-            await this.buildStopShapesRemainingFromTrips(agencyId, stopId, [...uniqueTripByShapeIds]));
+            await this.buildStopShapesRemainingFromTrips(
+                agencyId, stopId, [...uniqueTripByShapeIds], filterStops)
+        );
 
         return L.layerGroup([this.stopShapeLayer, this.stopShapeRemainingLayer]);
     }
@@ -136,7 +140,10 @@ export class TripShapeService {
     }
 
     private async buildStopShapesRemainingFromTrips(
-        agencyId: string, stopId: string, trips: TripDto[]
+        agencyId: string,
+        stopId: string,
+        trips: TripDto[],
+        filterStops: (sIds: string[]) => Promise<void>,
     ): Promise<L.GeoJSON[]> {
         const shapes: L.GeoJSON[] = [];
         const stop = await this.staticDataService.getStopById(agencyId, stopId);
@@ -152,9 +159,10 @@ export class TripShapeService {
                     time.stop_lat, time.stop_lon, times[i].stop_lat, times[i].stop_lon);
             }
 
+            await filterStops(times.map((time) => time.stop_id).slice(i));
+
             const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
             const nearestPt = await this.getNearestPoint(shapePts, stop, stopDistTraveled);
-
             if (!nearestPt) return shapes;
             shapes.push(this.buildTripShape(
                 shapePts.filter((shapePt) =>
