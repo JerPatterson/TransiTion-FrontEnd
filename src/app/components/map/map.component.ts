@@ -36,15 +36,18 @@ export class MapComponent implements OnInit {
 
 
     @Input() set agencies(values: string[]) {
-        this.agencyIds = values;
-        this.updateVehicles().then(() => {
-            if (!this.stopIds.size) this.updateStops();
+        this.updateAgencies(values).then(() => {
+            this.updateVehicles().then(() => {
+                if (!this.stopIds.size) this.updateStops();
+            })
         });
     };
 
     @Input() set routes(routeIds: RouteId[]) {
         this.updateRoutes(routeIds).then(() => {
-            if (!this.stopIds.size) this.updateStops();
+            this.updateVehicles().then(() => {
+                if (!this.stopIds.size) this.updateStops();
+            })
         });
     };
 
@@ -123,6 +126,11 @@ export class MapComponent implements OnInit {
     }
 
 
+    private async updateAgencies(agencyIds: string[]): Promise<void> {
+        this.agencyIds = agencyIds;
+    }
+
+
     private async updateVehicles(): Promise<void> {
         if (!this.routeIds.size) {
             await this.addAllVehicles();
@@ -166,15 +174,14 @@ export class MapComponent implements OnInit {
 
     private async updateRoutes(routeIds: RouteId[]): Promise<void> {
         if (!routeIds.length) {
-            await this.tripShapeService.clearRouteShapeLayers();
             this.routeIds.clear();
+            await this.tripShapeService.clearRouteShapeLayers();
         } else if (routeIds.length > this.routeIds.size) {
             await this.addRouteShapes(routeIds);
         } else if (routeIds.length < this.routeIds.size) {
             await this.removeRouteShapes(routeIds);
         }
 
-        await this.updateVehicles()
         this.tripStopsLayer = undefined;
         this.stopMarkerService.clearTripStopsLayer();
         this.tripShapeService.clearTripShapeLayer();
