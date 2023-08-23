@@ -7,7 +7,7 @@
             [ngStyle]="{ color: this.attributes.style?.iconColor }">
             <g
                 [attr.fill]="this.attributes.style?.backgroundColor"
-                [attr.transform]="'rotate(' + (this.attributes.bearing - 180) + ' 35 35)'">
+                [attr.transform]="'rotate(' + (this.attributes.bearing ? this.attributes.bearing - 180 : 0) + ' 35 35)'">
                 <circle cx="35" cy="35" r="20"/>
                 <path *ngIf="this.attributes.bearing >= 0" d="M35,70 20,53 35,60 50,53z"/>
             </g>

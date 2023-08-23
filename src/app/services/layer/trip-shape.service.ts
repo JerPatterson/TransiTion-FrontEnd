@@ -13,6 +13,7 @@ import { AGENCY_TO_STYLE } from '@app/utils/styles';
 export class TripShapeService {
     private tripShapeLayer = L.layerGroup();
     private stopShapeLayer = L.layerGroup();
+    private stopShapeRemainingLayer = L.layerGroup();
 
     private currentRoutes = new Set<string>();
     private routeToRouteShapeLayer = new Map<string, L.GeoJSON>();
@@ -51,16 +52,27 @@ export class TripShapeService {
             }
         });
 
+        this.stopShapeLayer = L.layerGroup(
+            await this.buildStopShapes(agencyId, [...uniqueShapeIds]));
+        this.stopShapeRemainingLayer = L.layerGroup(
+            await this.buildStopShapesRemainingFromTrips(agencyId, stopId, [...uniqueTripByShapeIds]));
 
-        this.stopShapeLayer = L.layerGroup((await this.buildStopShapes(agencyId, [...uniqueShapeIds]))
-            .concat(await this.buildStopShapesRemainingFromTrips(agencyId, stopId, [...uniqueTripByShapeIds])));
-
-        return this.stopShapeLayer;
+        return L.layerGroup([this.stopShapeLayer, this.stopShapeRemainingLayer]);
     }
 
     clearStopShapeLayer(): void {
         this.stopShapeLayer.remove();
+        this.stopShapeRemainingLayer.remove();
         this.stopShapeLayer.clearLayers();
+        this.stopShapeRemainingLayer.clearLayers();
+    }
+
+    hideStopShapeRemainingLayer(): void {
+        this.stopShapeRemainingLayer.remove();
+    }
+
+    showStopShapeRemainingLayer(): L.LayerGroup {
+        return this.stopShapeRemainingLayer;
     }
 
 
@@ -89,7 +101,7 @@ export class TripShapeService {
         this.currentRoutes = routes;
     }
 
-    async clearRouteShapeLayers() {
+    clearRouteShapeLayers() {
         this.routeToRouteShapeLayer.forEach((layer) => layer.remove());
         this.routeToRouteShapeLayer = new Map<string, L.GeoJSON>();
         this.currentRoutes = new Set<string>();

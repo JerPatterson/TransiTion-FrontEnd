@@ -36,6 +36,8 @@ export class MapComponent implements OnInit {
 
 
     @Input() set agencies(values: string[]) {
+        if (!this.map) return;
+        this.tripIds = [];
         this.updateAgencies(values)
             .then(() => {
                 this.updateVehicles();
@@ -45,6 +47,8 @@ export class MapComponent implements OnInit {
     };
 
     @Input() set routes(routeIds: RouteId[]) {
+        if (!this.map) return;
+        this.tripIds = [];
         this.updateRoutes(routeIds)
             .then(() => {
                 this.updateVehicles();
@@ -54,18 +58,21 @@ export class MapComponent implements OnInit {
     };
 
     @Input() set stops(stopIds: StopId[]) {
+        if (!this.map) return;
+        this.tripIds = [];
         this.updateStops(stopIds);
     };
 
     @Input() set vehicle(value: VehicleId | null | undefined) {
-        if (value) return;
+        if (value || !this.map) return;
         this.stopMarkerService.clearTripStopsLayer();
         this.tripShapeService.clearTripShapeLayer();
+        this.tripShapeService.showStopShapeRemainingLayer().addTo(this.map);
         if (!this.stopIds.size) this.updateStops();
     }
 
     @Input() set stop(value: StopId | null | undefined) {
-        if (value) return;
+        if (value || !this.map) return;
         this.tripIds = [];
         this.tripShapeService.clearStopShapeLayer();
         this.updateVehicles()
@@ -96,7 +103,8 @@ export class MapComponent implements OnInit {
 
     private readonly emitStopSelected = (stopId: StopId) => {
         this.newStopSelected.emit(stopId);
-        this.addTripsFromStop(stopId.agencyId, stopId.stopId);
+        if (!this.routeIds.size)
+            this.addTripsFromStop(stopId.agencyId, stopId.stopId);
     };
 
     private readonly centerMapOnLocation = (lat: number, lon: number) => {
@@ -199,7 +207,7 @@ export class MapComponent implements OnInit {
     private async updateRoutes(routeIds: RouteId[]): Promise<void> {
         if (!routeIds.length) {
             this.routeIds.clear();
-            await this.tripShapeService.clearRouteShapeLayers();
+            this.tripShapeService.clearRouteShapeLayers();
         } else if (routeIds.length > this.routeIds.size) {
             await this.addRouteShapes(routeIds);
         } else if (routeIds.length < this.routeIds.size) {
@@ -212,6 +220,7 @@ export class MapComponent implements OnInit {
     }
 
     private async addTripShape(agencyId: string, tripId: string, color: string): Promise<void> {
+        this.tripShapeService.hideStopShapeRemainingLayer();
         (await this.tripShapeService.createTripShapeLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
@@ -297,15 +306,19 @@ export class MapComponent implements OnInit {
 
 
     private async addTripsFromStop(agencyId: string, stopId: string): Promise<void> {
+        console.log('here');
         this.filterVehiclesFromTripIds = async (tripIds: string[]) => {
             this.tripIds = tripIds;
             await this.addVehiclesFromTrips(agencyId, tripIds);
         };
+
         (await this.tripShapeService.createStopShapesLayer(
             agencyId, stopId, this.filterVehiclesFromTripIds
         )).addTo(this.map);
 
-        if (!this.tripIds.length) this.tripShapeService.clearStopShapeLayer();
+        if (!this.tripIds.length) {
+            this.tripShapeService.clearStopShapeLayer();
+        }
     }
 
 

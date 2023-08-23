@@ -106,7 +106,8 @@ export class MainPageComponent implements AfterContentChecked {
     }
 
     hideVehicleInfoComponent() {
-        this.componentDisplayed = MapComponentDisplayed.None;
+        this.componentDisplayed = this.selections.stop ?
+            MapComponentDisplayed.StopInfo : MapComponentDisplayed.None;
         this.selections.vehicle = undefined;
     }
 }
