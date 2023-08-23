@@ -73,6 +73,7 @@ export class MapComponent implements OnInit {
     private agencyIds: string[] = [];
     private routeIds = new Set<string>();
     private stopIds = new Set<string>();
+    private tripIds: string[] = [];
 
     private options: MapRenderingOptions = {
         darkModeEnable: false,
@@ -90,6 +91,8 @@ export class MapComponent implements OnInit {
     private readonly centerMapOnLocation = (lat: number, lon: number) => {
         this.map.setView([lat, lon], LOCATION_CENTER_ZOOM);
     };
+
+    private filterVehiclesFromTripIds = (_: string[]) => {}
 
     private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
         this.newVehicleSelected.emit(vehicleId);
@@ -132,7 +135,9 @@ export class MapComponent implements OnInit {
 
 
     private async updateVehicles(): Promise<void> {
-        if (!this.routeIds.size) {
+        if (this.tripIds.length) {
+            this.filterVehiclesFromTripIds(this.tripIds);
+        } else if (!this.routeIds.size) {
             await this.addAllVehicles();
         } else {
             await this.addAllVehiclesFromRoutes();
@@ -150,6 +155,14 @@ export class MapComponent implements OnInit {
     private async addAllVehiclesFromRoutes(): Promise<void> {
         (await this.vehicleMarkerService.createRouteVehiclesLayer(
             [...this.routeIds], this.options, this.emitVehicleSelected
+        )).addTo(this.map);
+        if (!this.options.useVehicleClusters)
+            this.map.setZoom(this.map.getZoom());
+    }
+
+    private async addVehiclesFromTrips(agencyId: string, tripIds: string[]) {
+        (await this.vehicleMarkerService.createTripVehiclesLayer(
+            agencyId, tripIds, this.options, this.emitVehicleSelected
         )).addTo(this.map);
         if (!this.options.useVehicleClusters)
             this.map.setZoom(this.map.getZoom());
@@ -251,7 +264,7 @@ export class MapComponent implements OnInit {
     }
 
 
-    private async addSelectedStops(stopIds: StopId[]) {
+    private async addSelectedStops(stopIds: StopId[]): Promise<void> {
         let centerTheMap = false;
         if (stopIds.length > this.stopIds.size) {
             centerTheMap = true;
@@ -272,8 +285,14 @@ export class MapComponent implements OnInit {
     }
 
 
-    private addTripsFromStop(agencyId: string, stopId: string) {
-        
+    private async addTripsFromStop(agencyId: string, stopId: string): Promise<void> {
+        this.filterVehiclesFromTripIds = (tripIds: string[]) => {
+            this.tripIds = tripIds;
+            this.addVehiclesFromTrips(agencyId, tripIds);
+        };
+        (await this.tripShapeService.createStopShapesLayer(
+            agencyId, stopId, this.filterVehiclesFromTripIds
+        )).addTo(this.map);
     }
 
 

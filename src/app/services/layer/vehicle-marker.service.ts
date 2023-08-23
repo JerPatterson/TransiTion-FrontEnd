@@ -88,8 +88,24 @@ export class VehicleMarkerService {
                 routes.push(route);
             }
         }
-
         this.vehicleLayers.push(vehiclesLayer);
+        
+        return vehiclesLayer;
+    }
+
+    async createTripVehiclesLayer(
+        agencyId: string,
+        tripIds: string[],
+        options: MapRenderingOptions,
+        clickHandler: (v: VehicleId, rId: string, tId: string) => void,
+    ): Promise<L.LayerGroup> {
+        this.clearVehiclesLayer();
+        const vehiclesLayer = L.layerGroup();
+        if (!tripIds.length) return vehiclesLayer;
+
+        vehiclesLayer.addLayer(await this.buildTripVehiclesLayer(agencyId, tripIds, options, clickHandler));
+        this.vehicleLayers.push(vehiclesLayer);
+
         return vehiclesLayer;
     }
 
@@ -170,6 +186,38 @@ export class VehicleMarkerService {
                     const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, clickHandler);
                     if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
+            });
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
+            layerGroup.on('remove', () => this.markersCanvas.clear());
+        }
+
+        return layerGroup;
+    }
+
+    private async buildTripVehiclesLayer(
+        agencyId: string,
+        tripIds: string[], 
+        options: MapRenderingOptions,
+        clickHandler: (v: VehicleId, tId: string, c: string) => void,
+    ) : Promise<L.LayerGroup> {
+        console.log(tripIds);
+        let layerGroup: L.LayerGroup;
+        if (options.useVehicleClusters) {
+            layerGroup = await this.buildVehicleMarkerClusterGroup(
+                this.getBackgroundColor(agencyId), 
+                options.mergeAllVehicleClusters,
+            );
+
+            (await this.rtDataService.getVehiclesFromTripIds(agencyId, tripIds)).forEach(async vehicle => {
+                if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
+                const vehicleMarker = await this.buildVehicleMarkerCluster(agencyId, vehicle, clickHandler);
+                if (vehicleMarker) layerGroup.addLayer(vehicleMarker);
+            });
+        } else {
+            (await this.rtDataService.getVehiclesFromTripIds(agencyId, tripIds)).forEach(async vehicle => {
+                if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
+                const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, clickHandler);
+                if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
             });
             layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
             layerGroup.on('remove', () => this.markersCanvas.clear());

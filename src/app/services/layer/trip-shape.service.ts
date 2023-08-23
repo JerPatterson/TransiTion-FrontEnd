@@ -5,12 +5,14 @@ import { ShapeDto } from '@app/utils/dtos';
 import { DEFAULT_SHAPE_COLOR } from '@app/utils/constants';
 import { RouteId } from '@app/utils/component-interface';
 import { GeoJsonObject } from 'geojson';
+import { AGENCY_TO_STYLE } from '@app/utils/styles';
 
 @Injectable({
     providedIn: 'root'
 })
 export class TripShapeService {
-    private tripLayer = L.layerGroup();
+    private tripShapeLayer = L.layerGroup();
+    private stopShapeLayer = L.layerGroup();
 
     private currentRoutes = new Set<string>();
     private routeToRouteShapeLayer = new Map<string, L.GeoJSON>();
@@ -19,24 +21,49 @@ export class TripShapeService {
 
     async createTripShapeLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
         this.clearTripShapeLayer();
-        this.tripLayer = await this.buildTripShapeLayer(agencyId, tripId, color);
-        return this.tripLayer;
+        this.tripShapeLayer = await this.buildTripShapeLayer(agencyId, tripId, color);
+        return this.tripShapeLayer;
     }
 
     clearTripShapeLayer(): void {
-        this.tripLayer.remove();
-        this.tripLayer.clearLayers();
+        this.tripShapeLayer.remove();
+        this.tripShapeLayer.clearLayers();
+    }
+
+
+    async createStopShapesLayer(
+        agencyId: string,
+        stopId: string,
+        filterVehicles: (tIds: string[]) => void,
+    ): Promise<L.LayerGroup> {
+        this.clearTripShapeLayer();
+        this.clearStopShapeLayer();
+        const uniqueShapeIds = new Set<string>();
+        const trips = (await this.staticDataService.getTodayTripsFromStop(agencyId, stopId))
+            .filter((trip) => !this.currentRoutes.size || this.currentRoutes.has(trip.route_id));
+    
+        filterVehicles(trips.map((trip) => trip.trip_id));
+        trips.forEach((trip) => uniqueShapeIds.add(trip.shape_id));
+        this.stopShapeLayer = L.layerGroup(await this.buildStopShapes(agencyId, [...uniqueShapeIds]));
+
+        return this.stopShapeLayer;
+    }
+
+    clearStopShapeLayer(): void {
+        this.stopShapeLayer.remove();
+        this.stopShapeLayer.clearLayers();
     }
 
 
     async addRouteShapeLayer(routeIds: RouteId[]): Promise<L.LayerGroup> {
+        this.clearStopShapeLayer();
         return L.layerGroup(await Promise.all(
             routeIds
                 .filter((routeId) => 
                     !this.currentRoutes.has(`${routeId.agencyId}/${routeId.routeId}`)
                 ).map((routeId) => {
                     this.currentRoutes.add(`${routeId.agencyId}/${routeId.routeId}`);
-                    return this.buildRouteShapeLayer(routeId);
+                    return this.buildRouteShape(routeId);
                 })
             ),
             { pane: 'tripshape' },
@@ -44,6 +71,7 @@ export class TripShapeService {
     }
 
     async removeRouteShapeLayer(routeIds: RouteId[]): Promise<void> {
+        this.clearStopShapeLayer();
         const routes = new Set(routeIds
             .map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
         [...this.currentRoutes]
@@ -73,10 +101,24 @@ export class TripShapeService {
         return new L.GeoJSON(content, options);
     }
 
-    private async buildRouteShapeLayer(routeId: RouteId): Promise<L.GeoJSON> {
-        const tripLayer = await this.buildTripShapesLayer([routeId]);
-        this.routeToRouteShapeLayer.set(`${routeId.agencyId}/${routeId.routeId}`, tripLayer);
-        return tripLayer;
+
+    private async buildStopShapes(agencyId: string, shapeIds: string[]): Promise<L.GeoJSON[]> {
+        const shapes: L.GeoJSON[] = [];
+        const color = AGENCY_TO_STYLE.get(agencyId)?.backgroundColor;
+        const renderer = L.canvas({ pane: 'routeshapes' });
+        for (const shapeId of shapeIds) {
+            const shapePts = await this.staticDataService.getShapeById(agencyId, shapeId);
+            shapes.push(this.buildTripShape(shapePts, color ? color : DEFAULT_SHAPE_COLOR, renderer));
+        }
+
+        return shapes;
+    }
+
+
+    private async buildRouteShape(routeId: RouteId): Promise<L.GeoJSON> {
+        const tripShapeLayer = await this.buildTripShapesLayer([routeId]);
+        this.routeToRouteShapeLayer.set(`${routeId.agencyId}/${routeId.routeId}`, tripShapeLayer);
+        return tripShapeLayer;
     }
 
     private deleteRouteShapeLayer(route: string): void {
