@@ -132,7 +132,6 @@ export class StopMarkerService {
             previousColor = `#${route?.route_color}`;
         }
 
-        console.log(markers.length);
         return L.layerGroup(markers);
     }
 

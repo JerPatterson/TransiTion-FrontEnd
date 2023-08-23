@@ -99,6 +99,11 @@ export class StaticDataService {
         return response.json();
     }
 
+    async getTimesFromTrip(agencyId: string, tripId: string): Promise<TimeDto[]> {
+        const response = await fetch(`${SERVER_URL}/times/${agencyId}/${tripId}`);
+        return response.json();
+    }
+
     async getTimesFromStop(agencyId: string, stopId: string): Promise<TimeDto[]> {
         const response = await fetch(`${SERVER_URL}/times/stop/today/${agencyId}/${stopId}`);
         return response.json();

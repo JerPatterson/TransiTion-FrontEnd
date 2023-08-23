@@ -316,12 +316,12 @@ export class MapComponent implements OnInit {
         this.map.createPane('marker');
         (this.map.getPane('marker') as HTMLElement).style.zIndex = '398';
 
-        this.map.createPane('tripshape');
-        (this.map.getPane('tripshape') as HTMLElement).style.zIndex = '397';
+        this.map.createPane('shapeHighOpacity');
+        (this.map.getPane('shapeHighOpacity') as HTMLElement).style.zIndex = '397';
 
-        this.map.createPane('routeshapes');
-        (this.map.getPane('routeshapes') as HTMLElement).style.zIndex = '396';
-        (this.map.getPane('routeshapes') as HTMLElement).style.opacity = '0.5';
+        this.map.createPane('shapeLowOpacity');
+        (this.map.getPane('shapeLowOpacity') as HTMLElement).style.zIndex = '396';
+        (this.map.getPane('shapeLowOpacity') as HTMLElement).style.opacity = '0.5';
     }
 }
     

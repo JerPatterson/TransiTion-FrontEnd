@@ -200,7 +200,6 @@ export class VehicleMarkerService {
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, tId: string, c: string) => void,
     ) : Promise<L.LayerGroup> {
-        console.log(tripIds);
         let layerGroup: L.LayerGroup;
         if (options.useVehicleClusters) {
             layerGroup = await this.buildVehicleMarkerClusterGroup(

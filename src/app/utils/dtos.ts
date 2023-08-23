@@ -87,8 +87,8 @@ export interface TimeDto {
   shape_dist_traveled?: number;
   timepoint?: number;
   route_id?: string;
-  trip?: TripDto;
-  stop?: StopDto;
+  stop_lon: number;
+  stop_lat: number;
 }
 
 export interface ShapeDto {
@@ -97,7 +97,7 @@ export interface ShapeDto {
   shape_pt_lat: number;
   shape_pt_lon: number;
   shape_pt_sequence: number;
-  shape_dist_traveled?: number;
+  shape_dist_traveled: number;
 }
 
 export interface CalendarDto {

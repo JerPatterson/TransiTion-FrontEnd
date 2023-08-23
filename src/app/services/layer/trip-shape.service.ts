@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import L from 'leaflet';
 import { StaticDataService } from '@app/services/static/static-data.service';
-import { ShapeDto } from '@app/utils/dtos';
+import { ShapeDto, StopDto, TripDto } from '@app/utils/dtos';
 import { DEFAULT_SHAPE_COLOR } from '@app/utils/constants';
 import { RouteId } from '@app/utils/component-interface';
 import { GeoJsonObject } from 'geojson';
@@ -39,12 +39,21 @@ export class TripShapeService {
         this.clearTripShapeLayer();
         this.clearStopShapeLayer();
         const uniqueShapeIds = new Set<string>();
+        const uniqueTripByShapeIds: TripDto[] = [];
         const trips = (await this.staticDataService.getTodayTripsFromStop(agencyId, stopId))
             .filter((trip) => !this.currentRoutes.size || this.currentRoutes.has(trip.route_id));
     
         filterVehicles(trips.map((trip) => trip.trip_id));
-        trips.forEach((trip) => uniqueShapeIds.add(trip.shape_id));
-        this.stopShapeLayer = L.layerGroup(await this.buildStopShapes(agencyId, [...uniqueShapeIds]));
+        trips.forEach((trip) => {
+            if (!uniqueShapeIds.has(trip.shape_id)) {
+                uniqueShapeIds.add(trip.shape_id);
+                uniqueTripByShapeIds.push(trip);
+            }
+        });
+
+
+        this.stopShapeLayer = L.layerGroup((await this.buildStopShapes(agencyId, [...uniqueShapeIds]))
+            .concat(await this.buildStopShapesRemainingFromTrips(agencyId, stopId, [...uniqueTripByShapeIds])));
 
         return this.stopShapeLayer;
     }
@@ -66,7 +75,7 @@ export class TripShapeService {
                     return this.buildRouteShape(routeId);
                 })
             ),
-            { pane: 'tripshape' },
+            { pane: 'shapeHighOpacity' },
         ); 
     }
 
@@ -90,7 +99,7 @@ export class TripShapeService {
     private async buildTripShapeLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
         const trip = await this.staticDataService.getTripById(agencyId, tripId);
         const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
-        const renderer = L.canvas({ pane: 'tripshape' });
+        const renderer = L.canvas({ pane: 'shapeHighOpacity' });
         return L.layerGroup([this.buildTripShape(shapePts, color, renderer)]);
     }
 
@@ -105,10 +114,43 @@ export class TripShapeService {
     private async buildStopShapes(agencyId: string, shapeIds: string[]): Promise<L.GeoJSON[]> {
         const shapes: L.GeoJSON[] = [];
         const color = AGENCY_TO_STYLE.get(agencyId)?.backgroundColor;
-        const renderer = L.canvas({ pane: 'routeshapes' });
+        const renderer = L.canvas({ pane: 'shapeLowOpacity' });
         for (const shapeId of shapeIds) {
             const shapePts = await this.staticDataService.getShapeById(agencyId, shapeId);
             shapes.push(this.buildTripShape(shapePts, color ? color : DEFAULT_SHAPE_COLOR, renderer));
+        }
+
+        return shapes;
+    }
+
+    private async buildStopShapesRemainingFromTrips(
+        agencyId: string, stopId: string, trips: TripDto[]
+    ): Promise<L.GeoJSON[]> {
+        const shapes: L.GeoJSON[] = [];
+        const stop = await this.staticDataService.getStopById(agencyId, stopId);
+        const color = AGENCY_TO_STYLE.get(agencyId)?.backgroundColor;
+        const renderer = L.canvas({ pane: 'shapeHighOpacity' });
+        for (const trip of trips) {
+            let i = 0;
+            let stopDistTraveled = 0;
+            const times = await this.staticDataService.getTimesFromTrip(agencyId, trip.trip_id);
+            for (let time of times) {
+                if (time.stop_id === stopId || ++i === times.length) break;
+                stopDistTraveled += this.getDistanceBetweenCoordinates(
+                    time.stop_lat, time.stop_lon, times[i].stop_lat, times[i].stop_lon);
+            }
+
+            const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
+            const nearestPt = await this.getNearestPoint(shapePts, stop, stopDistTraveled);
+
+            if (!nearestPt) return shapes;
+            shapes.push(this.buildTripShape(
+                shapePts.filter((shapePt) =>
+                    shapePt.shape_pt_sequence >= nearestPt.shape_pt_sequence
+                        && shapePt.shape_dist_traveled >= stopDistTraveled),
+                color ? color : DEFAULT_SHAPE_COLOR,
+                renderer,
+            ));
         }
 
         return shapes;
@@ -131,7 +173,7 @@ export class TripShapeService {
     async buildTripShapesLayer(routeIds: RouteId[]): Promise<L.GeoJSON> {
         const shapeIds = new Set<string>();
         const shapeLayer = L.geoJSON([], { interactive: false });
-        const canvasRenderer = L.canvas({ pane: 'routeshapes' });
+        const canvasRenderer = L.canvas({ pane: 'shapeLowOpacity' });
 
         for (let routeId of routeIds) {
             const trips = await this.staticDataService.getTodayTripsFromRoute(routeId.agencyId, routeId.routeId);
@@ -151,5 +193,31 @@ export class TripShapeService {
     private async getShapeColor(agencyId: string, routeId: string): Promise<string> {
         const route = await this.staticDataService.getRouteById(agencyId, routeId);
         return route?.route_color ? `#${route.route_color}` : DEFAULT_SHAPE_COLOR;
+    }
+
+    private async getNearestPoint(
+        shapePts: ShapeDto[], stop: StopDto, stopDistTraveled: number
+    ): Promise<ShapeDto | undefined> {
+        return shapePts.map((shapePt) => {
+            return {
+                ...shapePt,
+                distFromStop: this.getSquareDistanceBetweenCoordinates(
+                    stop.stop_lat, stop.stop_lon, shapePt.shape_pt_lat, shapePt.shape_pt_lon),
+            };
+        }).sort((a, b) => {
+            return a.distFromStop - b.distFromStop;
+        }).find((shapePt) => {
+            return stopDistTraveled < shapePt.shape_dist_traveled;
+        });
+    }
+
+    private getDistanceBetweenCoordinates(aLat: number, aLon: number, bLat: number, bLon: number): number {
+        return Math.sqrt(this.getSquareDistanceBetweenCoordinates(aLat, aLon, bLat, bLon));
+    }
+
+    private getSquareDistanceBetweenCoordinates(aLat: number, aLon: number, bLat: number, bLon: number): number {
+        return Math.pow((aLat -bLat) * 110.574, 2)
+            + Math.pow((aLon - bLon) * 111.320 
+            * Math.cos((aLat + bLat) / 2 * Math.PI / 180), 2)
     }
 }
