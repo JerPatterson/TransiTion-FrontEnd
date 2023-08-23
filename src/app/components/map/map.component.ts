@@ -36,19 +36,21 @@ export class MapComponent implements OnInit {
 
 
     @Input() set agencies(values: string[]) {
-        this.updateAgencies(values).then(() => {
-            this.updateVehicles().then(() => {
+        this.updateAgencies(values)
+            .then(() => {
+                this.updateVehicles();
+            }).then(() => {
                 if (!this.stopIds.size) this.updateStops();
-            })
-        });
+            });
     };
 
     @Input() set routes(routeIds: RouteId[]) {
-        this.updateRoutes(routeIds).then(() => {
-            this.updateVehicles().then(() => {
+        this.updateRoutes(routeIds)
+            .then(() => {
+                this.updateVehicles();
+            }).then(() => {
                 if (!this.stopIds.size) this.updateStops();
-            })
-        });
+            });
     };
 
     @Input() set stops(stopIds: StopId[]) {
@@ -56,11 +58,20 @@ export class MapComponent implements OnInit {
     };
 
     @Input() set vehicle(value: VehicleId | null | undefined) {
-        if (!value) {
-            this.stopMarkerService.clearTripStopsLayer();
-            this.tripShapeService.clearTripShapeLayer();
-            if (!this.stopIds.size) this.updateStops();
-        }
+        if (value) return;
+        this.stopMarkerService.clearTripStopsLayer();
+        this.tripShapeService.clearTripShapeLayer();
+        if (!this.stopIds.size) this.updateStops();
+    }
+
+    @Input() set stop(value: StopId | null | undefined) {
+        if (value) return;
+        this.tripIds = [];
+        this.tripShapeService.clearStopShapeLayer();
+        this.updateVehicles()
+            .then(() => {
+                if (!this.stopIds.size) this.updateStops();
+            });
     }
 
     @Output() newVehicleSelected = new EventEmitter<VehicleId>();
@@ -92,7 +103,7 @@ export class MapComponent implements OnInit {
         this.map.setView([lat, lon], LOCATION_CENTER_ZOOM);
     };
 
-    private filterVehiclesFromTripIds = (_: string[]) => {}
+    private filterVehiclesFromTripIds = async (_: string[]) => {}
 
     private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
         this.newVehicleSelected.emit(vehicleId);
@@ -286,13 +297,15 @@ export class MapComponent implements OnInit {
 
 
     private async addTripsFromStop(agencyId: string, stopId: string): Promise<void> {
-        this.filterVehiclesFromTripIds = (tripIds: string[]) => {
+        this.filterVehiclesFromTripIds = async (tripIds: string[]) => {
             this.tripIds = tripIds;
-            this.addVehiclesFromTrips(agencyId, tripIds);
+            await this.addVehiclesFromTrips(agencyId, tripIds);
         };
         (await this.tripShapeService.createStopShapesLayer(
             agencyId, stopId, this.filterVehiclesFromTripIds
         )).addTo(this.map);
+
+        if (!this.tripIds.length) this.tripShapeService.clearStopShapeLayer();
     }
 
 

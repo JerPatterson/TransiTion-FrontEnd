@@ -34,7 +34,7 @@ export class TripShapeService {
     async createStopShapesLayer(
         agencyId: string,
         stopId: string,
-        filterVehicles: (tIds: string[]) => void,
+        filterVehicles: (tIds: string[]) => Promise<void>,
     ): Promise<L.LayerGroup> {
         this.clearTripShapeLayer();
         this.clearStopShapeLayer();
@@ -43,7 +43,7 @@ export class TripShapeService {
         const trips = (await this.staticDataService.getTodayTripsFromStop(agencyId, stopId))
             .filter((trip) => !this.currentRoutes.size || this.currentRoutes.has(trip.route_id));
     
-        filterVehicles(trips.map((trip) => trip.trip_id));
+        await filterVehicles(trips.map((trip) => trip.trip_id));
         trips.forEach((trip) => {
             if (!uniqueShapeIds.has(trip.shape_id)) {
                 uniqueShapeIds.add(trip.shape_id);
