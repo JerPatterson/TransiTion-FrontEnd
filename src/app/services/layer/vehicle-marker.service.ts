@@ -36,7 +36,9 @@ import { MapRenderingOptions, VehicleId } from '@app/utils/component-interface';
     providedIn: 'root'
 })
 export class VehicleMarkerService {
-    private vehicleLayers: L.LayerGroup[] = [];
+    private layerGroup = new L.LayerGroup();
+    private layerIdsByAgencyId = new Map<string, number[]>();
+
     private markersCanvas = new L.MarkersCanvas();
 
     constructor(
@@ -44,88 +46,106 @@ export class VehicleMarkerService {
         private rtDataService: RealtimeDataService,
     ) {}
 
-    async createVehiclesLayer(
+    get vehicleLayer() {
+        return this.layerGroup;
+    }
+
+    async updateLayerFromAgencies(
         agencyIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
-    ): Promise<L.LayerGroup> {
-        this.clearVehiclesLayer();
-        const vehiclesLayer = L.layerGroup();
-        if (options.mergeAllVehicleClusters) {
-            vehiclesLayer.addLayer(await this.buildVehiclesLayer(agencyIds, options, clickHandler));
-        } else {
-            agencyIds.forEach(async (agencyId) => {
-                vehiclesLayer.addLayer(await this.buildVehiclesLayer([agencyId], options, clickHandler));
-            });
-        }
-
-        this.vehicleLayers.push(vehiclesLayer);
-        return vehiclesLayer;
+    ): Promise<void> {
+        this.resetLayerGroup();
+        await this.addToLayerFromAgencies(
+            agencyIds, options, clickHandler);
     }
 
-    async createRouteVehiclesLayer(
+    async addToLayerFromAgencies(
+        agencyIds: string[],
+        options: MapRenderingOptions,
+        clickHandler: (v: VehicleId, rId: string, tId: string) => void,
+    ): Promise<void> {
+        if (options.mergeAllVehicleClusters) {
+            this.layerGroup.addLayer(
+                await this.buildLayerFromAgencies(agencyIds, options, clickHandler));
+        } else {
+            agencyIds.forEach(async (agencyId) => {
+                const layer = await this.buildLayerFromAgencies([agencyId], options, clickHandler);
+                this.layerGroup.addLayer(layer);
+                this.addLayerIdToAgency(agencyId, this.layerGroup.getLayerId(layer));
+            });
+        }
+    }
+
+    removeOfLayerFromAgencies(agencyIds: string[]): void {
+        agencyIds.forEach((agencyId) => {
+            this.layerIdsByAgencyId.get(agencyId)?.forEach((layerId) => 
+                this.layerGroup.removeLayer(layerId));
+            this.layerIdsByAgencyId.delete(agencyId);
+        });
+    }
+
+    async updateLayerFromRoutes(
         routeIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
-    ): Promise<L.LayerGroup> {
-        this.clearVehiclesLayer();
-        const vehiclesLayer = L.layerGroup();
-        if (!routeIds.length) return vehiclesLayer;
-        const routesIdsSorted = routeIds.sort((a, b) => a.localeCompare(b));
+    ): Promise<void> {
+        this.resetLayerGroup();
+        if (!routeIds.length) return;
+        const routesSorted = routeIds.sort((a, b) => a.localeCompare(b));
 
         if (options.mergeAllVehicleClusters) {
-            vehiclesLayer.addLayer(await this.buildRouteVehiclesLayer(routesIdsSorted, options, clickHandler));
+            this.layerGroup.addLayer(await this.buildLayerFromRoutes(routesSorted, options, clickHandler));
         } else {
             let routes: string[] = [];
-            let currentAgencyId = routesIdsSorted[0].split(PARAM_SEPARATOR)[0];
-            for (let route of routesIdsSorted.concat([PARAM_SEPARATOR])) {
+            let currentAgencyId = routesSorted[0].split(PARAM_SEPARATOR)[0];
+            for (let route of routesSorted.concat([PARAM_SEPARATOR])) {
                 const agencyId = route.split(PARAM_SEPARATOR)[0];
                 if (agencyId !== currentAgencyId) {
-                    vehiclesLayer.addLayer(await this.buildRouteVehiclesLayer(routes, options, clickHandler));
+                    const layer = await this.buildLayerFromRoutes(routes, options, clickHandler);
+                    this.layerGroup.addLayer(layer);
+                    this.addLayerIdToAgency(agencyId, this.layerGroup.getLayerId(layer));
                     currentAgencyId = agencyId;
                     routes = [];
                 }
                 routes.push(route);
             }
         }
-        this.vehicleLayers.push(vehiclesLayer);
-        
-        return vehiclesLayer;
     }
 
-    async createTripVehiclesLayer(
+    async updateLayerFromTrips(
         agencyId: string,
         tripIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
-    ): Promise<L.LayerGroup> {
-        this.clearVehiclesLayer();
-        const vehiclesLayer = L.layerGroup();
-        if (!tripIds.length) return vehiclesLayer;
-
-        vehiclesLayer.addLayer(await this.buildTripVehiclesLayer(agencyId, tripIds, options, clickHandler));
-        this.vehicleLayers.push(vehiclesLayer);
-
-        return vehiclesLayer;
-    }
-
-    clearVehiclesLayer(): void {
-        this.vehicleLayers.forEach((layer) => {
-            layer.remove();
-            layer.clearLayers();
-        });
-        this.vehicleLayers = [];
+    ): Promise<void> {
+        this.resetLayerGroup();
+        const layer = await this.buildLayerFromTrips(agencyId, tripIds, options, clickHandler);
+        this.layerGroup.addLayer(layer);
+        this.addLayerIdToAgency(agencyId, this.layerGroup.getLayerId(layer)); 
     }
 
 
-    private async buildVehiclesLayer(
+    resetLayerGroup(): void {
+        this.layerGroup.clearLayers();
+        this.layerIdsByAgencyId.clear();
+    }
+
+
+    private addLayerIdToAgency(agencyId: string, layerId: number): void {
+        let layerIds = this.layerIdsByAgencyId.get(agencyId);
+        layerIds ? layerIds.push(layerId) : this.layerIdsByAgencyId.set(agencyId, [layerId]);
+    }
+
+
+    private async buildLayerFromAgencies(
         agencyIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         if (options.useVehicleClusters) {
-            layerGroup = await this.buildVehicleMarkerClusterGroup(
+            layerGroup = await this.buildMarkerClusterGroup(
                 agencyIds.length === 1 ? 
                     this.getBackgroundColor(agencyIds[0]) : DEFAULT_BACKGROUND_COLOR, 
                 options.mergeAllVehicleClusters,
@@ -134,7 +154,7 @@ export class VehicleMarkerService {
             agencyIds.map(async (agencyId) => {
                 (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
                     if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
-                    const vehicleMarker = await this.buildVehicleMarkerCluster(agencyId, vehicle, clickHandler);
+                    const vehicleMarker = await this.buildMarkerCluster(agencyId, vehicle, clickHandler);
                     if (vehicleMarker) layerGroup.addLayer(vehicleMarker);
                 });
             });
@@ -142,18 +162,18 @@ export class VehicleMarkerService {
             agencyIds.map(async (agencyId) => {
                 (await this.rtDataService.getVehiclesFromAgency(agencyId)).forEach(async vehicle => {
                     if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
-                    const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, clickHandler);
+                    const vehicleMarker = await this.buildMarkerCanvas(agencyId, vehicle, clickHandler);
                     if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
                 });
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'clickableMarker' });
-            layerGroup.on('remove', () => this.markersCanvas.clear());
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' })
+                .on('remove', () => this.markersCanvas.clear());
         }
 
         return layerGroup;
     }
 
-    private async buildRouteVehiclesLayer(
+    private async buildLayerFromRoutes(
         routes: string[], 
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, tId: string, c: string) => void,
@@ -162,7 +182,7 @@ export class VehicleMarkerService {
         const firstRouteAgencyId = routes[0].split(PARAM_SEPARATOR)[0];
         const lastRouteAgencyId = routes[routes.length - 1].split(PARAM_SEPARATOR)[0];
         if (options.useVehicleClusters) {
-            layerGroup = await this.buildVehicleMarkerClusterGroup(
+            layerGroup = await this.buildMarkerClusterGroup(
                 firstRouteAgencyId === lastRouteAgencyId ? 
                     this.getBackgroundColor(firstRouteAgencyId) : DEFAULT_BACKGROUND_COLOR, 
                 options.mergeAllVehicleClusters,
@@ -173,7 +193,7 @@ export class VehicleMarkerService {
                 const routeId = route.split(PARAM_SEPARATOR)[1];
                 (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
                     if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
-                    const vehicleMarker = await this.buildVehicleMarkerCluster(agencyId, vehicle, clickHandler);
+                    const vehicleMarker = await this.buildMarkerCluster(agencyId, vehicle, clickHandler);
                     if (vehicleMarker) layerGroup.addLayer(vehicleMarker);
                 });
             });
@@ -183,18 +203,20 @@ export class VehicleMarkerService {
                 const routeId = route.split(PARAM_SEPARATOR)[1];
                 (await this.rtDataService.getVehiclesFromRoute(agencyId, routeId)).forEach(async vehicle => {
                     if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
-                    const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, clickHandler);
-                    if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
+                    const vehicleMarker = await this.buildMarkerCanvas(agencyId, vehicle, clickHandler);
+                    if (!vehicleMarker) return;
+                    this.markersCanvas.addMarker(vehicleMarker);
+                    this.addLayerIdToAgency(agencyId, layerGroup.getLayerId(vehicleMarker));
                 });
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
-            layerGroup.on('remove', () => this.markersCanvas.clear());
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' })
+                .on('remove', () => this.markersCanvas.clear());
         }
 
         return layerGroup;
     }
 
-    private async buildTripVehiclesLayer(
+    private async buildLayerFromTrips(
         agencyId: string,
         tripIds: string[], 
         options: MapRenderingOptions,
@@ -202,31 +224,33 @@ export class VehicleMarkerService {
     ) : Promise<L.LayerGroup> {
         let layerGroup: L.LayerGroup;
         if (options.useVehicleClusters) {
-            layerGroup = await this.buildVehicleMarkerClusterGroup(
+            layerGroup = await this.buildMarkerClusterGroup(
                 this.getBackgroundColor(agencyId), 
                 options.mergeAllVehicleClusters,
             );
 
             (await this.rtDataService.getVehiclesFromTripIds(agencyId, tripIds)).forEach(async vehicle => {
                 if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
-                const vehicleMarker = await this.buildVehicleMarkerCluster(agencyId, vehicle, clickHandler);
-                if (vehicleMarker) layerGroup.addLayer(vehicleMarker);
+                const vehicleMarker = await this.buildMarkerCluster(agencyId, vehicle, clickHandler);
+                if (!vehicleMarker) return;
+                layerGroup.addLayer(vehicleMarker);
+                this.addLayerIdToAgency(agencyId, layerGroup.getLayerId(vehicleMarker));
             });
         } else {
             (await this.rtDataService.getVehiclesFromTripIds(agencyId, tripIds)).forEach(async vehicle => {
                 if (!options.showOldVehicles && this.wasSeenLongAgo(vehicle.timestamp as number)) return;
-                const vehicleMarker = await this.buildVehicleMarkerCanvas(agencyId, vehicle, clickHandler);
+                const vehicleMarker = await this.buildMarkerCanvas(agencyId, vehicle, clickHandler);
                 if (vehicleMarker) this.markersCanvas.addMarker(vehicleMarker);
             });
-            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' });
-            layerGroup.on('remove', () => this.markersCanvas.clear());
+            layerGroup = L.layerGroup([this.markersCanvas], { pane: 'marker' })
+                .on('remove', () => this.markersCanvas.clear());
         }
 
         return layerGroup;
     }
 
 
-    private async buildVehicleMarkerClusterGroup(
+    private async buildMarkerClusterGroup(
         color: string, 
         clusteringAtMaxZoom: boolean
     ): Promise<L.MarkerClusterGroup> {
@@ -250,16 +274,16 @@ export class VehicleMarkerService {
         });
     }
 
-    private async buildVehicleMarkerCluster(
+    private async buildMarkerCluster(
         agencyId: string,
         vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
         emitMarkerClicked: (v: VehicleId, rId: string, tId: string) => void,
     ) : Promise<L.Marker | undefined> {
         if (!vehicle.position) return;
-        const marker = L.marker(
+        return L.marker(
                 [vehicle.position.latitude, vehicle.position.longitude], 
                 { 
-                    icon: await this.buildVehicleIconCluster(
+                    icon: await this.buildIconCluster(
                         agencyId,
                         vehicle.trip?.routeId,
                         vehicle.position.bearing,
@@ -274,11 +298,9 @@ export class VehicleMarkerService {
                     await this.getRouteColor(agencyId, vehicle.trip?.routeId),
                 ),
             );
-    
-        return marker;
     }
 
-    private async buildVehicleIconCluster(
+    private async buildIconCluster(
         agencyId: string,
         routeId?: string | null,
         bearing?: number | null,
@@ -310,7 +332,7 @@ export class VehicleMarkerService {
     }
 
 
-    private async buildVehicleMarkerCanvas(
+    private async buildMarkerCanvas(
         agencyId: string,
         vehicle: GtfsRealtimeBindings.transit_realtime.IVehiclePosition,
         emitMarkerClicked: (v: VehicleId, rId: string, tId: string) => void,
@@ -319,7 +341,7 @@ export class VehicleMarkerService {
         const marker = L.marker(
                 [vehicle.position.latitude, vehicle.position.longitude], 
                 { 
-                    icon: await this.buildVehicleIconCanvas(
+                    icon: await this.buildIconCanvas(
                         agencyId,
                         vehicle.trip?.routeId,
                         vehicle.position.bearing,
@@ -338,7 +360,7 @@ export class VehicleMarkerService {
         return marker;
     }
 
-    private async buildVehicleIconCanvas(
+    private async buildIconCanvas(
         agencyId: string,
         routeId?: string | null,
         bearing?: number | null,

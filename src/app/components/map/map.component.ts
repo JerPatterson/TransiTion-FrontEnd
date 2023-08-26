@@ -44,25 +44,16 @@ export class MapComponent implements OnInit {
 
 
     @Input() set agencies(values: string[]) {
-        if (!this.map) return;
-        this.filterTripIds = [];
-        this.filterStopIds = [];
-        this.updateAgencies(values)
-            .then(() => {
-                this.updateVehicles();
-            }).then(() => {
-                if (!this.stopIds.size) this.updateStops();
-            });
+        const agencyIdsAdded = values.filter((value) => !this.agencyIds.has(value));
+        const agencyIdsRemoved = [...this.agencyIds].filter((value) => !values.includes(value));
+        this.updateAgencies(agencyIdsAdded, agencyIdsRemoved);
     };
 
     @Input() set routes(routeIds: RouteId[]) {
         if (!this.map) return;
         this.filterTripIds = [];
         this.filterStopIds = [];
-        this.updateRoutes(routeIds)
-            .then(() => {
-                this.updateVehicles();
-            }).then(() => {
+        this.updateRoutes(routeIds).then(() => {
                 if (!this.stopIds.size) this.updateStops();
             });
     };
@@ -100,9 +91,10 @@ export class MapComponent implements OnInit {
     private stopsLayer?: L.LayerGroup;
     private tripStopsLayer?: L.LayerGroup;
 
-    private agencyIds: string[] = [];
+    private agencyIds = new Set<string>();
     private routeIds = new Set<string>();
     private stopIds = new Set<string>();
+
     private filterTripIds: string[] = [];
     private filterStopIds: string[] = [];
 
@@ -141,6 +133,8 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
+
+        this.vehicleMarkerService.vehicleLayer.addTo(this.map);
         setInterval(() => this.updateVehicles(), 30 * ONE_SEC_IN_MS);
     }
     
@@ -162,8 +156,14 @@ export class MapComponent implements OnInit {
     }
 
 
-    private async updateAgencies(agencyIds: string[]): Promise<void> {
-        this.agencyIds = agencyIds;
+    private async updateAgencies(agencyIdsAdded: string[], agencyIdsRemoved: string[]): Promise<void> {
+        agencyIdsAdded.forEach((agencyId) => this.agencyIds.add(agencyId));
+        agencyIdsRemoved.forEach((agencyId) => this.agencyIds.delete(agencyId));
+        if (!this.map) return;
+        if (!this.routeIds.size && !this.filterTripIds.length)
+            await this.vehicleMarkerService.addToLayerFromAgencies(
+                agencyIdsAdded, this.options, this.emitVehicleSelected);
+        this.vehicleMarkerService.removeOfLayerFromAgencies(agencyIdsRemoved);
     }
 
 
@@ -178,25 +178,23 @@ export class MapComponent implements OnInit {
     }
 
     private async addAllVehicles(): Promise<void> {
-        (await this.vehicleMarkerService.createVehiclesLayer(
-            this.agencyIds, this.options, this.emitVehicleSelected
-        )).addTo(this.map);
+        await this.vehicleMarkerService.updateLayerFromAgencies(
+            [...this.agencyIds], this.options, this.emitVehicleSelected);
         if (!this.options.useVehicleClusters)
             this.map.setZoom(this.map.getZoom());
     }
 
     private async addAllVehiclesFromRoutes(): Promise<void> {
-        (await this.vehicleMarkerService.createRouteVehiclesLayer(
-            [...this.routeIds], this.options, this.emitVehicleSelected
-        )).addTo(this.map);
+        await this.vehicleMarkerService.updateLayerFromRoutes(
+            [...this.routeIds], this.options, this.emitVehicleSelected);
         if (!this.options.useVehicleClusters)
             this.map.setZoom(this.map.getZoom());
     }
 
     private async addVehiclesFromTrips(agencyId: string, tripIds: string[]) {
-        (await this.vehicleMarkerService.createTripVehiclesLayer(
+        (await this.vehicleMarkerService.updateLayerFromTrips(
             agencyId, tripIds, this.options, this.emitVehicleSelected
-        )).addTo(this.map);
+        ));
         if (!this.options.useVehicleClusters)
             this.map.setZoom(this.map.getZoom());
     }
@@ -286,8 +284,10 @@ export class MapComponent implements OnInit {
 
     private async addAllStops(): Promise<void> {
         if (this.stopsLayer) this.map.removeLayer(this.stopsLayer);
+        this.stopMarkerService.clearStopsLayer();
+        if (this.agencyIds.size > 1) return;
         this.stopsLayer = (await this.stopMarkerService.createAllStopsLayer(
-            this.agencyIds,
+            [...this.agencyIds],
             this.emitStopSelected,
         ));
     }

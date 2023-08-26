@@ -105,6 +105,7 @@ export class VehicleInfoComponent implements OnChanges, OnDestroy {
 
     private async setTrip(agencyId: string, tripId: string) {
         try {
+            if (this.attributes.trip?.trip_id === tripId) return;
             this.attributes.trip = await this.stDataService.getTripById(agencyId, tripId);
         } catch {
             this.attributes.trip = undefined;
