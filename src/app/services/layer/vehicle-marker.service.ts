@@ -56,7 +56,7 @@ export class VehicleMarkerService {
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<void> {
-        this.resetLayerGroup();
+        this.clearLayerGroup();
         await this.addAgencies(agencyIds, options, clickHandler);
     }
 
@@ -90,16 +90,16 @@ export class VehicleMarkerService {
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<void> {
-        this.resetLayerGroup();
+        this.clearLayerGroup();
         if (!routeIds.length) return;
-        const routesSorted = routeIds.sort((a, b) => a.localeCompare(b));
+        const routeIdsSorted = routeIds.sort((a, b) => a.localeCompare(b));
 
         if (options.mergeAllVehicleClusters) {
-            this.layerGroup.addLayer(await this.buildLayerFromRoutes(routesSorted, options, clickHandler));
+            this.layerGroup.addLayer(await this.buildLayerFromRoutes(routeIdsSorted, options, clickHandler));
         } else {
             let routeIdsFromAgency: string[] = [];
-            let currentAgencyId = routesSorted[0].split(PARAM_SEPARATOR)[0];
-            for (let routeId of routesSorted.concat([PARAM_SEPARATOR])) {
+            let currentAgencyId = routeIdsSorted[0].split(PARAM_SEPARATOR)[0];
+            for (let routeId of routeIdsSorted.concat([PARAM_SEPARATOR])) {
                 const agencyId = routeId.split(PARAM_SEPARATOR)[0];
                 if (agencyId !== currentAgencyId) {
                     const layer = await this.buildLayerFromRoutes(routeIdsFromAgency, options, clickHandler);
@@ -120,18 +120,17 @@ export class VehicleMarkerService {
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<void> {
-        this.resetLayerGroup();
+        this.clearLayerGroup();
         const layer = await this.buildLayerFromTrips(agencyId, tripIds, options, clickHandler);
         this.layerGroup.addLayer(layer);
         this.addLayerIdToAgency(agencyId, this.layerGroup.getLayerId(layer)); 
     }
 
 
-    resetLayerGroup(): void {
+    private clearLayerGroup(): void {
         this.layerGroup.clearLayers();
         this.layerIdsByAgencyId.clear();
     }
-
 
     private addLayerIdToAgency(agencyId: string, layerId: number): void {
         let layerIds = this.layerIdsByAgencyId.get(agencyId);

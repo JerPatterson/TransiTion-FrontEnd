@@ -81,7 +81,7 @@ export class MapComponent implements OnInit {
         if (value || !this.map) return;
         this.filterTripIds = [];
         this.filterStopIds = [];
-        this.tripShapeService.clearStopLayer();
+        this.tripShapeService.clearStopLayers();
         this.updateVehicles()
             .then(() => {
                 if (!this.stopIds.size) this.updateStops();
@@ -196,9 +196,11 @@ export class MapComponent implements OnInit {
     private async updateRoutes(routeIdsAdded: RouteId[], routeIdsRemoved: RouteId[]): Promise<void> {
         routeIdsAdded.forEach((routeId) => this.routeIds.add(`${routeId.agencyId}/${routeId.routeId}`));
         routeIdsRemoved.forEach((routeId) => this.routeIds.delete(`${routeId.agencyId}/${routeId.routeId}`));
+    
         if (!this.map) return;
-        await this.updateVehicles();
         this.tripShapeService.removeRoutes(routeIdsRemoved);
+        
+        await this.updateVehicles();
         await this.tripShapeService.addRoutes(routeIdsAdded);
     }
 
