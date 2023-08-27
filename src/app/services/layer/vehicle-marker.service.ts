@@ -37,10 +37,9 @@ import { MapRenderingOptions, VehicleId } from '@app/utils/component-interface';
 })
 export class VehicleMarkerService {
     private layerGroup = new L.LayerGroup();
-
+    private markersCanvas = new L.MarkersCanvas();
     private layerIdsByAgencyId = new Map<string, number[]>();
 
-    private markersCanvas = new L.MarkersCanvas();
 
     constructor(
         private stDataService: StaticDataService,
