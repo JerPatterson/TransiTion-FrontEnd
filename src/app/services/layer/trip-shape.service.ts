@@ -113,7 +113,6 @@ export class TripShapeService {
             const layer = await this.buildRouteShape(routeId);
             this.routeLayerGroup.addLayer(layer);
             const layerId = this.routeLayerGroup.getLayerId(layer);
-            this.addLayerIdToAgency(routeId.agencyId, layerId);
             this.addLayerIdToRoute(`${routeId.agencyId}/${routeId.routeId}`, layerId);
         });
     }

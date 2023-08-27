@@ -37,6 +37,7 @@ import { MapRenderingOptions, VehicleId } from '@app/utils/component-interface';
 })
 export class VehicleMarkerService {
     private layerGroup = new L.LayerGroup();
+
     private layerIdsByAgencyId = new Map<string, number[]>();
 
     private markersCanvas = new L.MarkersCanvas();
@@ -56,11 +57,10 @@ export class VehicleMarkerService {
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<void> {
         this.resetLayerGroup();
-        await this.addFromAgencies(
-            agencyIds, options, clickHandler);
+        await this.addAgencies(agencyIds, options, clickHandler);
     }
 
-    async addFromAgencies(
+    async addAgencies(
         agencyIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
@@ -77,7 +77,7 @@ export class VehicleMarkerService {
         }
     }
 
-    removeFromAgencies(agencyIds: string[]): void {
+    removeAgencies(agencyIds: string[]): void {
         agencyIds.forEach((agencyId) => {
             this.layerIdsByAgencyId.get(agencyId)?.forEach((layerId) => 
                 this.layerGroup.removeLayer(layerId));
@@ -97,18 +97,19 @@ export class VehicleMarkerService {
         if (options.mergeAllVehicleClusters) {
             this.layerGroup.addLayer(await this.buildLayerFromRoutes(routesSorted, options, clickHandler));
         } else {
-            let routes: string[] = [];
+            let routeIdsFromAgency: string[] = [];
             let currentAgencyId = routesSorted[0].split(PARAM_SEPARATOR)[0];
-            for (let route of routesSorted.concat([PARAM_SEPARATOR])) {
-                const agencyId = route.split(PARAM_SEPARATOR)[0];
+            for (let routeId of routesSorted.concat([PARAM_SEPARATOR])) {
+                const agencyId = routeId.split(PARAM_SEPARATOR)[0];
                 if (agencyId !== currentAgencyId) {
-                    const layer = await this.buildLayerFromRoutes(routes, options, clickHandler);
+                    const layer = await this.buildLayerFromRoutes(routeIdsFromAgency, options, clickHandler);
                     this.layerGroup.addLayer(layer);
-                    this.addLayerIdToAgency(agencyId, this.layerGroup.getLayerId(layer));
+                    const layerId = this.layerGroup.getLayerId(layer);
+                    this.addLayerIdToAgency(agencyId, layerId);
                     currentAgencyId = agencyId;
-                    routes = [];
+                    routeIdsFromAgency = [];
                 }
-                routes.push(route);
+                routeIdsFromAgency.push(routeId);
             }
         }
     }
