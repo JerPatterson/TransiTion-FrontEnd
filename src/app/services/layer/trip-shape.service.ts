@@ -18,7 +18,18 @@ export class TripShapeService {
     private currentRoutes = new Set<string>();
     private routeToRouteShapeLayer = new Map<string, L.GeoJSON>();
 
-    constructor(private staticDataService: StaticDataService) {}
+    private routeLayerGroup = new L.LayerGroup();
+
+    private layerIdsByRouteId = new Map<string, number[]>();
+
+
+    constructor(private stDataService: StaticDataService) {}
+
+
+    get routeLayer() {
+        return this.routeLayerGroup;
+    }
+
 
     async createTripShapeLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
         this.clearTripShapeLayer();
@@ -42,7 +53,7 @@ export class TripShapeService {
         this.clearStopShapeLayer();
         const uniqueShapeIds = new Set<string>();
         const uniqueTripByShapeIds: TripDto[] = [];
-        const trips = (await this.staticDataService.getTodayTripsFromStop(agencyId, stopId))
+        const trips = (await this.stDataService.getTodayTripsFromStop(agencyId, stopId))
             .filter((trip) => !this.currentRoutes.size || this.currentRoutes.has(trip.route_id));
     
         await filterVehicles(trips.map((trip) => trip.trip_id));
@@ -80,29 +91,24 @@ export class TripShapeService {
     }
 
 
-    async addRouteShapeLayer(routeIds: RouteId[]): Promise<L.LayerGroup> {
+    async addRoutes(routeIds: RouteId[]): Promise<void> {
         this.clearStopShapeLayer();
-        return L.layerGroup(await Promise.all(
-            routeIds
-                .filter((routeId) => 
-                    !this.currentRoutes.has(`${routeId.agencyId}/${routeId.routeId}`)
-                ).map((routeId) => {
-                    this.currentRoutes.add(`${routeId.agencyId}/${routeId.routeId}`);
-                    return this.buildRouteShape(routeId);
-                })
-            ),
-            { pane: 'shapeHighOpacity' },
-        ); 
+        routeIds.forEach(async (routeId) => {
+            const layer = await this.buildRouteShape(routeId);
+            this.routeLayerGroup.addLayer(layer);
+            const layerId = this.routeLayerGroup.getLayerId(layer);
+            this.addLayerIdToRoute(`${routeId.agencyId}/${routeId.routeId}`, layerId);
+        });
     }
 
-    async removeRouteShapeLayer(routeIds: RouteId[]): Promise<void> {
+    async removeRoutes(routeIds: RouteId[]): Promise<void> {
         this.clearStopShapeLayer();
-        const routes = new Set(routeIds
-            .map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
-        [...this.currentRoutes]
-            .filter((route) => !routes.has(route))
-            .forEach((removedRoute) => this.deleteRouteShapeLayer(removedRoute));
-        this.currentRoutes = routes;
+        routeIds.forEach((routeId) => {
+            this.layerIdsByRouteId.get(`${routeId.agencyId}/${routeId.routeId}`)?.forEach((layerId) => {
+                this.routeLayerGroup.removeLayer(layerId);
+            });
+            this.layerIdsByRouteId.delete(`${routeId.agencyId}/${routeId.routeId}`);
+        })
     }
 
     clearRouteShapeLayers() {
@@ -112,9 +118,16 @@ export class TripShapeService {
     }
 
 
+    private addLayerIdToRoute(routeId: string, layerId: number): void {
+        let layerIds = this.layerIdsByRouteId.get(routeId);
+        layerIds ? layerIds.push(layerId) : this.layerIdsByRouteId.set(routeId, [layerId]);
+    }
+
+
+
     private async buildTripShapeLayer(agencyId: string, tripId: string, color: string): Promise<L.LayerGroup> {
-        const trip = await this.staticDataService.getTripById(agencyId, tripId);
-        const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
+        const trip = await this.stDataService.getTripById(agencyId, tripId);
+        const shapePts = await this.stDataService.getShapeById(agencyId, trip.shape_id);
         const renderer = L.canvas({ pane: 'shapeHighOpacity' });
         return L.layerGroup([this.buildTripShape(shapePts, color, renderer)]);
     }
@@ -132,7 +145,7 @@ export class TripShapeService {
         const color = AGENCY_TO_STYLE.get(agencyId)?.backgroundColor;
         const renderer = L.canvas({ pane: 'shapeLowOpacity' });
         for (const shapeId of shapeIds) {
-            const shapePts = await this.staticDataService.getShapeById(agencyId, shapeId);
+            const shapePts = await this.stDataService.getShapeById(agencyId, shapeId);
             shapes.push(this.buildTripShape(shapePts, color ? color : DEFAULT_SHAPE_COLOR, renderer));
         }
 
@@ -146,13 +159,13 @@ export class TripShapeService {
         filterStops: (sIds: string[]) => Promise<void>,
     ): Promise<L.GeoJSON[]> {
         const shapes: L.GeoJSON[] = [];
-        const stop = await this.staticDataService.getStopById(agencyId, stopId);
+        const stop = await this.stDataService.getStopById(agencyId, stopId);
         const color = AGENCY_TO_STYLE.get(agencyId)?.backgroundColor;
         const renderer = L.canvas({ pane: 'shapeHighOpacity' });
         for (const trip of trips) {
             let i = 0;
             let stopDistTraveled = 0;
-            const times = await this.staticDataService.getTimesFromTrip(agencyId, trip.trip_id);
+            const times = await this.stDataService.getTimesFromTrip(agencyId, trip.trip_id);
             for (let time of times) {
                 if (time.stop_id === stopId || ++i === times.length) break;
                 stopDistTraveled += this.getDistanceBetweenCoordinates(
@@ -161,7 +174,7 @@ export class TripShapeService {
 
             await filterStops(times.map((time) => time.stop_id).slice(i));
 
-            const shapePts = await this.staticDataService.getShapeById(agencyId, trip.shape_id);
+            const shapePts = await this.stDataService.getShapeById(agencyId, trip.shape_id);
             const nearestPt = await this.getNearestPoint(shapePts, stop, stopDistTraveled);
             if (!nearestPt) return shapes;
             shapes.push(this.buildTripShape(
@@ -183,12 +196,6 @@ export class TripShapeService {
         return tripShapeLayer;
     }
 
-    private deleteRouteShapeLayer(route: string): void {
-        const tripsLayer = this.routeToRouteShapeLayer.get(route);
-        if (!tripsLayer) return;
-        tripsLayer.remove();
-        this.routeToRouteShapeLayer.delete(route);
-    }
 
     async buildTripShapesLayer(routeIds: RouteId[]): Promise<L.GeoJSON> {
         const shapeIds = new Set<string>();
@@ -196,12 +203,12 @@ export class TripShapeService {
         const canvasRenderer = L.canvas({ pane: 'shapeLowOpacity' });
 
         for (let routeId of routeIds) {
-            const trips = await this.staticDataService.getTodayTripsFromRoute(routeId.agencyId, routeId.routeId);
+            const trips = await this.stDataService.getTodayTripsFromRoute(routeId.agencyId, routeId.routeId);
             for (let trip of trips) {
                 if (!shapeIds.has(trip.shape_id)) {
                     shapeIds.add(trip.shape_id);
                     const shapeColor = await this.getShapeColor(routeId.agencyId, routeId.routeId);
-                    const shapePts = await this.staticDataService.getShapeById(routeId.agencyId, trip.shape_id);
+                    const shapePts = await this.stDataService.getShapeById(routeId.agencyId, trip.shape_id);
                     shapeLayer.addLayer(this.buildTripShape(shapePts, shapeColor, canvasRenderer));
                 }
             }
@@ -211,7 +218,7 @@ export class TripShapeService {
     }
 
     private async getShapeColor(agencyId: string, routeId: string): Promise<string> {
-        const route = await this.staticDataService.getRouteById(agencyId, routeId);
+        const route = await this.stDataService.getRouteById(agencyId, routeId);
         return route?.route_color ? `#${route.route_color}` : DEFAULT_SHAPE_COLOR;
     }
 

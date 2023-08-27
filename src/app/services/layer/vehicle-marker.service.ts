@@ -56,11 +56,11 @@ export class VehicleMarkerService {
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
     ): Promise<void> {
         this.resetLayerGroup();
-        await this.addToLayerFromAgencies(
+        await this.addFromAgencies(
             agencyIds, options, clickHandler);
     }
 
-    async addToLayerFromAgencies(
+    async addFromAgencies(
         agencyIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
@@ -77,7 +77,7 @@ export class VehicleMarkerService {
         }
     }
 
-    removeOfLayerFromAgencies(agencyIds: string[]): void {
+    removeFromAgencies(agencyIds: string[]): void {
         agencyIds.forEach((agencyId) => {
             this.layerIdsByAgencyId.get(agencyId)?.forEach((layerId) => 
                 this.layerGroup.removeLayer(layerId));

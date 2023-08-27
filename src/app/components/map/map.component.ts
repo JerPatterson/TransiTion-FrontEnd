@@ -50,12 +50,17 @@ export class MapComponent implements OnInit {
     };
 
     @Input() set routes(routeIds: RouteId[]) {
-        if (!this.map) return;
-        this.filterTripIds = [];
-        this.filterStopIds = [];
-        this.updateRoutes(routeIds).then(() => {
-                if (!this.stopIds.size) this.updateStops();
+        const routeIdsSet = new Set(routeIds.map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
+        const routeIdsAdded = routeIds.filter((routeId) => !this.routeIds.has(`${routeId.agencyId}/${routeId.routeId}`));
+        const routeIdsRemoved = [...this.routeIds]
+            .filter((routeId) => !routeIdsSet.has(routeId))
+            .map((routeId) => {
+                return {
+                    agencyId: routeId.split(PARAM_SEPARATOR)[0],
+                    routeId: routeId.split(PARAM_SEPARATOR)[1],
+                }
             });
+        this.updateRoutes(routeIdsAdded, routeIdsRemoved);
     };
 
     @Input() set stops(stopIds: StopId[]) {
@@ -135,6 +140,7 @@ export class MapComponent implements OnInit {
         this.initMap();
 
         this.vehicleMarkerService.vehicleLayer.addTo(this.map);
+        this.tripShapeService.routeLayer.addTo(this.map);
         setInterval(() => this.updateVehicles(), 30 * ONE_SEC_IN_MS);
     }
     
@@ -161,9 +167,9 @@ export class MapComponent implements OnInit {
         agencyIdsRemoved.forEach((agencyId) => this.agencyIds.delete(agencyId));
         if (!this.map) return;
         if (!this.routeIds.size && !this.filterTripIds.length)
-            await this.vehicleMarkerService.addToLayerFromAgencies(
+            await this.vehicleMarkerService.addFromAgencies(
                 agencyIdsAdded, this.options, this.emitVehicleSelected);
-        this.vehicleMarkerService.removeOfLayerFromAgencies(agencyIdsRemoved);
+        this.vehicleMarkerService.removeFromAgencies(agencyIdsRemoved);
     }
 
 
@@ -216,47 +222,55 @@ export class MapComponent implements OnInit {
     }
 
 
-    private async updateRoutes(routeIds: RouteId[]): Promise<void> {
-        if (!routeIds.length) {
-            this.routeIds.clear();
-            this.tripShapeService.clearRouteShapeLayers();
-        } else if (routeIds.length > this.routeIds.size) {
-            await this.addRouteShapes(routeIds);
-        } else if (routeIds.length < this.routeIds.size) {
-            await this.removeRouteShapes(routeIds);
-        }
-
-        this.tripStopsLayer = undefined;
-        this.stopMarkerService.clearTripStopsLayer();
-        this.tripShapeService.clearTripShapeLayer();
+    private async updateRoutes(routeIdsAdded: RouteId[], routeIdsRemoved: RouteId[]): Promise<void> {
+        routeIdsAdded.forEach((routeId) => this.routeIds.add(`${routeId.agencyId}/${routeId.routeId}`));
+        routeIdsRemoved.forEach((routeId) => this.routeIds.delete(`${routeId.agencyId}/${routeId.routeId}`));
+        if (!this.map) return;
+        this.tripShapeService.addRoutes(routeIdsAdded);
+        this.tripShapeService.removeRoutes(routeIdsRemoved);
     }
+
+    // private async updateRoutes(routeIds: RouteId[]): Promise<void> {
+    //     if (!routeIds.length) {
+    //         this.routeIds.clear();
+    //         this.tripShapeService.clearRouteShapeLayers();
+    //     } else if (routeIds.length > this.routeIds.size) {
+    //         await this.addRouteShapes(routeIds);
+    //     } else if (routeIds.length < this.routeIds.size) {
+    //         await this.removeRouteShapes(routeIds);
+    //     }
+
+    //     this.tripStopsLayer = undefined;
+    //     this.stopMarkerService.clearTripStopsLayer();
+    //     this.tripShapeService.clearTripShapeLayer();
+    // }
 
     private async addTripShape(agencyId: string, tripId: string, color: string): Promise<void> {
         this.tripShapeService.hideStopShapeRemainingLayer();
         (await this.tripShapeService.createTripShapeLayer(agencyId, tripId, color)).addTo(this.map);
     }
 
-    private async addRouteShapes(routeIds: RouteId[]): Promise<void> {
-        routeIds.forEach((routeId) => {
-            this.routeIds.add(`${routeId.agencyId}/${routeId.routeId}`);
-        });
-        (await this.tripShapeService.addRouteShapeLayer(routeIds)).addTo(this.map);
-    }
+    // private async addRouteShapes(routeIds: RouteId[]): Promise<void> {
+    //     routeIds.forEach((routeId) => {
+    //         this.routeIds.add(`${routeId.agencyId}/${routeId.routeId}`);
+    //     });
+    //     await this.tripShapeService.addRouteShapeLayer(routeIds);
+    // }
 
-    private async removeRouteShapes(routeIds: RouteId[]): Promise<void> {
-        const routes = new Set(routeIds
-            .map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
-        const routesToDelete = [...this.routeIds].filter((route) => !routes.has(route));
-        routesToDelete.forEach((route) => this.routeIds.delete(route));
-        await this.tripShapeService.removeRouteShapeLayer(
-            [...this.routeIds].map((route) => {
-                return {
-                    agencyId: route.split(PARAM_SEPARATOR)[0],
-                    routeId: route.split(PARAM_SEPARATOR)[1],
-                }
-            })
-        );
-    }
+    // private async removeRouteShapes(routeIds: RouteId[]): Promise<void> {
+    //     const routes = new Set(routeIds
+    //         .map((routeId) => `${routeId.agencyId}/${routeId.routeId}`));
+    //     const routesToDelete = [...this.routeIds].filter((route) => !routes.has(route));
+    //     routesToDelete.forEach((route) => this.routeIds.delete(route));
+    //     await this.tripShapeService.removeRouteShapeLayer(
+    //         [...this.routeIds].map((route) => {
+    //             return {
+    //                 agencyId: route.split(PARAM_SEPARATOR)[0],
+    //                 routeId: route.split(PARAM_SEPARATOR)[1],
+    //             }
+    //         })
+    //     );
+    // }
 
 
     private async updateStops(stopIds: StopId[] = []) {
