@@ -8,6 +8,7 @@ import { StaticDataService } from 'src/app/services/static/static-data.service';
 import { RouteType } from '@app/utils/enums';
 import { AGENCY_TO_STYLE } from '@app/utils/styles';
 import { 
+    AGENCY_AREA_CENTER_ZOOM,
     BASE_NUMBER_HEXADECIMAL,
     DEFAULT_BACKGROUND_COLOR,
     DEFAULT_ICON_COLOR,
@@ -63,13 +64,25 @@ export class VehicleMarkerService {
         agencyIds: string[],
         options: MapRenderingOptions,
         clickHandler: (v: VehicleId, rId: string, tId: string) => void,
+        centerMapFunction?: (lat: number, lon: number, zoom?: number) => void,
     ): Promise<void> {
+        if (!agencyIds.length) return;
+        if (agencyIds.length === 1 && centerMapFunction) {
+            const agency = await this.stDataService.getAgencyById(agencyIds[0]);
+            centerMapFunction(
+                agency.min_lat + (agency.max_lat - agency.min_lat) / 2,
+                agency.min_lon + (agency.max_lon - agency.min_lon) / 2,
+                AGENCY_AREA_CENTER_ZOOM
+            );
+        }
+
         if (options.mergeAllVehicleClusters) {
             this.layerGroup.addLayer(
                 await this.buildLayerFromAgencies(agencyIds, options, clickHandler));
         } else {
             agencyIds.forEach(async (agencyId) => {
-                const layer = await this.buildLayerFromAgencies([agencyId], options, clickHandler);
+                const layer = await this.buildLayerFromAgencies(
+                    [agencyId], options, clickHandler);
                 this.layerGroup.addLayer(layer);
                 this.addLayerIdToAgency(agencyId, this.layerGroup.getLayerId(layer));
             });

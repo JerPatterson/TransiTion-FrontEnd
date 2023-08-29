@@ -9,6 +9,10 @@ export interface AgencyDto {
   agency_phone?: string;
   agency_fare_url?: string;
   agency_email?: string;
+  min_lat: number;
+  min_lon: number;
+  max_lat: number;
+  max_lon: number;
 }
 
 export interface StopDto {

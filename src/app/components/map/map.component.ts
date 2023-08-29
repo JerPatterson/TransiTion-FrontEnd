@@ -20,8 +20,8 @@ import { StopMarkerService } from '@app/services/layer/stop-marker.service';
     styleUrls: ['./map.component.css']
 })
 export class MapComponent implements OnInit {
-    @Input() lat: number = 45.6;
-    @Input() lon: number = -73.75;
+    @Input() lat: number = 45.504809476468836;
+    @Input() lon: number = -73.61317999214221;
 
     @Input() set darkModeEnable(value: boolean) {
         this.options.darkModeEnable = value;
@@ -143,27 +143,29 @@ export class MapComponent implements OnInit {
 
     private readonly emitStopSelected = (stopId: StopId) => {
         this.newStopSelected.emit(stopId);
-        if (!this.routeIds.size)
+        if (!this.isFilteringOnRoutes)
             this.addTripsFromStop(stopId.agencyId, stopId.stopId);
     };
-
-    private readonly centerMapOnLocation = (lat: number, lon: number) => {
-        this.map.setView([lat, lon], LOCATION_CENTER_ZOOM);
-    };
-
-    private filterVehiclesFromTrips = async (_: string[]) => {}
-    private filterStopsFromTrips = async (_: string[]) => {}
 
     private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
         this.newVehicleSelected.emit(vehicleId);
         this.addTrip(vehicleId.agencyId, tripId, color);
     };
 
+    private readonly centerMapOnLocation = (lat: number, lon: number, zoom: number = LOCATION_CENTER_ZOOM) => {
+        this.map.setView([lat, lon], zoom);
+    };
+
+    private filterVehiclesFromTrips = async (_: string[]) => {}
+    private filterStopsFromTrips = async (_: string[]) => {}
+
+
     constructor(
         private vehicleMarkerService: VehicleMarkerService,
         private stopMarkerService: StopMarkerService,
         private tripShapeService: TripShapeService,
     ) {}
+
 
     ngOnInit(): void {
         this.initMap();
@@ -215,7 +217,7 @@ export class MapComponent implements OnInit {
             } else {
                 this.vehicleMarkerService.removeAgencies(agencyIdsRemoved);
                 await this.vehicleMarkerService.addAgencies(
-                    agencyIdsAdded, this.options, this.emitVehicleSelected);
+                    agencyIdsAdded, this.options, this.emitVehicleSelected, this.centerMapOnLocation);
             }
         }
 
