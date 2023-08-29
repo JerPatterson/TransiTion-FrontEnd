@@ -239,7 +239,7 @@ export class StopMarkerService {
                     fillOpacity: 1,
                     fillColor: "#ffffff",
                     interactive: interactive,
-                    pane: 'marker',
+                    pane: 'circleMarker',
                 },
             ).addEventListener('click', listenerFunction);
     }
@@ -253,7 +253,7 @@ export class StopMarkerService {
                     fillOpacity: 1,
                     fillColor: "#ffffff",
                     interactive: true,
-                    pane: 'marker',
+                    pane: 'circleMarker',
                 }
             ).bindPopup(`${stop.stop_name} [${stop.stop_code}]`);
     }
@@ -336,7 +336,7 @@ export class StopMarkerService {
                 return `
                     <svg
                         version="1.0"
-                        height="28" x="0" y="25"
+                        height="20" x="0" y="30"
                         xmlns="http://www.w3.org/2000/svg"
                         xmlns:xlink="http://www.w3.org/1999/xlink"
                         viewBox="0 0 560.000000 446.000000"

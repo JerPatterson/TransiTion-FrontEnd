@@ -172,6 +172,7 @@ export class MapComponent implements OnInit {
         this.tripShapeService.stopRemainingLayer.addTo(this.map);
         this.tripShapeService.routeLayer.addTo(this.map);
         this.stopMarkerService.stopTripsLayer.addTo(this.map);
+        this.stopMarkerService.selectedStopLayer.addTo(this.map);
         this.vehicleMarkerService.vehicleLayer.addTo(this.map);
         setInterval(() => this.updateVehicles(), 30 * ONE_SEC_IN_MS);
     }
@@ -212,6 +213,8 @@ export class MapComponent implements OnInit {
             if (this.options.mergeAllVehicleClusters) {
                 await this.updateVehicles();
             } else {
+                console.log('here');
+                console.log(agencyIdsAdded, agencyIdsRemoved);
                 this.vehicleMarkerService.removeAgencies(agencyIdsRemoved);
                 await this.vehicleMarkerService.addAgencies(
                     agencyIdsAdded, this.options, this.emitVehicleSelected);
@@ -331,7 +334,10 @@ export class MapComponent implements OnInit {
 
     private setMapPanes() {
         this.map.createPane('marker');
-        (this.map.getPane('marker') as HTMLElement).style.zIndex = '398';
+        (this.map.getPane('marker') as HTMLElement).style.zIndex = '399';
+
+        this.map.createPane('circleMarker');
+        (this.map.getPane('circleMarker') as HTMLElement).style.zIndex = '398';
 
         this.map.createPane('shapeHighOpacity');
         (this.map.getPane('shapeHighOpacity') as HTMLElement).style.zIndex = '397';
