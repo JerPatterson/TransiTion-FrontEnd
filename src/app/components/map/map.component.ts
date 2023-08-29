@@ -213,8 +213,6 @@ export class MapComponent implements OnInit {
             if (this.options.mergeAllVehicleClusters) {
                 await this.updateVehicles();
             } else {
-                console.log('here');
-                console.log(agencyIdsAdded, agencyIdsRemoved);
                 this.vehicleMarkerService.removeAgencies(agencyIdsRemoved);
                 await this.vehicleMarkerService.addAgencies(
                     agencyIdsAdded, this.options, this.emitVehicleSelected);

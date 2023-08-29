@@ -26,6 +26,10 @@ export class RouteListComponent {
         );
     };
 
+    @Input() set clearAll(length: number) {
+        if (!length) this.routeIdsSelected.clear();
+    };
+
     @Output() addRouteId = new EventEmitter<RouteId>();
     @Output() removeRouteId = new EventEmitter<RouteId>();
 

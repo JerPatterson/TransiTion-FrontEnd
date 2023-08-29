@@ -12,6 +12,7 @@ export class AgencyListComponent implements OnInit {
     agencyIds = new Set<string>();
 
     @Input() selections: string[] = [];
+
     @Input() set selectAll(option: boolean) {
         const agencyIdsToEmit: string[] = [];
         if (option) {
@@ -31,6 +32,11 @@ export class AgencyListComponent implements OnInit {
             this.removeAgencyIds.emit(agencyIdsToEmit);
         }
     }
+
+    @Input() set clearAll(length: number) {
+        if (!length) this.agencyIds.clear();
+    }
+
 
     @Output() addAgencyIds = new EventEmitter<string[]>();
     @Output() removeAgencyIds = new EventEmitter<string[]>();

@@ -28,6 +28,7 @@
         [ngClass]="this.componentDisplayed === 1 ? '' : 'hidden'"
         [selections]="this.selections.agencies"
         [selectAll]="this.selectOptions.allAgencies"
+        [clearAll]="this.selections.agencies.length"
         (addAgencyIds)="this.addAgencyIds($event)"
         (removeAgencyIds)="this.removeAgencyIds($event)">
     </app-agency-list>
@@ -36,6 +37,7 @@
         [ngClass]="this.componentDisplayed === 2 ? '' : 'hidden'"
         [agencyIds]="this.selections.agencies"
         [selections]="this.selections.routes"
+        [clearAll]="this.selections.routes.length"
         (addRouteId)="this.addRouteId($event)"
         (removeRouteId)="this.removeRouteId($event)">
     </app-route-list>
@@ -45,25 +47,34 @@
         [agencyIds]="this.selections.agencies"
         [routeIds]="this.selections.routes"
         [selections]="this.selections.stops"
+        [clearAll]="this.selections.stops.length"
         (addStopId)="this.addStopId($event)"
         (removeStopId)="this.removeStopId($event)">
     </app-stop-list>
 </div>
 
-<div
-    class="option-container"
-    *ngIf="this.componentDisplayed === 1 || this.componentDisplayed === 2">
+<div class="option-container">
     <button
-        *ngIf="componentDisplayed === 1"
-        [ngClass]="this.selectOptions.allAgencies ? 'selected' : ''"
+        *ngIf="this.componentDisplayed === 1 && !this.selectOptions.allAgencies"
         (click)="this.changeSelectAllAgenciesOption()">
         <svg class="option-icon">
             <use xlink:href='./assets/icons/select-all.svg#select-all' href="./assets/icons/select-all.svg#select-all"></use>
         </svg>
-        <span
-            class="option-name"
-            *ngIf="!this.selectOptions.allAgencies">
+        <span class="option-name">
             Tout sélectionner
+        </span>
+    </button>
+    <button
+        *ngIf="
+            this.componentDisplayed === 1 && this.selections.agencies.length ||
+            this.componentDisplayed === 2 && this.selections.routes.length ||
+            this.componentDisplayed === 3 && this.selections.stops.length"
+        (click)="this.clearSelections()">
+        <svg class="option-icon">
+            <use xlink:href='./assets/icons/unselect-all.svg#unselect-all' href="./assets/icons/unselect-all.svg#unselect-all"></use>
+        </svg>
+        <span class="option-name">
+            Effacer la sélection
         </span>
     </button>
 </div>

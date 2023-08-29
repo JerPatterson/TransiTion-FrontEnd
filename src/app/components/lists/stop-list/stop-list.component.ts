@@ -41,6 +41,11 @@ export class StopListComponent {
         );
     };
 
+    @Input() set clearAll(length: number) {
+        if (!length) this.stopIdsSelected.clear();
+    };
+
+
     @Output() removeStopId = new EventEmitter<StopId>();
     @Output() addStopId = new EventEmitter<StopId>();
 

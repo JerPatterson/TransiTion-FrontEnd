@@ -52,6 +52,23 @@ export class MainPageComponent implements AfterContentChecked {
         this.componentDisplayed = componentToDisplay;
     }
 
+    clearSelections() {
+        switch (this.componentDisplayed) {
+            case 1:
+                this.selections.agencies = [];
+                this.selections.routes = [];
+                this.selectOptions.allAgencies = false;
+                break;
+            case 2:
+                this.selections.routes = [];
+                this.selections.stops = [];
+                break;
+            case 3: 
+                this.selections.stops = [];
+                break;
+        }
+    }
+
 
     addAgencyIds(agencyIds: string[]) {
         this.selections.agencies = this.selections.agencies.concat(agencyIds);
