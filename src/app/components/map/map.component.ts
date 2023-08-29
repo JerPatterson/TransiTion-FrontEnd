@@ -275,18 +275,6 @@ export class MapComponent implements OnInit {
             this.map.setZoom(this.map.getZoom());
     }
 
-
-    private async addVehiclesFromTrips(agencyId: string, tripIds: string[]) {
-        await this.vehicleMarkerService.updateLayerFromTrips(
-            agencyId, tripIds, this.options, this.emitVehicleSelected);
-    }
-
-    private async addTrip(agencyId: string, tripId: string, color: string): Promise<void> {
-        this.tripShapeService.hideStopRemainingLayer();
-        await this.tripShapeService.setTripLayer(agencyId, tripId, color);
-        await this.stopMarkerService.setTripLayer(agencyId, tripId, color);
-    }
-
     private async addLayerIfHigherZoomLevel(layer: L.LayerGroup | undefined, comparisonZoomLevel: number) {
         if (!layer) return;
         if (!this.map.hasLayer(layer) && this.map.getZoom() > comparisonZoomLevel) {
@@ -297,10 +285,17 @@ export class MapComponent implements OnInit {
     }
 
 
+    private async addTrip(agencyId: string, tripId: string, color: string): Promise<void> {
+        this.tripShapeService.hideStopRemainingLayer();
+        await this.tripShapeService.setTripLayer(agencyId, tripId, color);
+        await this.stopMarkerService.setTripLayer(agencyId, tripId, color);
+    }
+
     private async addTripsFromStop(agencyId: string, stopId: string): Promise<void> {
         this.filterVehiclesFromTrips = async (tripIds: string[]) => {
             this.filterTripIds = tripIds;
-            await this.addVehiclesFromTrips(agencyId, tripIds);
+            await this.vehicleMarkerService.updateLayerFromTrips(
+                agencyId, tripIds, this.options, this.emitVehicleSelected);
         };
 
         this.filterStopsFromTrips = async (stopIds: string[]) => {
