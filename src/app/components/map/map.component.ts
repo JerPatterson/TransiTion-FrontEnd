@@ -82,21 +82,28 @@ export class MapComponent implements OnInit {
         if (!this.map) return;
         if (this.vehicleId) {
             this.stopMarkerService.hideStopLayer();
+            this.stopMarkerService.hideStopTripsLayer();
         } else {
-            this.stopMarkerService.clearTripLayer();
             this.tripShapeService.clearTripLayer();
+            this.tripShapeService.stopRemainingLayer.addTo(this.map);
+            this.stopMarkerService.clearTripLayer();
             if (!this.stopIds.size) this.updateStops();
         }
     }
 
     @Input() set stop(value: StopId | null | undefined) {
-        if (value || !this.map) return;
-        this.filterTripIds = [];
-        this.filterStopIds = [];
-        this.updateVehicles()
-            .then(() => {
-                if (!this.stopIds.size) this.updateStops();
-            });
+        this.stopId = value;
+        if (!this.map) return;
+        if (this.stopId) {
+            this.stopMarkerService.hideStopLayer();
+        } else {
+            this.filterTripIds = [];
+            this.filterStopIds = [];
+            this.tripShapeService.clearStopLayers();
+            this.stopMarkerService.clearStopTripsLayer();
+            this.updateVehicles()
+                .then(() => this.updateStops());
+        }
     }
 
     @Output() newVehicleSelected = new EventEmitter<VehicleId>();
@@ -108,6 +115,7 @@ export class MapComponent implements OnInit {
     private routeIds = new Set<string>();
     private stopIds = new Set<string>();
 
+    private stopId?: StopId | null;
     private vehicleId?: VehicleId | null;
     private filterTripIds: string[] = [];
     private filterStopIds: string[] = [];
@@ -148,8 +156,7 @@ export class MapComponent implements OnInit {
 
     private readonly emitVehicleSelected = (vehicleId: VehicleId, tripId: string, color: string) => {
         this.newVehicleSelected.emit(vehicleId);
-        this.addTripShape(vehicleId.agencyId, tripId, color);
-        this.addTripStops(vehicleId.agencyId, tripId, color);
+        this.addTrip(vehicleId.agencyId, tripId, color);
     };
 
     constructor(
@@ -160,13 +167,11 @@ export class MapComponent implements OnInit {
 
     ngOnInit(): void {
         this.initMap();
-
         this.tripShapeService.tripLayer.addTo(this.map);
         this.tripShapeService.stopLayer.addTo(this.map);
         this.tripShapeService.stopRemainingLayer.addTo(this.map);
         this.tripShapeService.routeLayer.addTo(this.map);
-
-        this.stopMarkerService.selectedStopLayer.addTo(this.map);
+        this.stopMarkerService.stopTripsLayer.addTo(this.map);
         this.vehicleMarkerService.vehicleLayer.addTo(this.map);
         setInterval(() => this.updateVehicles(), 30 * ONE_SEC_IN_MS);
     }
@@ -182,10 +187,18 @@ export class MapComponent implements OnInit {
         this.setBaseLayerControl();
         this.setMapPanes();
 
-        this.map.on('zoomend', () => {
-            this.addLayerIfHigherZoomLevel(this.stopMarkerService.stopLayer, SHOW_STOP_ABOVE_ZOOM);
-            this.addLayerIfHigherZoomLevel(this.stopMarkerService.tripLayer, SHOW_STOP_ABOVE_ZOOM);
-        });
+        this.map.on('zoomend', () => this.handleZoomEndEvent());
+    }
+
+
+    private async handleZoomEndEvent() {
+        if (!this.vehicleId && !this.stopId) {
+            await this.addLayerIfHigherZoomLevel(this.stopMarkerService.stopLayer, SHOW_STOP_ABOVE_ZOOM);
+        } else if (!this.vehicleId) {
+            await this.addLayerIfHigherZoomLevel(this.stopMarkerService.stopTripsLayer, SHOW_STOP_ABOVE_ZOOM)
+        } else if (this.vehicleId) {
+            await this.addLayerIfHigherZoomLevel(this.stopMarkerService.tripLayer, SHOW_STOP_ABOVE_ZOOM);
+        }
     }
 
 
@@ -259,14 +272,16 @@ export class MapComponent implements OnInit {
             this.map.setZoom(this.map.getZoom());
     }
 
+
     private async addVehiclesFromTrips(agencyId: string, tripIds: string[]) {
         await this.vehicleMarkerService.updateLayerFromTrips(
             agencyId, tripIds, this.options, this.emitVehicleSelected);
     }
 
-    private async addTripStops(agencyId: string, tripId: string, color: string): Promise<void> {
-        this.stopMarkerService.clearTripLayer();
-        await this.stopMarkerService.addTrip(agencyId, tripId, color);
+    private async addTrip(agencyId: string, tripId: string, color: string): Promise<void> {
+        this.tripShapeService.hideStopRemainingLayer();
+        await this.tripShapeService.setTripLayer(agencyId, tripId, color);
+        await this.stopMarkerService.setTripLayer(agencyId, tripId, color);
     }
 
     private async addLayerIfHigherZoomLevel(layer: L.LayerGroup | undefined, comparisonZoomLevel: number) {
@@ -278,17 +293,6 @@ export class MapComponent implements OnInit {
         }
     }
 
-    private async addTripShape(agencyId: string, tripId: string, color: string): Promise<void> {
-        this.tripShapeService.hideStopRemainingLayer();
-        await this.tripShapeService.setTripLayer(agencyId, tripId, color);
-    }
-
-
-    private async addStops(agencyId: string, stopIds: string[]): Promise<void> {
-        await this.stopMarkerService.addStops(
-            stopIds.map((stopId) => { return { agencyId, stopId } }), this.emitStopSelected);
-    }
-
 
     private async addTripsFromStop(agencyId: string, stopId: string): Promise<void> {
         this.filterVehiclesFromTrips = async (tripIds: string[]) => {
@@ -298,7 +302,9 @@ export class MapComponent implements OnInit {
 
         this.filterStopsFromTrips = async (stopIds: string[]) => {
             this.filterStopIds = this.filterStopIds.concat(stopIds);
-            await this.addStops(agencyId, stopIds);
+            this.stopMarkerService.hideStopLayer();
+            await this.stopMarkerService.addStops(
+                agencyId, stopIds, this.emitStopSelected);
         };
 
         await this.tripShapeService.setStopLayer(

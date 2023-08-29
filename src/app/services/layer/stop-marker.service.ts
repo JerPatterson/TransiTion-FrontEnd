@@ -12,6 +12,7 @@ import { DEFAULT_BACKGROUND_COLOR, PARAM_SEPARATOR, STOP_ANCHOR_SHIFT, STOP_ICON
 export class StopMarkerService {
     private stopLayerGroup = new L.LayerGroup();
     private tripLayerGroup = new L.LayerGroup();
+    private stopTripsLayerGroup = new L.LayerGroup();
     private selectedStopLayerGroup = new L.LayerGroup();
 
     private layerIdsByAgencyId = new Map<string, number[]>();
@@ -25,7 +26,11 @@ export class StopMarkerService {
     }
 
     get tripLayer() {
-        return this.stopLayerGroup;
+        return this.tripLayerGroup;
+    }
+
+    get stopTripsLayer() {
+        return this.stopTripsLayerGroup;
     }
 
     get selectedStopLayer() {
@@ -40,6 +45,10 @@ export class StopMarkerService {
         this.stopLayerGroup.remove();
     }
 
+    hideStopTripsLayer(): void {
+        this.stopTripsLayerGroup.remove();
+    }
+
     clearStopLayer(): void {
         this.layerIdsByAgencyId.clear();
         this.layerIdsByRouteId.clear();
@@ -48,6 +57,10 @@ export class StopMarkerService {
 
     clearTripLayer(): void {
         this.tripLayerGroup.clearLayers();
+    }
+
+    clearStopTripsLayer(): void {
+        this.stopTripsLayerGroup.clearLayers();
     }
 
     removeAgencies(agencyIds: string[]): void {
@@ -112,22 +125,30 @@ export class StopMarkerService {
         centerMapFunction?: (lat: number, lon: number) => void,
     ): Promise<void> {
         if (!stopIds.length) return;
-        await this.centerMapOnStop(stopIds[stopIds.length - 1], centerMapFunction)
+        await this.centerMapOnStop(stopIds[stopIds.length - 1], centerMapFunction);
         await this.buildSelectionsLayer(stopIds, clickHandler);
     }
 
     async addStops(
-        stopIds: StopId[],
+        agencyId: string,
+        stopIds: string[],
         clickHandler?: (s: StopId) => void,
-        centerMapFunction?: (lat: number, lon: number) => void,
     ): Promise<void> {
         if (!stopIds.length) return;
-        await this.centerMapOnStop(stopIds[Math.floor(stopIds.length / 2)], centerMapFunction)
-        await this.buildSelectionsLayer(stopIds, clickHandler);
+        let style = AGENCY_TO_STYLE.get(agencyId);
+        const color = style ? style.backgroundColor : DEFAULT_BACKGROUND_COLOR
+        const stops = await this.staticDataService.getStopByIds(agencyId, stopIds);
+        await Promise.all(stops.map(async (stop) => {
+            this.stopTripsLayerGroup.addLayer(await this.buildCircleMarker(agencyId, stop, clickHandler, color));
+        }));
     }
 
-    async addTrip(agencyId: string, tripId: string, color: string): Promise<void> {
-        await this.buildTripLayer(agencyId, tripId, color);
+    async setTripLayer(agencyId: string, tripId: string, color: string): Promise<void> {
+        this.clearTripLayer();
+        const stops = await this.staticDataService.getStopsFromTrip(agencyId, tripId);
+        stops.map((stop) => {
+            this.tripLayerGroup.addLayer(this.buildTripCircleMarker(stop, color));
+        });
     }
 
 
@@ -186,14 +207,6 @@ export class StopMarkerService {
                 stopIdsFromAgency = [];
             }
         }
-    }
-
-    private async buildTripLayer(agencyId: string, tripId: string, color: string): Promise<void> {
-        const stops = await this.staticDataService.getStopsFromTrip(agencyId, tripId);
-        await Promise.all(stops.map((stop) => {
-            const marker = this.buildTripCircleMarker(stop, color);
-            this.tripLayerGroup.addLayer(marker);
-        }));
     }
 
     private async centerMapOnStop(
